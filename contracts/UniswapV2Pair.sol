@@ -18,7 +18,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
 
     // TODO: change to the actual address of the TokenLibrary contract
-    TokenLibrary public tokenLib;
+    TokenLibrary public tokenLib = TokenLibrary(address(0x5FbDB2315678afecb367f032d93F642f64180aa3));
     address public lpToken;
 
     address public factory;
