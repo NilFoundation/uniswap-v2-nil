@@ -1,14 +1,15 @@
 import chai, { expect } from 'chai'
 import { Contract } from 'ethers'
-import { expandTo18Decimals, mineBlock, encodePrice } from './shared/utilities'
+// import { , mineBlock, encodePrice } from './shared/utilities'
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers"
 import { deploy } from './shared/fixtures';
-import { TokenLibrary, UniswapV2Factory, UniswapV2Factory__factory } from '../typechain-types';
+import { TokenLibrary, UniswapV2Factory, UniswapV2Factory__factory, UniswapV2Pair } from '../typechain-types';
 import { time } from '@nomicfoundation/hardhat-toolbox/network-helpers';
 
-const MINIMUM_LIQUIDITY = ethers.parseEther("1000");
+const MINIMUM_LIQUIDITY = 1000n;
+const AddressZero = ethers.ZeroAddress;
 
 
 describe('UniswapV2Pair', () => {
@@ -17,10 +18,12 @@ describe('UniswapV2Pair', () => {
   let factory: UniswapV2Factory;
   let token0: string;
   let token1: string;
-  let pairAddress: string;
+
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
 
+  let pair: UniswapV2Pair;
+  let pairTokenAddress: string;
 
   async function deploy() {
     const [alice, bob] = await ethers.getSigners();
@@ -29,7 +32,7 @@ describe('UniswapV2Pair', () => {
     const TokenLibrary = await ethers.getContractFactory("TokenLibrary");
     tokenContract = await TokenLibrary.deploy();
 
-    const blk = await time.latestBlock();
+    let blk = await time.latestBlock();
 
     await tokenContract.newToken(
       "TestToken0",
@@ -59,43 +62,50 @@ describe('UniswapV2Pair', () => {
     await factory.createPair(token0, token1);
     const pairCreatedFilter = factory.filters.PairCreated;
 
-    events = await tokenContract.queryFilter(pairCreatedFilter, 'latest');
-    console.log(events)
+    blk = await time.latestBlock();
+    events = await factory.queryFilter(pairCreatedFilter, blk);
+    const pairAddress = events[0].args?.[2]
+
+    pair = await ethers.getContractAt("UniswapV2Pair", pairAddress);
 
     events = await tokenContract.queryFilter(tokenCreatedFilter, blk);
-    pairAddress = events[0].args[0];
-
+    pairTokenAddress = events[0].args?.[0];
   }
 
   beforeEach(async () => {
-    const [alice, bob] = await ethers.getSigners();
+    [alice, bob] = await ethers.getSigners();
     await loadFixture(deploy);
   })
 
   it('mint', async () => {
-    // const token0Amount = expandTo18Decimals(1)
-    // const token1Amount = expandTo18Decimals(4)
-    // await token0.transfer(pair.address, token0Amount)
-    // await token1.transfer(pair.address, token1Amount)
+    const token0Amount = ethers.parseEther('1');
+    const token1Amount = ethers.parseEther('4');
+    await tokenContract.transfer(token0, await pair.getAddress(), token0Amount)
+    await tokenContract.transfer(token1, await pair.getAddress(), token1Amount)
 
-    // const expectedLiquidity = expandTo18Decimals(2)
-    // await expect(pair.mint(wallet.address, overrides))
-    //   .to.emit(pair, 'Transfer')
-    //   .withArgs(AddressZero, AddressZero, MINIMUM_LIQUIDITY)
-    //   .to.emit(pair, 'Transfer')
-    //   .withArgs(AddressZero, wallet.address, expectedLiquidity.sub(MINIMUM_LIQUIDITY))
-    //   .to.emit(pair, 'Sync')
-    //   .withArgs(token0Amount, token1Amount)
-    //   .to.emit(pair, 'Mint')
-    //   .withArgs(wallet.address, token0Amount, token1Amount)
+    const expectedLiquidity = ethers.parseEther('2');
+    const aliceBalanceToken0 = await tokenContract.balanceOf(token0, alice.address);
+    const aliceBalanceToken1 = await tokenContract.balanceOf(token1, alice.address);
 
-    // expect(await pair.totalSupply()).to.eq(expectedLiquidity)
-    // expect(await pair.balanceOf(wallet.address)).to.eq(expectedLiquidity.sub(MINIMUM_LIQUIDITY))
-    // expect(await token0.balanceOf(pair.address)).to.eq(token0Amount)
-    // expect(await token1.balanceOf(pair.address)).to.eq(token1Amount)
-    // const reserves = await pair.getReserves()
-    // expect(reserves[0]).to.eq(token0Amount)
-    // expect(reserves[1]).to.eq(token1Amount)
+    await expect(pair.mint(alice.address))
+      .to.emit(tokenContract, 'Transfer')
+      .withArgs(AddressZero, AddressZero, MINIMUM_LIQUIDITY)
+      .to.emit(tokenContract, 'Transfer')
+      .withArgs(AddressZero, alice.address, expectedLiquidity - (MINIMUM_LIQUIDITY))
+      .to.emit(pair, 'Sync')
+      .withArgs(token1Amount, token0Amount)
+      .to.emit(pair, 'Mint')
+      .withArgs(alice.address, token1Amount, token0Amount)
+
+    const token = await tokenContract.tokens(pairTokenAddress);
+
+    expect((await tokenContract.tokens(pairTokenAddress)).totalSupply).to.eq(expectedLiquidity)
+    expect(await tokenContract.balanceOf(pairTokenAddress, alice.address)).to.eq(expectedLiquidity - (MINIMUM_LIQUIDITY))
+    expect(await tokenContract.balanceOf(token0, await pair.getAddress())).to.eq(token0Amount)
+    expect(await tokenContract.balanceOf(token1, await pair.getAddress())).to.eq(token1Amount)
+    const reserves = await pair.getReserves()
+    expect(reserves[0]).to.eq(token1Amount)
+    expect(reserves[1]).to.eq(token0Amount)
   })
 
   // async function addLiquidity(token0Amount: BigNumber, token1Amount: BigNumber) {

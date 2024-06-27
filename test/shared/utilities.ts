@@ -9,14 +9,15 @@ import {
   toUtf8Bytes,
   solidityPack
 } from 'ethers/utils'
+import { ethers } from 'hardhat'
 
-const PERMIT_TYPEHASH = keccak256(
+const PERMIT_TYPEHASH = ethers.keccak256(
   toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
 )
 
-export function expandTo18Decimals(n: number): BigNumber {
-  return bigNumberify(n).mul(bigNumberify(10).pow(18))
-}
+// export function expandTo18Decimals(n: number): BigNumber {
+//   return bigNumberify(n).mul(bigNumberify(10).pow(18))
+// }
 
 function getDomainSeparator(name: string, tokenAddress: string) {
   return keccak256(
@@ -81,7 +82,7 @@ export async function getApprovalDigest(
 
 export async function mineBlock(provider: Web3Provider, timestamp: number): Promise<void> {
   await new Promise(async (resolve, reject) => {
-    ;(provider._web3Provider.sendAsync as any)(
+    ; (provider._web3Provider.sendAsync as any)(
       { jsonrpc: '2.0', method: 'evm_mine', params: [timestamp] },
       (error: any, result: any): void => {
         if (error) {

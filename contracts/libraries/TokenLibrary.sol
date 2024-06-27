@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.5.16;
 
+import "hardhat/console.sol";
+
 contract TokenLibrary {
     event TokenCreated(
         address adr,
@@ -10,6 +12,9 @@ contract TokenLibrary {
         uint _totalSupply,
         address _minter
     );
+
+    // TODO: add token address
+    event Transfer(address from, address to, uint256 amount);
 
     struct Token {
         string name;
@@ -72,6 +77,16 @@ contract TokenLibrary {
     function _mint(address _token, address _to, uint _amount) internal {
         tokens[_token].balances[_to] += _amount;
         tokens[_token].totalSupply += _amount;
+
+        console.log("\n mint:");
+
+        console.log(address(0));
+        console.log(_to);
+        console.log(_amount);
+
+        console.log("\n");
+
+        emit Transfer(address(0), _to, _amount);
     }
 
     function burn(address _token, uint _amount) public {
@@ -133,5 +148,11 @@ contract TokenLibrary {
         );
         tokens[_token].balances[_from] -= _amount;
         tokens[_token].balances[_to] += _amount;
+
+        console.log(_from);
+        console.log(_to);
+        console.log(_amount);
+
+        emit Transfer(_from, _to, _amount);
     }
 }
