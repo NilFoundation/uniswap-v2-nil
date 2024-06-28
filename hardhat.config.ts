@@ -2,8 +2,18 @@ import { HardhatUserConfig } from "hardhat/config";
 import '@nomicfoundation/hardhat-chai-matchers'
 import '@nomicfoundation/hardhat-ethers'
 import '@typechain/hardhat'
+import type { NilHardhatUserConfig } from "@nilfoundation/hardhat-plugin";
+import "@nilfoundation/hardhat-plugin";
+import "@nomicfoundation/hardhat-ignition-ethers";
+import * as dotenv from "dotenv"
 
-const config: HardhatUserConfig = {
+dotenv.config();
+
+
+const config: NilHardhatUserConfig = {
+  ignition: {
+    requiredConfirmations: 1,
+  },
   solidity: {
     compilers: [{
       version: "0.6.6",
@@ -43,6 +53,13 @@ const config: HardhatUserConfig = {
     }
     ]
   },
+  networks: {
+    nil_cluster: {
+      url: process.env.NIL_RPC_ENDPOINT,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
+  },
+  walletAddress: process.env.WALLET_ADDR,
 };
 
 export default config;
