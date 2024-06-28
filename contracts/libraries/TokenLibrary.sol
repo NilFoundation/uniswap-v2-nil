@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.5.16;
 
-import "hardhat/console.sol";
-
 contract TokenLibrary {
     event TokenCreated(
         address adr,
@@ -89,6 +87,8 @@ contract TokenLibrary {
 
         tokens[_token].balances[msg.sender] -= _amount;
         tokens[_token].totalSupply -= _amount;
+
+        emit Transfer(msg.sender, address(0), _amount);
     }
 
     function newToken(

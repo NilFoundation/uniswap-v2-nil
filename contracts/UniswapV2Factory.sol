@@ -3,8 +3,6 @@ pragma solidity =0.5.16;
 import "./interfaces/IUniswapV2Factory.sol";
 import "./UniswapV2Pair.sol";
 
-import "hardhat/console.sol";
-
 contract UniswapV2Factory is IUniswapV2Factory {
     address public feeTo;
     address public feeToSetter;
@@ -52,7 +50,6 @@ contract UniswapV2Factory is IUniswapV2Factory {
         getPair[token1][token0] = pair; // populate mapping in the reverse direction
         allPairs.push(pair);
 
-        // console.log("test");
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 

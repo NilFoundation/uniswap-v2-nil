@@ -197,10 +197,6 @@ describe('UniswapV2Pair', () => {
 
     await tokenContract.transfer(token1, await pair.getAddress(), swapAmount)
 
-    // await pair.swap(expectedOutputAmount, 0, alice.address, '0x');
-
-
-
     await expect(pair.swap(expectedOutputAmount, 0, alice.address, '0x'))
       .to.emit(tokenContract, 'Transfer')
       .withArgs(await pair.getAddress(), alice.address, expectedOutputAmount)
@@ -222,123 +218,37 @@ describe('UniswapV2Pair', () => {
     expect(await tokenContract.balanceOf(token1, alice.address)).to.eq(totalSupplyToken1 - (token1Amount) - (swapAmount) - totalSupplyToken0 / 2n)
   })
 
-  // it('swap:gas', async () => {
-  //   const token0Amount = expandTo18Decimals(5)
-  //   const token1Amount = expandTo18Decimals(10)
-  //   await addLiquidity(token0Amount, token1Amount)
+  it('burn', async () => {
+    const token0Amount = ethers.parseEther('3')
+    const token1Amount = ethers.parseEther('3')
+    await addLiquidity(token0Amount, token1Amount)
 
-  //   // ensure that setting price{0,1}CumulativeLast for the first time doesn't affect our gas math
-  //   await mineBlock(provider, (await provider.getBlock('latest')).timestamp + 1)
-  //   await pair.sync(overrides)
+    const expectedLiquidity = ethers.parseEther('3')
+    await tokenContract.transfer(pairTokenAddress, await pair.getAddress(), expectedLiquidity - MINIMUM_LIQUIDITY)
 
-  //   const swapAmount = expandTo18Decimals(1)
-  //   const expectedOutputAmount = bigNumberify('453305446940074565')
-  //   await token1.transfer(pair.address, swapAmount)
-  //   await mineBlock(provider, (await provider.getBlock('latest')).timestamp + 1)
-  //   const tx = await pair.swap(expectedOutputAmount, 0, wallet.address, '0x', overrides)
-  //   const receipt = await tx.wait()
-  //   expect(receipt.gasUsed).to.eq(73462)
-  // })
+    await expect(pair.burn(alice.address))
+      .to.emit(tokenContract, 'Transfer')
+      .withArgs(await pair.getAddress(), AddressZero, expectedLiquidity - MINIMUM_LIQUIDITY)
+      .to.emit(tokenContract, 'Transfer')
+      .withArgs(await pair.getAddress(), alice.address, token0Amount - BigInt(1000))
+      .to.emit(tokenContract, 'Transfer')
+      .withArgs(await pair.getAddress(), alice.address, token1Amount - BigInt(1000))
+      .to.emit(pair, 'Sync')
+      .withArgs(1000, 1000)
+      .to.emit(pair, 'Burn')
+      .withArgs(alice.address, token0Amount - BigInt(1000), token1Amount - BigInt(1000), alice.address)
 
-  // it('burn', async () => {
-  //   const token0Amount = expandTo18Decimals(3)
-  //   const token1Amount = expandTo18Decimals(3)
-  //   await addLiquidity(token0Amount, token1Amount)
+    expect(await pair.balanceOf(alice.address)).to.eq(0)
+    const totalSupply = (await tokenContract.tokens(pairTokenAddress))[3];
 
-  //   const expectedLiquidity = expandTo18Decimals(3)
-  //   await pair.transfer(pair.address, expectedLiquidity.sub(MINIMUM_LIQUIDITY))
-  //   await expect(pair.burn(wallet.address, overrides))
-  //     .to.emit(pair, 'Transfer')
-  //     .withArgs(pair.address, AddressZero, expectedLiquidity.sub(MINIMUM_LIQUIDITY))
-  //     .to.emit(token0, 'Transfer')
-  //     .withArgs(pair.address, wallet.address, token0Amount.sub(1000))
-  //     .to.emit(token1, 'Transfer')
-  //     .withArgs(pair.address, wallet.address, token1Amount.sub(1000))
-  //     .to.emit(pair, 'Sync')
-  //     .withArgs(1000, 1000)
-  //     .to.emit(pair, 'Burn')
-  //     .withArgs(wallet.address, token0Amount.sub(1000), token1Amount.sub(1000), wallet.address)
+    expect(totalSupply).to.eq(MINIMUM_LIQUIDITY)
+    expect(await tokenContract.balanceOf(token0, await pair.getAddress())).to.eq(1000)
+    expect(await tokenContract.balanceOf(token1, await pair.getAddress())).to.eq(1000)
 
-  //   expect(await pair.balanceOf(wallet.address)).to.eq(0)
-  //   expect(await pair.totalSupply()).to.eq(MINIMUM_LIQUIDITY)
-  //   expect(await token0.balanceOf(pair.address)).to.eq(1000)
-  //   expect(await token1.balanceOf(pair.address)).to.eq(1000)
-  //   const totalSupplyToken0 = await token0.totalSupply()
-  //   const totalSupplyToken1 = await token1.totalSupply()
-  //   expect(await token0.balanceOf(wallet.address)).to.eq(totalSupplyToken0.sub(1000))
-  //   expect(await token1.balanceOf(wallet.address)).to.eq(totalSupplyToken1.sub(1000))
-  // })
+    const totalSupplyToken0 = (await tokenContract.tokens(token0))[3]
+    const totalSupplyToken1 = (await tokenContract.tokens(token1))[3]
 
-  // it('price{0,1}CumulativeLast', async () => {
-  //   const token0Amount = expandTo18Decimals(3)
-  //   const token1Amount = expandTo18Decimals(3)
-  //   await addLiquidity(token0Amount, token1Amount)
-
-  //   const blockTimestamp = (await pair.getReserves())[2]
-  //   await mineBlock(provider, blockTimestamp + 1)
-  //   await pair.sync(overrides)
-
-  //   const initialPrice = encodePrice(token0Amount, token1Amount)
-  //   expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0])
-  //   expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1])
-  //   expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 1)
-
-  //   const swapAmount = expandTo18Decimals(3)
-  //   await token0.transfer(pair.address, swapAmount)
-  //   await mineBlock(provider, blockTimestamp + 10)
-  //   // swap to a new price eagerly instead of syncing
-  //   await pair.swap(0, expandTo18Decimals(1), wallet.address, '0x', overrides) // make the price nice
-
-  //   expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10))
-  //   expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10))
-  //   expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 10)
-
-  //   await mineBlock(provider, blockTimestamp + 20)
-  //   await pair.sync(overrides)
-
-  //   const newPrice = encodePrice(expandTo18Decimals(6), expandTo18Decimals(2))
-  //   expect(await pair.price0CumulativeLast()).to.eq(initialPrice[0].mul(10).add(newPrice[0].mul(10)))
-  //   expect(await pair.price1CumulativeLast()).to.eq(initialPrice[1].mul(10).add(newPrice[1].mul(10)))
-  //   expect((await pair.getReserves())[2]).to.eq(blockTimestamp + 20)
-  // })
-
-  // it('feeTo:off', async () => {
-  //   const token0Amount = expandTo18Decimals(1000)
-  //   const token1Amount = expandTo18Decimals(1000)
-  //   await addLiquidity(token0Amount, token1Amount)
-
-  //   const swapAmount = expandTo18Decimals(1)
-  //   const expectedOutputAmount = bigNumberify('996006981039903216')
-  //   await token1.transfer(pair.address, swapAmount)
-  //   await pair.swap(expectedOutputAmount, 0, wallet.address, '0x', overrides)
-
-  //   const expectedLiquidity = expandTo18Decimals(1000)
-  //   await pair.transfer(pair.address, expectedLiquidity.sub(MINIMUM_LIQUIDITY))
-  //   await pair.burn(wallet.address, overrides)
-  //   expect(await pair.totalSupply()).to.eq(MINIMUM_LIQUIDITY)
-  // })
-
-  // it('feeTo:on', async () => {
-  //   await factory.setFeeTo(other.address)
-
-  //   const token0Amount = expandTo18Decimals(1000)
-  //   const token1Amount = expandTo18Decimals(1000)
-  //   await addLiquidity(token0Amount, token1Amount)
-
-  //   const swapAmount = expandTo18Decimals(1)
-  //   const expectedOutputAmount = bigNumberify('996006981039903216')
-  //   await token1.transfer(pair.address, swapAmount)
-  //   await pair.swap(expectedOutputAmount, 0, wallet.address, '0x', overrides)
-
-  //   const expectedLiquidity = expandTo18Decimals(1000)
-  //   await pair.transfer(pair.address, expectedLiquidity.sub(MINIMUM_LIQUIDITY))
-  //   await pair.burn(wallet.address, overrides)
-  //   expect(await pair.totalSupply()).to.eq(MINIMUM_LIQUIDITY.add('249750499251388'))
-  //   expect(await pair.balanceOf(other.address)).to.eq('249750499251388')
-
-  //   // using 1000 here instead of the symbolic MINIMUM_LIQUIDITY because the amounts only happen to be equal...
-  //   // ...because the initial liquidity amounts were equal
-  //   expect(await token0.balanceOf(pair.address)).to.eq(bigNumberify(1000).add('249501683697445'))
-  //   expect(await token1.balanceOf(pair.address)).to.eq(bigNumberify(1000).add('250000187312969'))
-  // })
+    expect(await tokenContract.balanceOf(token0, alice.address)).to.eq(totalSupplyToken0 - BigInt(1000) - totalSupplyToken0 / 2n)
+    expect(await tokenContract.balanceOf(token1, alice.address)).to.eq(totalSupplyToken1 - BigInt(1000) - totalSupplyToken0 / 2n)
+  })
 })
