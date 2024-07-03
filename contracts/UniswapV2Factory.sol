@@ -18,8 +18,9 @@ contract UniswapV2Factory is IUniswapV2Factory {
         uint
     );
 
-    constructor(address _feeToSetter) public {
+    constructor(address _feeToSetter, address _tokenLib) public {
         feeToSetter = _feeToSetter;
+        tokenLib = _tokenLib;
     }
 
     function allPairsLength() external view returns (uint) {
@@ -45,6 +46,8 @@ contract UniswapV2Factory is IUniswapV2Factory {
             pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
         IUniswapV2Pair(pair).initialize(token0, token1);
+        IUniswapV2Pair(pair).setTokenLib(tokenLib);
+
         getPair[token0][token1] = pair;
         getPair[token1][token0] = pair; // populate mapping in the reverse direction
         allPairs.push(pair);

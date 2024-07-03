@@ -18,9 +18,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     bytes4 private constant SELECTOR =
         bytes4(keccak256(bytes("transfer(address,uint256)")));
 
-    // TODO: change to the actual address of the TokenLibrary contract
-    TokenLibrary public tokenLib =
-        TokenLibrary(address(0x5FbDB2315678afecb367f032d93F642f64180aa3));
+    TokenLibrary public tokenLib;
     address public lpToken;
 
     address public factory;
@@ -87,9 +85,14 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         require(msg.sender == factory, "UniswapV2: FORBIDDEN"); // sufficient check
         token0 = _token0;
         token1 = _token1;
+    }
 
-        (string memory token0Name, , , , ) = tokenLib.tokens(_token0);
-        (string memory token1Name, , , , ) = tokenLib.tokens(_token1);
+    function setTokenLib(address _tokenLib) external {
+        require(msg.sender == factory, "UniswapV2: FORBIDDEN");
+        tokenLib = TokenLibrary(_tokenLib);
+
+        (string memory token0Name, , , , ) = tokenLib.tokens(token0);
+        (string memory token1Name, , , , ) = tokenLib.tokens(token1);
 
         lpToken = tokenLib.newToken(
             string(abi.encodePacked(token0Name, "-", token1Name)),

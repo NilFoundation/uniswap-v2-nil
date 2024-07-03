@@ -54,7 +54,7 @@ describe('UniswapV2Pair', () => {
     token0 = events[1].args[0];
 
     const Factory = await ethers.getContractFactory("UniswapV2Factory");
-    factory = await Factory.deploy(await tokenContract.getAddress(), ethers.ZeroAddress);
+    factory = await Factory.deploy(await tokenContract.getAddress(), await tokenContract.getAddress());
 
     await factory.createPair(token0, token1);
     const pairCreatedFilter = factory.filters.PairCreated;
