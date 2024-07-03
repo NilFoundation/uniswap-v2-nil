@@ -1,16 +1,15 @@
-import { HardhatUserConfig } from "hardhat/config";
 import '@nomicfoundation/hardhat-chai-matchers'
+import "@nomicfoundation/hardhat-ignition-ethers";
 import '@nomicfoundation/hardhat-ethers'
 import '@typechain/hardhat'
-// import type { NilHardhatUserConfig } from "@nilfoundation/hardhat-plugin";
-// import "@nilfoundation/hardhat-plugin";
+import type { NilHardhatUserConfig } from "@nilfoundation/hardhat-plugin";
+import "@nilfoundation/hardhat-plugin";
 import "@nomicfoundation/hardhat-ignition-ethers";
 import * as dotenv from "dotenv"
 
 dotenv.config();
 
-
-const config: HardhatUserConfig = {
+const config: NilHardhatUserConfig = {
   ignition: {
     requiredConfirmations: 1,
   },
