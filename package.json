@@ -1,14 +1,5 @@
 {
-  "name": "hardhat-project",
-  "scripts": {
-    "test": "npx hardhat test --config hardhat.config.testing.ts",
-    "compile": "npx hardhat compile",
-    "clean": "npx hardhat clean",
-    "format": "biome format ./",
-    "lint": "biome check ./",
-    "fix:format": "biome format --write ./",
-    "fix:lint": "biome check --apply ./"
-  },
+  "name": "Uniswap-v2",
   "devDependencies": {
     "@biomejs/biome": "1.8.2",
     "@nomicfoundation/hardhat-ethers": "^3.0.6",
@@ -22,5 +13,11 @@
   "dependencies": {
     "@nilfoundation/hardhat-plugin": "^0.1.0",
     "dotenv": "^16.4.5"
+  },
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test --config hardhat.config.testing.ts",
+    "deploy": "rm -rf ignition/deployments && npx hardhat ignition deploy ./ignition/modules/amm.ts --network nil_cluster",
+    "clean": "rm -rf iginition/deployments"
   }
 }

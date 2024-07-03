@@ -7,7 +7,10 @@ import "@nilfoundation/hardhat-plugin";
 import "@nomicfoundation/hardhat-ignition-ethers";
 import * as dotenv from "dotenv"
 
+import "./tasks/swap";
+
 dotenv.config();
+
 
 const config: NilHardhatUserConfig = {
   ignition: {
