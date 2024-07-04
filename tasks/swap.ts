@@ -71,7 +71,7 @@ task("swap", "Swap token0 to token1")
 		console.log("Adding liquidity...");
 		await tokenLib.transfer(token0, await pair.getAddress(), token0Amount);
 		await tokenLib.transfer(token1, await pair.getAddress(), token1Amount);
-		await pair.mint(signer.address);
+		await pair.mint(hre.ethers.ZeroAddress);
 		console.log("Liqudity added...");
 
 		// const swapAmount = hre.ethers.parseEther("1")
