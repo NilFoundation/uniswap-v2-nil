@@ -14,13 +14,16 @@ interface IUniswapV2Pair {
         address spender
     ) external view returns (uint);
 
-    function approve(address spender, uint value) external returns (bool);
-    function transfer(address to, uint value) external returns (bool);
+    function approve(
+        address spender,
+        uint value
+    ) external payable returns (bool);
+    function transfer(address to, uint value) external payable returns (bool);
     function transferFrom(
         address from,
         address to,
         uint value
-    ) external returns (bool);
+    ) external payable returns (bool);
 
     function DOMAIN_SEPARATOR() external view returns (bytes32);
     function PERMIT_TYPEHASH() external pure returns (bytes32);
@@ -34,7 +37,7 @@ interface IUniswapV2Pair {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external;
+    ) external payable;
 
     event Mint(address indexed sender, uint amount0, uint amount1);
     event Burn(
@@ -65,17 +68,19 @@ interface IUniswapV2Pair {
     function price1CumulativeLast() external view returns (uint);
     function kLast() external view returns (uint);
 
-    function mint(address to) external returns (uint liquidity);
-    function burn(address to) external returns (uint amount0, uint amount1);
+    function mint(address to) external payable returns (uint liquidity);
+    function burn(
+        address to
+    ) external payable returns (uint amount0, uint amount1);
     function swap(
         uint amount0Out,
         uint amount1Out,
         address to,
         bytes calldata data
-    ) external;
-    function skim(address to) external;
-    function sync() external;
+    ) external payable;
+    function skim(address to) external payable;
+    function sync() external payable;
 
-    function initialize(address, address) external;
-    function setTokenLib(address _tokenLib) external;
+    function initialize(address, address) external payable;
+    function setTokenLib(address _tokenLib) external payable;
 }

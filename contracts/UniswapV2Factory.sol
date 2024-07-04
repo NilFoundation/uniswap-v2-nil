@@ -18,7 +18,7 @@ contract UniswapV2Factory is IUniswapV2Factory {
         uint
     );
 
-    constructor(address _feeToSetter, address _tokenLib) public {
+    constructor(address _feeToSetter, address _tokenLib) public payable {
         feeToSetter = _feeToSetter;
         tokenLib = _tokenLib;
     }
@@ -30,7 +30,7 @@ contract UniswapV2Factory is IUniswapV2Factory {
     function createPair(
         address tokenA,
         address tokenB
-    ) external returns (address pair) {
+    ) external payable returns (address pair) {
         require(tokenA != tokenB, "UniswapV2: IDENTICAL(_ADDRESSES");
         (address token0, address token1) = tokenA < tokenB
             ? (tokenA, tokenB)
@@ -55,13 +55,17 @@ contract UniswapV2Factory is IUniswapV2Factory {
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 
-    function setFeeTo(address _feeTo) external {
+    function setFeeTo(address _feeTo) external payable {
         require(msg.sender == feeToSetter, "UniswapV2: FORBIDDEN");
         feeTo = _feeTo;
     }
 
-    function setFeeToSetter(address _feeToSetter) external {
+    function setFeeToSetter(address _feeToSetter) external payable {
         require(msg.sender == feeToSetter, "UniswapV2: FORBIDDEN");
         feeToSetter = _feeToSetter;
+    }
+
+    function getTokenLib() public payable returns (address) {
+        return tokenLib;
     }
 }

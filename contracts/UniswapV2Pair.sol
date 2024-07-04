@@ -55,7 +55,11 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         _blockTimestampLast = blockTimestampLast;
     }
 
-    function _safeTransfer(address _token, address _to, uint _value) private {
+    function _safeTransfer(
+        address _token,
+        address _to,
+        uint _value
+    ) private  {
         tokenLib.transfer(_token, _to, _value);
     }
 
@@ -76,18 +80,18 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     );
     event Sync(uint112 reserve0, uint112 reserve1);
 
-    constructor() public {
+    constructor() public payable {
         factory = msg.sender;
     }
 
     // called once by the factory at time of deployment
-    function initialize(address _token0, address _token1) external {
+    function initialize(address _token0, address _token1) external payable {
         require(msg.sender == factory, "UniswapV2: FORBIDDEN"); // sufficient check
         token0 = _token0;
         token1 = _token1;
     }
 
-    function setTokenLib(address _tokenLib) external {
+    function setTokenLib(address _tokenLib) external payable {
         require(msg.sender == factory, "UniswapV2: FORBIDDEN");
         tokenLib = TokenLibrary(_tokenLib);
 
@@ -109,7 +113,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         uint balance1,
         uint112 _reserve0,
         uint112 _reserve1
-    ) private {
+    ) private  {
         require(
             balance0 <= uint112(-1) && balance1 <= uint112(-1),
             "UniswapV2: OVERFLOW"
@@ -136,7 +140,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     function _mintFee(
         uint112 _reserve0,
         uint112 _reserve1
-    ) private returns (bool feeOn) {
+    ) private  returns (bool feeOn) {
         address feeTo = IUniswapV2Factory(factory).feeTo();
         feeOn = feeTo != address(0);
         uint _kLast = kLast; // gas savings
@@ -157,7 +161,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function mint(address to) external lock returns (uint liquidity) {
+    function mint(address to) external payable lock returns (uint liquidity) {
         (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
         uint balance0 = tokenLib.balanceOf(token0, address(this));
         uint balance1 = tokenLib.balanceOf(token1, address(this));
@@ -186,7 +190,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     // this low-level function should be called from a contract which performs important safety checks
     function burn(
         address to
-    ) external lock returns (uint amount0, uint amount1) {
+    ) external payable lock returns (uint amount0, uint amount1) {
         (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
         address _token0 = token0; // gas savings
         address _token1 = token1; // gas savings
@@ -220,7 +224,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         uint amount1Out,
         address to,
         bytes calldata data
-    ) external lock {
+    ) external payable lock {
         require(
             amount0Out > 0 || amount1Out > 0,
             "UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -282,7 +286,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     }
 
     // force balances to match reserves
-    function skim(address to) external lock {
+    function skim(address to) external payable lock {
         address _token0 = token0; // gas savings
         address _token1 = token1; // gas savings
         _safeTransfer(
@@ -298,7 +302,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     }
 
     // force reserves to match balances
-    function sync() external lock {
+    function sync() external payable lock {
         _update(
             tokenLib.balanceOf(token0, address(this)),
             tokenLib.balanceOf(token1, address(this)),

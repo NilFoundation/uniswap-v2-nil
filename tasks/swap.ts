@@ -1,6 +1,6 @@
 import { task } from "hardhat/config";
 import { time } from "@nomicfoundation/hardhat-network-helpers"
-import { TokenLibrary, UniswapV2Pair } from '../typechain-types';
+import { TokenLibrary, UniswapV2Factory, UniswapV2Pair } from '../typechain-types';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 
 
@@ -11,10 +11,10 @@ task("swap", "Swap token0 to token1")
 
 		const [signer] = await hre.ethers.getSigners();
 
-		const factory = await hre.ethers.getContractAt("UniswapV2Factory", factoryAddress);
+		const factory = await hre.ethers.getContractAt("UniswapV2Factory", factoryAddress) as unknown as UniswapV2Factory;
 
 		console.log(factoryAddress)
-		const tokenLibAddress = await factory.tokenLib();
+		const tokenLibAddress = await factory.getTokenLib();
 		console.log(tokenLibAddress);
 
 		const tokenLib = await hre.ethers.getContractAt("TokenLibrary", tokenLibAddress);
