@@ -36,5 +36,5 @@ npm run deploy
 
 5) Copy the factory address and run the swap command
 ```shell
-npx hardhat swap --network nil_cluster --factory 0x0001cb94933e88FA114910413423E79B4d52116e
+npx hardhat swap --network nil_cluster --factory <factory address>
 ```
