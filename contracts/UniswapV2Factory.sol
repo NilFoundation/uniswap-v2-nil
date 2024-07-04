@@ -45,6 +45,8 @@ contract UniswapV2Factory is IUniswapV2Factory {
         assembly {
             pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
+        // UniswapV2Pair pair = new UniswapV2Pair{salt: salt}();
+
         IUniswapV2Pair(pair).initialize(token0, token1);
         IUniswapV2Pair(pair).setTokenLib(tokenLib);
 
@@ -65,7 +67,7 @@ contract UniswapV2Factory is IUniswapV2Factory {
         feeToSetter = _feeToSetter;
     }
 
-    function getTokenLib() public payable returns (address) {
+    function getTokenLib() public view returns (address) {
         return tokenLib;
     }
 }
