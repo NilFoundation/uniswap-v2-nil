@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.5.16;
+pragma solidity ^0.8.0;
+
+import {NilBase} from "../Nil.sol";
 
 contract TokenLibrary {
     event TokenCreated(
@@ -20,14 +22,39 @@ contract TokenLibrary {
         uint8 decimals;
         uint256 totalSupply;
         address minter;
-        mapping(address => uint) balances;
-        mapping(address => mapping(address => uint256)) allowance;
     }
+
+    mapping(address token => mapping(address => uint)) balances;
+    mapping(address token => mapping(address => mapping(address => uint256))) allowance;
 
     /// @dev mapping(address tokenHash => Token) public tokens;
     mapping(address => Token) public tokens;
 
-    function transfer(address _token, address _to, uint _amount) public {
+    constructor() payable {}
+
+    function getToken(
+        address _token
+    )
+        public
+        payable
+        returns (
+            string memory name,
+            string memory symbol,
+            uint8 decimals,
+            uint256 totalSupply,
+            address minter
+        )
+    {
+        Token memory t = tokens[_token];
+
+        return (t.name, t.symbol, t.decimals, t.totalSupply, t.minter);
+    }
+
+    function transfer(
+        address _token,
+        address _to,
+        uint _amount
+    ) public payable {
         _transferFrom(_token, msg.sender, _to, _amount);
     }
 
@@ -36,56 +63,59 @@ contract TokenLibrary {
         address _from,
         address _to,
         uint _amount
-    ) public {
+    ) public payable {
         require(
-            tokens[_token].allowance[_from][msg.sender] >= _amount,
+            allowance[_token][_from][msg.sender] >= _amount,
             "TokenLib: insufficient allowance"
         );
         _transferFrom(_token, _from, _to, _amount);
     }
 
-    function approve(address _token, address _spender, uint _amount) public {
+    function approve(
+        address _token,
+        address _spender,
+        uint _amount
+    ) public payable {
         require(
-            tokens[_token].balances[msg.sender] >= _amount,
+            balances[_token][msg.sender] >= _amount,
             "TokenLib: amount > balance"
         );
-        tokens[_token].allowance[msg.sender][_spender] = _amount;
-    }
-
-    function allowance(
-        address _token,
-        address _holder,
-        address _spender
-    ) public view returns (uint) {
-        return tokens[_token].allowance[_holder][_spender];
+        allowance[_token][msg.sender][_spender] = _amount;
     }
 
     function balanceOf(
         address _token,
         address _adr
-    ) public view returns (uint) {
-        return tokens[_token].balances[_adr];
+    ) public payable returns (uint) {
+        return balances[_token][_adr];
     }
 
-    function mint(address _token, address _to, uint _amount) public {
+    function getBalance(
+        address _token,
+        address _adr
+    ) public view returns (uint) {
+        return balances[_token][_adr];
+    }
+
+    function mint(address _token, address _to, uint _amount) public payable {
         require(msg.sender == tokens[_token].minter, "TokenLib: not minter");
         _mint(_token, _to, _amount);
     }
 
     function _mint(address _token, address _to, uint _amount) internal {
-        tokens[_token].balances[_to] += _amount;
+        balances[_token][_to] += _amount;
         tokens[_token].totalSupply += _amount;
 
         emit Transfer(address(0), _to, _amount);
     }
 
-    function burn(address _token, uint _amount) public {
+    function burn(address _token, uint _amount) public payable {
         require(
-            tokens[_token].balances[msg.sender] >= _amount,
+            balances[_token][msg.sender] >= _amount,
             "TokenLibrary: not enough balance"
         );
 
-        tokens[_token].balances[msg.sender] -= _amount;
+        balances[_token][msg.sender] -= _amount;
         tokens[_token].totalSupply -= _amount;
 
         emit Transfer(msg.sender, address(0), _amount);
@@ -97,7 +127,7 @@ contract TokenLibrary {
         uint8 _decimals,
         uint _totalSupply,
         address _minter
-    ) public returns (address) {
+    ) public payable returns (address) {
         bytes32 tokenHash = keccak256(abi.encodePacked(_name, _symbol));
 
         address tokenAddress;
@@ -135,11 +165,11 @@ contract TokenLibrary {
         uint _amount
     ) internal {
         require(
-            tokens[_token].balances[_from] >= _amount,
+            balances[_token][_from] >= _amount,
             "TokenLib: insufficient balance"
         );
-        tokens[_token].balances[_from] -= _amount;
-        tokens[_token].balances[_to] += _amount;
+        balances[_token][_from] -= _amount;
+        balances[_token][_to] += _amount;
 
         emit Transfer(_from, _to, _amount);
     }

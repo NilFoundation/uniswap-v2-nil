@@ -5,18 +5,13 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 
 task("swap", "Swap token0 to token1")
-	.addParam("factory", "factory contract")
+	.addParam("pair", "pair contract")
+	.addParam("lib", "lib contract")
 	.setAction(async (taskArgs, hre) => {
-		const factoryAddress = taskArgs.factory;
+		const walletAddress = "0x00016600EAb745CaFEDaa8961cC8162e0AF4b592";
 
-		const [signer] = await hre.ethers.getSigners();
-
-		const Factory = await hre.ethers.getContractFactory("UniswapV2Factory");
-		const factory = Factory.attach(factoryAddress) as UniswapV2Factory;
-
-		console.log(factoryAddress)
-		const tokenLibAddress = await factory.getTokenLib();
-		console.log(tokenLibAddress);
+		const pairAddress = taskArgs.pair;
+		const tokenLibAddress = taskArgs.lib;
 
 		const tokenLib = await hre.ethers.getContractAt("TokenLibrary", tokenLibAddress);
 
@@ -32,7 +27,7 @@ task("swap", "Swap token0 to token1")
 			symbolTokenA,
 			decimals,
 			supply,
-			signer.address
+			walletAddress
 		);
 
 		await tokenLib.newToken(
@@ -40,33 +35,52 @@ task("swap", "Swap token0 to token1")
 			symbolTokenB,
 			decimals,
 			supply,
-			signer.address
+			walletAddress
 		);
 
 		const token0 = calculateAddress(hre, nameTokenA, symbolTokenA);
 		const token1 = calculateAddress(hre, nameTokenB, symbolTokenB);
 
-		console.log(token0);
-		console.log(token1);
+		const token0Info = await tokenLib.tokens(token0);
+		const token1Info = await tokenLib.tokens(token1);
 
-		console.log("Creating pair....");
-		await factory.createPair(token0, token1);
+		console.log("token info:");
+		console.log(token0Info);
+		console.log(token1Info);
+		console.log();
 
-		const pairAddress = await factory.getPair(token0, token1);
+
+		const token0Balance = await tokenLib.getBalance(token0, walletAddress);
+		const token1Balance = await tokenLib.getBalance(token1, walletAddress);
+
+		console.log("token balance:");
+		console.log(token0Balance);
+		console.log(token1Balance);
+		console.log();
+
+		// console.log("Creating pair....");
+		// await factory.createPair(token0, token1);
+		// console.log("Pair created");
+		// const pairAddress = await factory.getPair(token0, token1);
+
 		const Pair = await hre.ethers.getContractFactory("UniswapV2Pair");
 		const pair = Pair.attach(pairAddress) as UniswapV2Pair;
+
 		console.log("Pair address", pairAddress);
+		await pair.initialize(token0, token1);
+
+		console.log("Setting token lib...");
+		await pair.setTokenLib(tokenLibAddress);
+		console.log("Token lib set");
+
+		const tokenLibFromContract = await pair.tokenLib();
+		console.log("tokenLib:", tokenLibFromContract);
+
+		const lpToken = await pair.lpToken();
+		console.log("lpToken:", lpToken);
 
 		const token0Amount = hre.ethers.parseEther("5");
 		const token1Amount = hre.ethers.parseEther("10");
-
-
-
-
-
-
-
-
 
 		console.log("Adding liquidity...");
 		await tokenLib.transfer(token0, await pair.getAddress(), token0Amount);
@@ -74,25 +88,42 @@ task("swap", "Swap token0 to token1")
 		await pair.mint(hre.ethers.ZeroAddress);
 		console.log("Liqudity added...");
 
-		// const swapAmount = hre.ethers.parseEther("1")
-		// const expectedOutputAmount = BigInt('1662497915624478906')
+		console.log("Trying to get reserves...");
+		const reserves = await pair.getReserves();
 
-		// const balanceToken0Before = await tokenLib.balanceOf(token0, signer.address);
-		// const balanceToken1Before = await tokenLib.balanceOf(token1, signer.address);
+		console.log(reserves)
 
-		// console.log("Balance token0 before:", balanceToken0Before.toString());
-		// console.log("Balance token1 before:", balanceToken1Before.toString());
+		const balanceToken0 = await pair.balanceToken0();
+		const balanceToken1 = await pair.balanceToken1();
 
-		// console.log("Swapping...");
-		// await tokenLib.transfer(token0, await pair.getAddress(), swapAmount)
+		console.log("balanceToken0", balanceToken0);
+		console.log("balanceToken1", balanceToken1);
 
-		// await pair.swap(0, expectedOutputAmount, signer.address, '0x');
+		const balancePairToken0 = await tokenLib.getBalance(token0, pairAddress);
+		const balancePairToken1 = await tokenLib.getBalance(token1, pairAddress);
 
-		// const balanceToken0After = await tokenLib.balanceOf(token0, signer.address);
-		// const balanceToken1After = await tokenLib.balanceOf(token1, signer.address);
+		console.log("balancePairToken0", balancePairToken0);
+		console.log("balancePairToken1", balancePairToken1);
 
-		// console.log("Balance token0 after:", balanceToken0After.toString());
-		// console.log("Balance token1 after:", balanceToken1After.toString());
+		const swapAmount = hre.ethers.parseEther("1")
+		const expectedOutputAmount = BigInt('1662497915624478906')
+
+		const balanceToken0Before = await tokenLib.getBalance(token0, walletAddress);
+		const balanceToken1Before = await tokenLib.getBalance(token1, walletAddress);
+
+		console.log("Balance token0 before:", balanceToken0Before.toString());
+		console.log("Balance token1 before:", balanceToken1Before.toString());
+
+		console.log("Swapping...");
+		await tokenLib.transfer(token0, await pair.getAddress(), swapAmount)
+
+		await pair.swap(0, expectedOutputAmount, walletAddress, '0x');
+
+		const balanceToken0After = await tokenLib.getBalance(token0, walletAddress);
+		const balanceToken1After = await tokenLib.getBalance(token1, walletAddress);
+
+		console.log("Balance token0 after:", balanceToken0After.toString());
+		console.log("Balance token1 after:", balanceToken1After.toString());
 	});
 
 

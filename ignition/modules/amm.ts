@@ -3,6 +3,6 @@ import { ethers } from "ethers";
 
 module.exports = buildModule("DEX", (m: any) => {
 	const tokenLib = m.contract("TokenLibrary");
-	const factory = m.contract("UniswapV2Factory", [ethers.ZeroAddress, tokenLib]);
+	const factory = m.contract("UniswapV2Pair");
 	return { tokenLib, factory };
 });

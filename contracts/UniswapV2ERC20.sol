@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity >=0.5.16;
 
 import "./interfaces/IUniswapV2ERC20.sol";
 import "./libraries/SafeMath.sol";
@@ -25,7 +25,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
     constructor() public payable {
         uint chainId;
         assembly {
-            chainId := chainid
+            chainId := chainId
         }
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
@@ -81,7 +81,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         address to,
         uint value
     ) external payable returns (bool) {
-        if (allowance[from][msg.sender] != uint(-1)) {
+        if (allowance[from][msg.sender] != uint(0)) {
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(
                 value
             );

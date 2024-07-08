@@ -1,4 +1,5 @@
-pragma solidity =0.5.16;
+// pragma solidity =0.5.16;
+pragma solidity ^0.8.0;
 
 import "./interfaces/IUniswapV2Factory.sol";
 import "./UniswapV2Pair.sol";
@@ -18,7 +19,7 @@ contract UniswapV2Factory is IUniswapV2Factory {
         uint
     );
 
-    constructor(address _feeToSetter, address _tokenLib) public payable {
+    constructor(address _feeToSetter, address _tokenLib) payable {
         feeToSetter = _feeToSetter;
         tokenLib = _tokenLib;
     }
@@ -40,15 +41,15 @@ contract UniswapV2Factory is IUniswapV2Factory {
             getPair[token0][token1] == address(0),
             "UniswapV2: PAIR_EXISTS"
         ); // single check is sufficient
-        bytes memory bytecode = type(UniswapV2Pair).creationCode;
-        bytes32 salt = keccak256(abi.encodePacked(token0, token1));
-        assembly {
-            pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
-        }
-        // UniswapV2Pair pair = new UniswapV2Pair{salt: salt}();
+        // bytes memory bytecode = type(UniswapV2Pair).creationCode;
+        // bytes32 salt = keccak256(abi.encodePacked(token0, token1));
+        // assembly {
+        //     pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        //
+        pair = address(new UniswapV2Pair());
 
-        IUniswapV2Pair(pair).initialize(token0, token1);
-        IUniswapV2Pair(pair).setTokenLib(tokenLib);
+        // IUniswapV2Pair(pair).initialize(token0, token1);
+        // IUniswapV2Pair(pair).setTokenLib(tokenLib);
 
         getPair[token0][token1] = pair;
         getPair[token1][token0] = pair; // populate mapping in the reverse direction

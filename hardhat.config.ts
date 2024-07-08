@@ -62,6 +62,7 @@ const config: NilHardhatUserConfig = {
     },
   },
   walletAddress: process.env.WALLET_ADDR,
+  directTxGasLimit: 500000
 };
 
 export default config;
