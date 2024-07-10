@@ -1,6 +1,5 @@
 import { task } from "hardhat/config";
-import { TokenLibrary, UniswapV2Factory, UniswapV2Pair } from '../typechain-types';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { UniswapV2Pair } from '../typechain-types';
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 
@@ -58,11 +57,6 @@ task("swap", "Swap token0 to token1")
 		console.log(token1Balance);
 		console.log();
 
-		// console.log("Creating pair....");
-		// await factory.createPair(token0, token1);
-		// console.log("Pair created");
-		// const pairAddress = await factory.getPair(token0, token1);
-
 		const Pair = await hre.ethers.getContractFactory("UniswapV2Pair");
 		const pair = Pair.attach(pairAddress) as UniswapV2Pair;
 
@@ -91,13 +85,7 @@ task("swap", "Swap token0 to token1")
 		console.log("Trying to get reserves...");
 		const reserves = await pair.getReserves();
 
-		console.log(reserves)
-
-		const balanceToken0 = await pair.balanceToken0();
-		const balanceToken1 = await pair.balanceToken1();
-
-		console.log("balanceToken0", balanceToken0);
-		console.log("balanceToken1", balanceToken1);
+		console.log("Reserves from pair: ", reserves[0], reserves[1]);
 
 		const balancePairToken0 = await tokenLib.getBalance(token0, pairAddress);
 		const balancePairToken1 = await tokenLib.getBalance(token1, pairAddress);
@@ -115,7 +103,7 @@ task("swap", "Swap token0 to token1")
 		console.log("Balance token1 before:", balanceToken1Before.toString());
 
 		console.log("Swapping...");
-		await tokenLib.transfer(token0, await pair.getAddress(), swapAmount)
+		await tokenLib.transfer(token0, await pair.getAddress(), swapAmount);
 
 		await pair.swap(0, expectedOutputAmount, walletAddress, '0x');
 
@@ -127,11 +115,6 @@ task("swap", "Swap token0 to token1")
 	});
 
 
-async function addLiquidity(tokenLib: TokenLibrary, pair: UniswapV2Pair, signer: SignerWithAddress, token0Amount: bigint, token1Amount: bigint, token0: string, token1: string) {
-	await tokenLib.transfer(token0, await pair.getAddress(), token0Amount);
-	await tokenLib.transfer(token1, await pair.getAddress(), token1Amount);
-	await pair.mint(signer.address);
-}
 
 function calculateAddress(hre: HardhatRuntimeEnvironment, name: string, symbol: string): string {
 	const hash = hre.ethers.solidityPackedKeccak256(["string", "string"], [name, symbol]);

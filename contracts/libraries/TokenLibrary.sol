@@ -13,8 +13,7 @@ contract TokenLibrary {
         address _minter
     );
 
-    // TODO: add token address
-    event Transfer(address from, address to, uint256 amount);
+    event Transfer(address token, address from, address to, uint256 amount);
 
     struct Token {
         string name;
@@ -106,7 +105,7 @@ contract TokenLibrary {
         balances[_token][_to] += _amount;
         tokens[_token].totalSupply += _amount;
 
-        emit Transfer(address(0), _to, _amount);
+        emit Transfer(_token, address(0), _to, _amount);
     }
 
     function burn(address _token, uint _amount) public payable {
@@ -118,7 +117,7 @@ contract TokenLibrary {
         balances[_token][msg.sender] -= _amount;
         tokens[_token].totalSupply -= _amount;
 
-        emit Transfer(msg.sender, address(0), _amount);
+        emit Transfer(_token, msg.sender, address(0), _amount);
     }
 
     function newToken(
@@ -171,6 +170,6 @@ contract TokenLibrary {
         balances[_token][_from] -= _amount;
         balances[_token][_to] += _amount;
 
-        emit Transfer(_from, _to, _amount);
+        emit Transfer(_token, _from, _to, _amount);
     }
 }
