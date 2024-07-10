@@ -11,13 +11,13 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@nilfoundation/hardhat-plugin": "^0.1.0",
+    "@nilfoundation/hardhat-plugin": "^0.1.5",
     "dotenv": "^16.4.5"
   },
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test --config hardhat.config.testing.ts",
-    "deploy": "rm -rf ignition/deployments && npx hardhat ignition deploy ./ignition/modules/amm.ts --network nil_cluster",
+    "deploy": "rm -rf ignition/deployments && npx hardhat ignition deploy ./ignition/modules/amm.ts --network nil",
     "clean": "rm -rf iginition/deployments"
   }
 }

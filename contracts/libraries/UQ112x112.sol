@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity >=0.5.16;
 
 // a library for handling binary fixed point numbers (https://en.wikipedia.org/wiki/Q_(number_format))
 
@@ -6,7 +6,7 @@ pragma solidity =0.5.16;
 // resolution: 1 / 2**112
 
 library UQ112x112 {
-    uint224 constant Q112 = 2**112;
+    uint224 constant Q112 = 2 ** 112;
 
     // encode a uint112 as a UQ112x112
     function encode(uint112 y) internal pure returns (uint224 z) {

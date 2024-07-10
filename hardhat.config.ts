@@ -2,10 +2,10 @@ import '@nomicfoundation/hardhat-chai-matchers'
 import "@nomicfoundation/hardhat-ignition-ethers";
 import '@nomicfoundation/hardhat-ethers'
 import '@typechain/hardhat'
-import type { NilHardhatUserConfig } from "@nilfoundation/hardhat-plugin";
-import "@nilfoundation/hardhat-plugin";
 import "@nomicfoundation/hardhat-ignition-ethers";
 import * as dotenv from "dotenv"
+import type { NilHardhatUserConfig } from "@nilfoundation/hardhat-plugin";
+import "@nilfoundation/hardhat-plugin";
 
 import "./tasks/swap";
 
@@ -56,12 +56,13 @@ const config: NilHardhatUserConfig = {
     ]
   },
   networks: {
-    nil_cluster: {
+    nil: {
       url: process.env.NIL_RPC_ENDPOINT,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
   walletAddress: process.env.WALLET_ADDR,
+  directTxGasLimit: 500000
 };
 
 export default config;

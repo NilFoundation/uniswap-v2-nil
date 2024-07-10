@@ -1,0 +1,3 @@
+[submodule "nil-hardhat-plugin"]
+	path = nil-hardhat-plugin
+	url = https://github.com/NilFoundation/nil-hardhat-plugin.git
