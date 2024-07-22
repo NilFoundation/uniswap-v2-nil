@@ -17,7 +17,7 @@ contract UniswapV2Pair is NilBase, IUniswapV2Pair, UniswapV2ERC20 {
     bytes4 private constant SELECTOR =
         bytes4(keccak256(bytes("transfer(address,uint256)")));
 
-    address public tokenLib;
+    address payable public tokenLib;
     address public lpToken;
 
     address public factory;
@@ -63,7 +63,7 @@ contract UniswapV2Pair is NilBase, IUniswapV2Pair, UniswapV2ERC20 {
         token1 = _token1;
     }
 
-    function setTokenLib(address _tokenLib) public payable {
+    function setTokenLib(address payable _tokenLib) public payable {
         tokenLib = _tokenLib;
 
         (string memory token0Name, , , , ) = TokenLibrary(tokenLib).getToken(
@@ -93,9 +93,9 @@ contract UniswapV2Pair is NilBase, IUniswapV2Pair, UniswapV2ERC20 {
         //     balance0 <= type(uint112).max && balance1 <= type(uint112).max,
         //     "UniswapV2: OVERFLOW"
         // );
-        uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
-        uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
-        if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
+        //uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
+       // uint32 timeElapsed = blockTimestamp - blockTimestampLast; // overflow is desired
+        //if (timeElapsed > 0 && _reserve0 != 0 && _reserve1 != 0) {
             // // * never overflows, and + overflow is desired
             // price0CumulativeLast +=
             //     uint(UQ112x112.encode(_reserve1).uqdiv(_reserve0)) *
@@ -103,13 +103,13 @@ contract UniswapV2Pair is NilBase, IUniswapV2Pair, UniswapV2ERC20 {
             // price1CumulativeLast +=
             //     uint(UQ112x112.encode(_reserve0).uqdiv(_reserve1)) *
             //     timeElapsed;
-        }
+        //}
 
         reserve0 = balance0;
         reserve1 = balance1;
-        blockTimestampLast = blockTimestamp;
+       // blockTimestampLast = blockTimestamp;
 
-        emit Sync(reserve0, reserve1);
+       // emit Sync(reserve0, reserve1);
     }
 
     // if fee is on, mint liquidity equivalent to 1/6th of the growth in sqrt(k)

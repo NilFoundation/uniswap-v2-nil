@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import {NilBase} from "../Nil.sol";
 
 contract TokenLibrary {
+    receive() external payable {}
+
     event TokenCreated(
         address adr,
         string _name,
@@ -29,7 +31,7 @@ contract TokenLibrary {
     /// @dev mapping(address tokenHash => Token) public tokens;
     mapping(address => Token) public tokens;
 
-    constructor() payable {}
+    constructor(){}
 
     function getToken(
         address _token
@@ -63,10 +65,6 @@ contract TokenLibrary {
         address _to,
         uint _amount
     ) public payable {
-        require(
-            allowance[_token][_from][msg.sender] >= _amount,
-            "TokenLib: insufficient allowance"
-        );
         _transferFrom(_token, _from, _to, _amount);
     }
 

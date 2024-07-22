@@ -7,7 +7,9 @@ import * as dotenv from "dotenv"
 import type { NilHardhatUserConfig } from "@nilfoundation/hardhat-plugin";
 import "@nilfoundation/hardhat-plugin";
 
+import "./tasks/initialize";
 import "./tasks/swap";
+import "./tasks/info";
 
 dotenv.config();
 
