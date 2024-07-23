@@ -82,7 +82,7 @@ task("initialize", "Swap token0 to token1")
 	console.log("Adding liquidity...");
 	await tokenLib.transfer(token0, await pair.getAddress(), token0Amount);
 	await tokenLib.transfer(token1, await pair.getAddress(), token1Amount);
-	await pair.mint(hre.ethers.ZeroAddress);
+	await pair.mint(walletAddress);
 	console.log("Liqudity added...");
 
 	console.log("Trying to get reserves...");
