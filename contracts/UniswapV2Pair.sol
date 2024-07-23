@@ -2,17 +2,16 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/IUniswapV2Pair.sol";
-import "./UniswapV2ERC20.sol";
-import "./libraries/TokenLibrary.sol";
+import "./TokenLibrary.sol";
 import "./libraries/Math.sol";
-import "./interfaces/IERC20.sol";
 import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Callee.sol";
 import {NilBase} from "./Nil.sol";
+import "./libraries/SafeMath.sol";
 
-contract UniswapV2Pair is NilBase, IUniswapV2Pair, UniswapV2ERC20 {
+contract UniswapV2Pair is NilBase, IUniswapV2Pair {
     using SafeMath for uint;
-
+    uint public totalSupply;
     uint public constant MINIMUM_LIQUIDITY = 10 ** 3;
     bytes4 private constant SELECTOR =
         bytes4(keccak256(bytes("transfer(address,uint256)")));

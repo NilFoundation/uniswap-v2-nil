@@ -7,7 +7,10 @@ task("initialize", "Swap token0 to token1")
 .addParam("pair", "pair contract")
 .addParam("lib", "lib contract")
 .setAction(async (taskArgs, hre) => {
-	const walletAddress = "0x000198db563c7db21Fb39D725595E771890C16Fd";
+	const walletAddress = process.env.WALLET_ADDR;
+	if (!walletAddress) {
+		throw new Error("WALLET_ADDR is not set");
+	}
 
 	const pairAddress = taskArgs.pair;
 	const tokenLibAddress = taskArgs.lib;

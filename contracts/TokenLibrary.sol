@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {NilBase} from "../Nil.sol";
+import {NilBase} from "./Nil.sol";
 
 contract TokenLibrary {
     receive() external payable {}
