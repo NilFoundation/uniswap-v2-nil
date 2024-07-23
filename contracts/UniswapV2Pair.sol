@@ -189,7 +189,7 @@ contract UniswapV2Pair is NilBase, IUniswapV2Pair {
             address(this)
         );
         bool feeOn = _mintFee(_reserve0, _reserve1);
-        (, , , uint _totalSupply, ) = TokenLibrary(tokenLib).tokens(lpToken); // gas savings, must be defined here since totalSupply can update in _mintFee
+        (, , , uint _totalSupply, ) = TokenLibrary(tokenLib).getToken(lpToken); // gas savings, must be defined here since totalSupply can update in _mintFee
         amount0 = liquidity.mul(balance0) / _totalSupply; // using balances ensures pro-rata distribution
         amount1 = liquidity.mul(balance1) / _totalSupply; // using balances ensures pro-rata distribution
         require(
