@@ -465,20 +465,20 @@
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
 
-"@nilfoundation/hardhat-plugin@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.npmjs.org/@nilfoundation/hardhat-plugin/-/hardhat-plugin-0.1.5.tgz"
-  integrity sha512-CzvXMQTt8z2skpCcnycqfQiPpac8yDQ0U8OtKdC7gUCJT21b7qkZw40SHBZ8/mJ9jLNdTy7z2PrG2NA3E2sm9A==
+"@nilfoundation/hardhat-plugin@^0.12.2":
+  version "0.12.2"
+  resolved "https://registry.npmjs.org/@nilfoundation/hardhat-plugin/-/hardhat-plugin-0.12.2.tgz"
+  integrity sha512-r+gwPYky7jnuEn1umWN323GrldABegRcB/QIfofBRN5DuaRyfc19vLthXBoWNsMDsF/GAZggP8g7R3ke432rog==
   dependencies:
-    "@nilfoundation/niljs" "^0.8.0"
+    "@nilfoundation/niljs" "^0.12.0"
     ethers "^6.12.1"
     hardhat "^2.22.4"
     viem "^2.16.3"
 
-"@nilfoundation/niljs@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.npmjs.org/@nilfoundation/niljs/-/niljs-0.8.0.tgz"
-  integrity sha512-7Ma4O3uZPixLfTubk8Ji5sa424U9qKw6tnEUKww/MYVtQT6VVhIo4nRN9G2SbJY2x6xdVJY6VlFR+NO1zAMBYA==
+"@nilfoundation/niljs@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.npmjs.org/@nilfoundation/niljs/-/niljs-0.12.0.tgz"
+  integrity sha512-mTEHhmBkOTU25HN3xcRXO7YtWYIwZNtO2vYR5ZaY3R5fMzIWqzcFopL4QK0r7/35YNs7ySCPb3VMLCFX6vFCiA==
   dependencies:
     "@chainsafe/persistent-merkle-tree" "^0.7.2"
     "@chainsafe/ssz" "^0.16.0"
@@ -492,9 +492,9 @@
     viem "^2.16.3"
 
 "@noble/curves@^1.4.0":
-  version "1.4.2"
-  resolved "https://registry.npmjs.org/@noble/curves/-/curves-1.4.2.tgz"
-  integrity sha512-TavHr8qycMChk8UwMld0ZDRvatedkzWfH8IiaeGCfymOP5i0hSCozz9vHOL0nkwk7HRMlFnAiKpS2jrUmSybcw==
+  version "1.5.0"
+  resolved "https://registry.npmjs.org/@noble/curves/-/curves-1.5.0.tgz"
+  integrity sha512-J5EKamIHnKPyClwVrzmaf5wSdQXgdHcPZIZLu3bwnbeCx8/7NPK5q2ZBWF+5FvYGByjiQQsJYX6jfgB2wDPn3A==
   dependencies:
     "@noble/hashes" "1.4.0"
 
@@ -505,10 +505,10 @@
   dependencies:
     "@noble/hashes" "1.3.3"
 
-"@noble/curves@~1.4.0", "@noble/curves@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/@noble/curves/-/curves-1.4.0.tgz"
-  integrity sha512-p+4cb332SFCrReJkCYe8Xzm0OWi4Jji5jVdIZRL/PmacmDkFNw6MrrV+gGpiPxLHbV+zKFRywUWbaseT+tZRXg==
+"@noble/curves@~1.4.0":
+  version "1.4.2"
+  resolved "https://registry.npmjs.org/@noble/curves/-/curves-1.4.2.tgz"
+  integrity sha512-TavHr8qycMChk8UwMld0ZDRvatedkzWfH8IiaeGCfymOP5i0hSCozz9vHOL0nkwk7HRMlFnAiKpS2jrUmSybcw==
   dependencies:
     "@noble/hashes" "1.4.0"
 
@@ -519,12 +519,14 @@
   dependencies:
     "@noble/hashes" "1.3.2"
 
-"@noble/hashes@^1.3.0":
+"@noble/curves@1.4.0":
   version "1.4.0"
-  resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.4.0.tgz"
-  integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
+  resolved "https://registry.npmjs.org/@noble/curves/-/curves-1.4.0.tgz"
+  integrity sha512-p+4cb332SFCrReJkCYe8Xzm0OWi4Jji5jVdIZRL/PmacmDkFNw6MrrV+gGpiPxLHbV+zKFRywUWbaseT+tZRXg==
+  dependencies:
+    "@noble/hashes" "1.4.0"
 
-"@noble/hashes@^1.4.0":
+"@noble/hashes@^1.3.0", "@noble/hashes@^1.4.0", "@noble/hashes@~1.4.0", "@noble/hashes@1.4.0":
   version "1.4.0"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.4.0.tgz"
   integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
@@ -538,11 +540,6 @@
   version "1.3.3"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.3.3.tgz"
   integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
-
-"@noble/hashes@~1.4.0", "@noble/hashes@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.4.0.tgz"
-  integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
 
 "@noble/hashes@1.3.2":
   version "1.3.2"
@@ -575,37 +572,53 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@nomicfoundation/edr-darwin-arm64@0.3.8":
-  version "0.3.8"
+"@nomicfoundation/edr-darwin-arm64@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/edr-darwin-arm64/-/edr-darwin-arm64-0.4.2.tgz"
+  integrity sha512-S+hhepupfqpBvMa9M1PVS08sVjGXsLnjyAsjhrrsjsNuTHVLhKzhkguvBD5g4If5skrwgOaVqpag4wnQbd15kQ==
 
-"@nomicfoundation/edr-darwin-x64@0.3.8":
-  version "0.3.8"
+"@nomicfoundation/edr-darwin-x64@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/edr-darwin-x64/-/edr-darwin-x64-0.4.2.tgz"
+  integrity sha512-/zM94AUrXz6CmcsecRNHJ50jABDUFafmGc4iBmkfX/mTp4tVZj7XTyIogrQIt0FnTaeb4CgZoLap2+8tW/Uldg==
 
-"@nomicfoundation/edr-linux-arm64-gnu@0.3.8":
-  version "0.3.8"
+"@nomicfoundation/edr-linux-arm64-gnu@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/edr-linux-arm64-gnu/-/edr-linux-arm64-gnu-0.4.2.tgz"
+  integrity sha512-TV3Pr2tFvvmCfPCi9PaCGLtqn+oLaPKfL2NWpnoCeFFdzDQXi2L930yP1oUPY5RXd78NLdVHMkEkbhb2b6Wuvg==
 
-"@nomicfoundation/edr-linux-arm64-musl@0.3.8":
-  version "0.3.8"
+"@nomicfoundation/edr-linux-arm64-musl@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/edr-linux-arm64-musl/-/edr-linux-arm64-musl-0.4.2.tgz"
+  integrity sha512-PALwrLBk1M9rolXyhSX8xdhe5jL0qf/PgiCIF7W7lUyVKrI/I0oiU0EHDk/Xw7yi2UJg4WRyhhZoHYa0g4g8Qg==
 
-"@nomicfoundation/edr-linux-x64-gnu@0.3.8":
-  version "0.3.8"
+"@nomicfoundation/edr-linux-x64-gnu@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/edr-linux-x64-gnu/-/edr-linux-x64-gnu-0.4.2.tgz"
+  integrity sha512-5svkftypDjAZ1LxV1onojlaqPRxrTEjJLkrUwLL+Fao5ZMe7aTnk5QQ1Jv76gW6WYZnMXNgjPhRcnw3oSNrqFA==
 
-"@nomicfoundation/edr-linux-x64-musl@0.3.8":
-  version "0.3.8"
+"@nomicfoundation/edr-linux-x64-musl@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/edr-linux-x64-musl/-/edr-linux-x64-musl-0.4.2.tgz"
+  integrity sha512-qiMlXQTggdH9zfOB4Eil4rQ95z8s7QdLJcOfz5Aym12qJNkCyF9hi4cc4dDCWA0CdI3x3oLbuf8qb81SF8R45w==
 
-"@nomicfoundation/edr-win32-x64-msvc@0.3.8":
-  version "0.3.8"
+"@nomicfoundation/edr-win32-x64-msvc@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/edr-win32-x64-msvc/-/edr-win32-x64-msvc-0.4.2.tgz"
+  integrity sha512-hDkAb0iaMmGYwBY/rA1oCX8VpsezfQcHPEPIEGXEcWC3WbnOgIZo0Qkpu/g0OMtFOJSQlWLXvKZuV7blhnrQag==
 
-"@nomicfoundation/edr@^0.3.7":
-  version "0.3.8"
+"@nomicfoundation/edr@^0.4.1":
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/edr/-/edr-0.4.2.tgz"
+  integrity sha512-U7v0HuZHfrsl/5FpUzuB2FYA0+FUglHHwiO6NhvLtNYKMZcPzdS6iUriMp/7GWs0SVxW3bAht9GinZPxdhVwWg==
   dependencies:
-    "@nomicfoundation/edr-darwin-arm64" "0.3.8"
-    "@nomicfoundation/edr-darwin-x64" "0.3.8"
-    "@nomicfoundation/edr-linux-arm64-gnu" "0.3.8"
-    "@nomicfoundation/edr-linux-arm64-musl" "0.3.8"
-    "@nomicfoundation/edr-linux-x64-gnu" "0.3.8"
-    "@nomicfoundation/edr-linux-x64-musl" "0.3.8"
-    "@nomicfoundation/edr-win32-x64-msvc" "0.3.8"
+    "@nomicfoundation/edr-darwin-arm64" "0.4.2"
+    "@nomicfoundation/edr-darwin-x64" "0.4.2"
+    "@nomicfoundation/edr-linux-arm64-gnu" "0.4.2"
+    "@nomicfoundation/edr-linux-arm64-musl" "0.4.2"
+    "@nomicfoundation/edr-linux-x64-gnu" "0.4.2"
+    "@nomicfoundation/edr-linux-x64-musl" "0.4.2"
+    "@nomicfoundation/edr-win32-x64-msvc" "0.4.2"
 
 "@nomicfoundation/ethereumjs-common@4.0.4":
   version "4.0.4"
@@ -719,22 +732,53 @@
   resolved "https://registry.npmjs.org/@nomicfoundation/ignition-ui/-/ignition-ui-0.15.5.tgz"
   integrity sha512-ZcE4rIn10qKahR4OqS8rl8NM2Fbg2QYiBXgMgj74ZI0++LlCcZgB5HyaBbX+lsnKHjTXtjYD3b+2mtg7jFbAMQ==
 
-"@nomicfoundation/solidity-analyzer-darwin-arm64@0.1.1":
-  version "0.1.1"
+"@nomicfoundation/solidity-analyzer-darwin-arm64@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer-darwin-arm64/-/solidity-analyzer-darwin-arm64-0.1.2.tgz"
+  integrity sha512-JaqcWPDZENCvm++lFFGjrDd8mxtf+CtLd2MiXvMNTBD33dContTZ9TWETwNFwg7JTJT5Q9HEecH7FA+HTSsIUw==
+
+"@nomicfoundation/solidity-analyzer-darwin-x64@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer-darwin-x64/-/solidity-analyzer-darwin-x64-0.1.2.tgz"
+  integrity sha512-fZNmVztrSXC03e9RONBT+CiksSeYcxI1wlzqyr0L7hsQlK1fzV+f04g2JtQ1c/Fe74ZwdV6aQBdd6Uwl1052sw==
+
+"@nomicfoundation/solidity-analyzer-linux-arm64-gnu@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer-linux-arm64-gnu/-/solidity-analyzer-linux-arm64-gnu-0.1.2.tgz"
+  integrity sha512-3d54oc+9ZVBuB6nbp8wHylk4xh0N0Gc+bk+/uJae+rUgbOBwQSfuGIbAZt1wBXs5REkSmynEGcqx6DutoK0tPA==
+
+"@nomicfoundation/solidity-analyzer-linux-arm64-musl@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer-linux-arm64-musl/-/solidity-analyzer-linux-arm64-musl-0.1.2.tgz"
+  integrity sha512-iDJfR2qf55vgsg7BtJa7iPiFAsYf2d0Tv/0B+vhtnI16+wfQeTbP7teookbGvAo0eJo7aLLm0xfS/GTkvHIucA==
+
+"@nomicfoundation/solidity-analyzer-linux-x64-gnu@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer-linux-x64-gnu/-/solidity-analyzer-linux-x64-gnu-0.1.2.tgz"
+  integrity sha512-9dlHMAt5/2cpWyuJ9fQNOUXFB/vgSFORg1jpjX1Mh9hJ/MfZXlDdHQ+DpFCs32Zk5pxRBb07yGvSHk9/fezL+g==
+
+"@nomicfoundation/solidity-analyzer-linux-x64-musl@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer-linux-x64-musl/-/solidity-analyzer-linux-x64-musl-0.1.2.tgz"
+  integrity sha512-GzzVeeJob3lfrSlDKQw2bRJ8rBf6mEYaWY+gW0JnTDHINA0s2gPR4km5RLIj1xeZZOYz4zRw+AEeYgLRqB2NXg==
+
+"@nomicfoundation/solidity-analyzer-win32-x64-msvc@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer-win32-x64-msvc/-/solidity-analyzer-win32-x64-msvc-0.1.2.tgz"
+  integrity sha512-Fdjli4DCcFHb4Zgsz0uEJXZ2K7VEO+w5KVv7HmT7WO10iODdU9csC2az4jrhEsRtiR9Gfd74FlG0NYlw1BMdyA==
 
 "@nomicfoundation/solidity-analyzer@^0.1.0", "@nomicfoundation/solidity-analyzer@^0.1.1":
-  version "0.1.1"
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer/-/solidity-analyzer-0.1.2.tgz"
+  integrity sha512-q4n32/FNKIhQ3zQGGw5CvPF6GTvDCpYwIf7bEY/dZTZbgfDsHyjJwURxUJf3VQuuJj+fDIFl4+KkBVbw4Ef6jA==
   optionalDependencies:
-    "@nomicfoundation/solidity-analyzer-darwin-arm64" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-darwin-x64" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-freebsd-x64" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-linux-arm64-gnu" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-linux-arm64-musl" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-linux-x64-gnu" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-linux-x64-musl" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-win32-arm64-msvc" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-win32-ia32-msvc" "0.1.1"
-    "@nomicfoundation/solidity-analyzer-win32-x64-msvc" "0.1.1"
+    "@nomicfoundation/solidity-analyzer-darwin-arm64" "0.1.2"
+    "@nomicfoundation/solidity-analyzer-darwin-x64" "0.1.2"
+    "@nomicfoundation/solidity-analyzer-linux-arm64-gnu" "0.1.2"
+    "@nomicfoundation/solidity-analyzer-linux-arm64-musl" "0.1.2"
+    "@nomicfoundation/solidity-analyzer-linux-x64-gnu" "0.1.2"
+    "@nomicfoundation/solidity-analyzer-linux-x64-musl" "0.1.2"
+    "@nomicfoundation/solidity-analyzer-win32-x64-msvc" "0.1.2"
 
 "@open-rpc/client-js@^1.8.1":
   version "1.8.1"
@@ -794,7 +838,7 @@
     "@noble/hashes" "~1.4.0"
     "@scure/base" "~1.1.6"
 
-"@scure/bip39@^1.3.0":
+"@scure/bip39@^1.3.0", "@scure/bip39@1.3.0":
   version "1.3.0"
   resolved "https://registry.npmjs.org/@scure/bip39/-/bip39-1.3.0.tgz"
   integrity sha512-disdg7gHuTDZtY+ZdkmLpPCk7fxZSu3gBiEGuoC1XYxv9cGx3Z6cpTggCgW6odSOOIXCiDjuGejW+aJKCY/pIQ==
@@ -817,14 +861,6 @@
   dependencies:
     "@noble/hashes" "~1.3.2"
     "@scure/base" "~1.1.4"
-
-"@scure/bip39@1.3.0":
-  version "1.3.0"
-  resolved "https://registry.npmjs.org/@scure/bip39/-/bip39-1.3.0.tgz"
-  integrity sha512-disdg7gHuTDZtY+ZdkmLpPCk7fxZSu3gBiEGuoC1XYxv9cGx3Z6cpTggCgW6odSOOIXCiDjuGejW+aJKCY/pIQ==
-  dependencies:
-    "@noble/hashes" "~1.4.0"
-    "@scure/base" "~1.1.6"
 
 "@sentry/core@5.30.0":
   version "5.30.0"
@@ -1010,7 +1046,9 @@
   integrity sha512-dJvrYWxP/UcXm36Qn36fxhUKu8A/xMRXVT2cliFF1Z7UA9liG5Psj3ezNSZw+5puH2czDXRLcXQxf8JbJt0ejg==
 
 "@types/node@*", "@types/node@>=18.0.0":
-  version "20.13.0"
+  version "20.14.11"
+  resolved "https://registry.npmjs.org/@types/node/-/node-20.14.11.tgz"
+  integrity sha512-kprQpL8MMeszbz6ojB5/tU8PLN4kesnN8Gjzw349rDlNgsSzg90lAVj3llK99Dh7JON+t9AuscPPFW6mPbTnSA==
   dependencies:
     undici-types "~5.26.4"
 
@@ -1058,7 +1096,12 @@ abbrev@1, abbrev@1.0.x:
   resolved "https://registry.npmjs.org/abbrev/-/abbrev-1.0.9.tgz"
   integrity sha512-LEyx4aLEC3x6T0UguF6YILf+ntvmOaWsVfENmIW0E9H09vKlLDGelMjjSm0jkDHALj8A8quZ/HapKNigzwge+Q==
 
-abitype@^1.0.2, abitype@1.0.5:
+abitype@^1.0.2:
+  version "1.0.6"
+  resolved "https://registry.npmjs.org/abitype/-/abitype-1.0.6.tgz"
+  integrity sha512-MMSqYh4+C/aVqI2RQaWqbvI4Kxo5cQV40WQ4QFtDnNzCkqChm8MuENhElmynZlO0qUy/ObkEUaXtKqYnx1Kp3A==
+
+abitype@1.0.5:
   version "1.0.5"
   resolved "https://registry.npmjs.org/abitype/-/abitype-1.0.5.tgz"
   integrity sha512-YzDhti7cjlfaBhHutMaboYB21Ha3rXR9QTkNJFzYC4kC8YclaiwPBBBJY8ejFdu2wnJeZCVZSMlQJ7fi8S6hsw==
@@ -1287,22 +1330,17 @@ blakejs@^1.1.0:
   resolved "https://registry.npmjs.org/blakejs/-/blakejs-1.2.1.tgz"
   integrity sha512-QXUSXI3QVc/gJME0dBpXrag1kbzOqCjCX8/b54ntNyW6sjtoqxqRk3LTmXzaJoh71zMsDCjM+47jS7XiwN/+fQ==
 
-bn.js@^4.11.0, bn.js@^4.11.8, bn.js@^4.11.9:
+bn.js@^4.11.0, bn.js@^4.11.8:
   version "4.12.0"
   resolved "https://registry.npmjs.org/bn.js/-/bn.js-4.12.0.tgz"
   integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
 
-bn.js@^5.1.2:
-  version "5.2.1"
-  resolved "https://registry.npmjs.org/bn.js/-/bn.js-5.2.1.tgz"
-  integrity sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==
+bn.js@^4.11.9:
+  version "4.12.0"
+  resolved "https://registry.npmjs.org/bn.js/-/bn.js-4.12.0.tgz"
+  integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
 
-bn.js@^5.2.0:
-  version "5.2.1"
-  resolved "https://registry.npmjs.org/bn.js/-/bn.js-5.2.1.tgz"
-  integrity sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==
-
-bn.js@^5.2.1:
+bn.js@^5.1.2, bn.js@^5.2.0, bn.js@^5.2.1:
   version "5.2.1"
   resolved "https://registry.npmjs.org/bn.js/-/bn.js-5.2.1.tgz"
   integrity sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==
@@ -1618,10 +1656,10 @@ command-line-usage@^6.1.0:
     table-layout "^1.0.2"
     typical "^5.2.0"
 
-commander@3.0.2:
-  version "3.0.2"
-  resolved "https://registry.npmjs.org/commander/-/commander-3.0.2.tgz"
-  integrity sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==
+commander@^8.1.0:
+  version "8.3.0"
+  resolved "https://registry.npmjs.org/commander/-/commander-8.3.0.tgz"
+  integrity sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==
 
 concat-map@0.0.1:
   version "0.0.1"
@@ -1950,7 +1988,20 @@ ethereumjs-abi@^0.6.8:
     bn.js "^4.11.8"
     ethereumjs-util "^6.0.0"
 
-ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.1:
+ethereumjs-util@^6.0.0:
+  version "6.2.1"
+  resolved "https://registry.npmjs.org/ethereumjs-util/-/ethereumjs-util-6.2.1.tgz"
+  integrity sha512-W2Ktez4L01Vexijrm5EB6w7dg4n/TgpoYU4avuT5T3Vmnw/eCRtiBrJfQYS/DCSvDIOLn2k57GcHdeBcgVxAqw==
+  dependencies:
+    "@types/bn.js" "^4.11.3"
+    bn.js "^4.11.0"
+    create-hash "^1.1.2"
+    elliptic "^6.5.2"
+    ethereum-cryptography "^0.1.3"
+    ethjs-util "0.1.6"
+    rlp "^2.2.3"
+
+ethereumjs-util@^6.2.1:
   version "6.2.1"
   resolved "https://registry.npmjs.org/ethereumjs-util/-/ethereumjs-util-6.2.1.tgz"
   integrity sha512-W2Ktez4L01Vexijrm5EB6w7dg4n/TgpoYU4avuT5T3Vmnw/eCRtiBrJfQYS/DCSvDIOLn2k57GcHdeBcgVxAqw==
@@ -2137,17 +2188,6 @@ fp-ts@^1.0.0, fp-ts@1.19.3:
   resolved "https://registry.npmjs.org/fp-ts/-/fp-ts-1.19.3.tgz"
   integrity sha512-H5KQDspykdHuztLTg+ajGN0Z2qUjcEf3Ybxc6hLt0k7/zPkn29XnKnxlBPyW2XIddWrGaJBzBl4VLYOtk39yZg==
 
-fs-extra@^0.30.0:
-  version "0.30.0"
-  resolved "https://registry.npmjs.org/fs-extra/-/fs-extra-0.30.0.tgz"
-  integrity sha512-UvSPKyhMn6LEd/WpUaV9C9t3zATuqoqfWc3QdPhPLb58prN9tqYPlPWi8Krxi44loBoUzlobqZ3+8tGpxxSzwA==
-  dependencies:
-    graceful-fs "^4.1.2"
-    jsonfile "^2.1.0"
-    klaw "^1.0.0"
-    path-is-absolute "^1.0.0"
-    rimraf "^2.2.8"
-
 fs-extra@^10.0.0:
   version "10.1.0"
   resolved "https://registry.npmjs.org/fs-extra/-/fs-extra-10.1.0.tgz"
@@ -2157,7 +2197,16 @@ fs-extra@^10.0.0:
     jsonfile "^6.0.1"
     universalify "^2.0.0"
 
-fs-extra@^7.0.0, fs-extra@^7.0.1:
+fs-extra@^7.0.0:
+  version "7.0.1"
+  resolved "https://registry.npmjs.org/fs-extra/-/fs-extra-7.0.1.tgz"
+  integrity sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==
+  dependencies:
+    graceful-fs "^4.1.2"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
+
+fs-extra@^7.0.1:
   version "7.0.1"
   resolved "https://registry.npmjs.org/fs-extra/-/fs-extra-7.0.1.tgz"
   integrity sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==
@@ -2329,7 +2378,7 @@ gopd@^1.0.1:
   dependencies:
     get-intrinsic "^1.1.3"
 
-graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9, graceful-fs@^4.2.0:
+graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   version "4.2.11"
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz"
   integrity sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==
@@ -2356,11 +2405,13 @@ hardhat-gas-reporter@^1.0.8:
     sha1 "^1.1.1"
 
 hardhat@^2.0.0, hardhat@^2.0.2, hardhat@^2.0.4, hardhat@^2.11.0, hardhat@^2.18.0, hardhat@^2.22.4, hardhat@^2.9.4, hardhat@^2.9.5, hardhat@^2.9.9:
-  version "2.22.4"
+  version "2.22.6"
+  resolved "https://registry.npmjs.org/hardhat/-/hardhat-2.22.6.tgz"
+  integrity sha512-abFEnd9QACwEtSvZZGSmzvw7N3zhQN1cDKz5SLHAupfG24qTHofCjqvD5kT5Wwsq5XOL0ON1Mq5rr4v0XX5ciw==
   dependencies:
     "@ethersproject/abi" "^5.1.2"
     "@metamask/eth-sig-util" "^4.0.0"
-    "@nomicfoundation/edr" "^0.3.7"
+    "@nomicfoundation/edr" "^0.4.1"
     "@nomicfoundation/ethereumjs-common" "4.0.4"
     "@nomicfoundation/ethereumjs-tx" "5.0.4"
     "@nomicfoundation/ethereumjs-util" "9.0.4"
@@ -2394,7 +2445,7 @@ hardhat@^2.0.0, hardhat@^2.0.2, hardhat@^2.0.4, hardhat@^2.11.0, hardhat@^2.18.0
     raw-body "^2.4.1"
     resolve "1.17.0"
     semver "^6.3.0"
-    solc "0.7.3"
+    solc "0.8.26"
     source-map-support "^0.5.13"
     stacktrace-parser "^0.1.10"
     tsort "0.0.1"
@@ -2677,13 +2728,6 @@ json-stringify-safe@^5.0.1:
   resolved "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
   integrity sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==
 
-jsonfile@^2.1.0:
-  version "2.4.0"
-  resolved "https://registry.npmjs.org/jsonfile/-/jsonfile-2.4.0.tgz"
-  integrity sha512-PKllAqbgLgxHaj8TElYymKCAgrASebJrWpTnEkOaTowt23VKXXN0sUeriJ+eh7y6ufb/CC5ap11pz71/cM0hUw==
-  optionalDependencies:
-    graceful-fs "^4.1.6"
-
 jsonfile@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/jsonfile/-/jsonfile-4.0.0.tgz"
@@ -2718,13 +2762,6 @@ kind-of@^6.0.2:
   version "6.0.3"
   resolved "https://registry.npmjs.org/kind-of/-/kind-of-6.0.3.tgz"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
-
-klaw@^1.0.0:
-  version "1.3.1"
-  resolved "https://registry.npmjs.org/klaw/-/klaw-1.3.1.tgz"
-  integrity sha512-TED5xi9gGQjGpNnvRWknrwAB1eL5GciPfVFOt3Vk1OJCVDQbzuSfrF3hkUQKlsgKrG1F+0t5W0m+Fje1jIt8rw==
-  optionalDependencies:
-    graceful-fs "^4.1.9"
 
 kleur@^3.0.3:
   version "3.0.3"
@@ -2863,14 +2900,7 @@ minimalistic-crypto-utils@^1.0.1:
   resolved "https://registry.npmjs.org/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz"
   integrity sha512-JIYlbt6g8i5jKfJ3xz7rF0LXmv2TkDxBLUkiBeZ7bAx4GnnNMr8xFpGnOxn6GhTEHx3SjRrZEoU+j04prX1ktg==
 
-minimatch@^3.0.4:
-  version "3.1.2"
-  resolved "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz"
-  integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
-  dependencies:
-    brace-expansion "^1.1.7"
-
-minimatch@^3.0.5:
+minimatch@^3.0.4, minimatch@^3.0.5, "minimatch@2 || 3":
   version "3.1.2"
   resolved "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz"
   integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
@@ -2883,13 +2913,6 @@ minimatch@^5.0.1, minimatch@5.0.1:
   integrity sha512-nLDxIFRyhDblz3qMuq+SoRZED4+miJ/G+tdDrjkkkRnjAsBexeGpgjLEQ0blJy7rHhR2b93rhQY4SvyWu9v03g==
   dependencies:
     brace-expansion "^2.0.1"
-
-"minimatch@2 || 3":
-  version "3.1.2"
-  resolved "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz"
-  integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
-  dependencies:
-    brace-expansion "^1.1.7"
 
 minimist@^1.2.5, minimist@^1.2.6:
   version "1.2.8"
@@ -3292,7 +3315,7 @@ require-directory@^2.1.1:
   resolved "https://registry.npmjs.org/require-directory/-/require-directory-2.1.1.tgz"
   integrity sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==
 
-require-from-string@^2.0.0, require-from-string@^2.0.2:
+require-from-string@^2.0.2:
   version "2.0.2"
   resolved "https://registry.npmjs.org/require-from-string/-/require-from-string-2.0.2.tgz"
   integrity sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==
@@ -3318,13 +3341,6 @@ reusify@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
-
-rimraf@^2.2.8:
-  version "2.7.1"
-  resolved "https://registry.npmjs.org/rimraf/-/rimraf-2.7.1.tgz"
-  integrity sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==
-  dependencies:
-    glob "^7.1.3"
 
 ripemd160@^2.0.0, ripemd160@^2.0.1:
   version "2.0.2"
@@ -3495,18 +3511,16 @@ slice-ansi@^4.0.0:
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
 
-solc@0.7.3:
-  version "0.7.3"
-  resolved "https://registry.npmjs.org/solc/-/solc-0.7.3.tgz"
-  integrity sha512-GAsWNAjGzIDg7VxzP6mPjdurby3IkGCjQcM8GFYZT6RyaoUZKmMU6Y7YwG+tFGhv7dwZ8rmR4iwFDrrD99JwqA==
+solc@0.8.26:
+  version "0.8.26"
+  resolved "https://registry.npmjs.org/solc/-/solc-0.8.26.tgz"
+  integrity sha512-yiPQNVf5rBFHwN6SIf3TUUvVAFKcQqmSUFeq+fb6pNRCo0ZCgpYOZDi3BVoezCPIAcKrVYd/qXlBLUP9wVrZ9g==
   dependencies:
     command-exists "^1.2.8"
-    commander "3.0.2"
+    commander "^8.1.0"
     follow-redirects "^1.12.1"
-    fs-extra "^0.30.0"
     js-sha3 "0.8.0"
     memorystream "^0.3.1"
-    require-from-string "^2.0.0"
     semver "^5.5.0"
     tmp "0.0.33"
 
@@ -3543,7 +3557,12 @@ source-map-support@^0.5.13:
     buffer-from "^1.0.0"
     source-map "^0.6.0"
 
-source-map@^0.6.0, source-map@^0.6.1:
+source-map@^0.6.0:
+  version "0.6.1"
+  resolved "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
+  integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
+
+source-map@^0.6.1:
   version "0.6.1"
   resolved "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
@@ -3946,9 +3965,9 @@ v8-compile-cache-lib@^3.0.1:
   integrity sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==
 
 viem@^2.16.3:
-  version "2.17.0"
-  resolved "https://registry.npmjs.org/viem/-/viem-2.17.0.tgz"
-  integrity sha512-+gaVlsfDsHL1oYdjpatdRxW1WK/slLYVvpOws3fEdLfQFUToezKI6YLC9l1g2uKm4Hg3OdGX1KQy/G7/58tTKQ==
+  version "2.19.4"
+  resolved "https://registry.npmjs.org/viem/-/viem-2.19.4.tgz"
+  integrity sha512-JdhK3ui3uPD2tnpqGNkJaDQV4zTfOeKXcF+VrU8RG88Dn2e0lFjv6l7m0YNmYLsHm+n5vFFfCLcUrTk6xcYv5w==
   dependencies:
     "@adraffy/ens-normalize" "1.10.0"
     "@noble/curves" "1.4.0"
@@ -3957,6 +3976,7 @@ viem@^2.16.3:
     "@scure/bip39" "1.3.0"
     abitype "1.0.5"
     isows "1.0.4"
+    webauthn-p256 "0.0.5"
     ws "8.17.1"
 
 web3-utils@^1.3.6:
@@ -3972,6 +3992,14 @@ web3-utils@^1.3.6:
     number-to-bn "1.7.0"
     randombytes "^2.1.0"
     utf8 "3.0.0"
+
+webauthn-p256@0.0.5:
+  version "0.0.5"
+  resolved "https://registry.npmjs.org/webauthn-p256/-/webauthn-p256-0.0.5.tgz"
+  integrity sha512-drMGNWKdaixZNobeORVIqq7k5DsRC9FnG201K2QjeOoQLmtSDaSsVZdkg6n5jUALJKcAG++zBPJXmv6hy0nWFg==
+  dependencies:
+    "@noble/curves" "^1.4.0"
+    "@noble/hashes" "^1.4.0"
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
