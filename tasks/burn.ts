@@ -12,10 +12,8 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
 	}
 
 	const pairAddress = taskArgs.pair;
-	const tokenLibAddress = taskArgs.lib;
 	const toAddress = taskArgs.to;
 
-	const tokenLib = await hre.ethers.getContractAt("TokenLibrary", tokenLibAddress);
 	const Pair = await hre.ethers.getContractFactory("UniswapV2Pair");
 	const pair = Pair.attach(pairAddress) as UniswapV2Pair;
 
@@ -23,7 +21,7 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
 	console.log("To address", toAddress);
 
 	const lpToken = await pair.lpToken();
-	const liquidity = await tokenLib.getBalance(lpToken, walletAddress);
+	const liquidity = await pair.currencyBalance(walletAddress);
 	console.log("Liquidity to burn:", liquidity.toString());
 
 	// Approve the pair contract to spend LP tokens
