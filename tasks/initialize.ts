@@ -5,7 +5,6 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 task("initialize", "Swap token0 to token1")
 .addParam("pair", "pair contract")
-.addParam("lib", "lib contract")
 .setAction(async (taskArgs, hre) => {
 	const walletAddress = process.env.WALLET_ADDR;
 	if (!walletAddress) {

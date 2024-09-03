@@ -21,7 +21,7 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
 	console.log("To address", toAddress);
 
 	const lpToken = await pair.lpToken();
-	const liquidity = await pair.currencyBalance(walletAddress);
+	const liquidity = await pair.balanceOf(walletAddress);
 	console.log("Liquidity to burn:", liquidity.toString());
 
 	// Approve the pair contract to spend LP tokens
@@ -32,6 +32,7 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
 
 	// Transfer LP tokens to pair contract and burn
 	console.log("Transferring LP tokens to pair contract and burning...");
+
 	const transferTx = await tokenLib.transferFrom(lpToken, walletAddress, pairAddress, liquidity);
 	await transferTx.wait();
 	console.log("Transferred.");

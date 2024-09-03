@@ -7,6 +7,7 @@ import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Callee.sol";
 import {NilCurrencyBase} from "./nil/NilCurrencyBase.sol";
 import "./libraries/SafeMath.sol";
+import "./nil/Nil.sol";
 
 contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     using SafeMath for uint;
@@ -46,19 +47,19 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         sendCurrency(_to, getCurrencyId(), _value);
     }
 
-    constructor() payable {
+    constructor() {
         factory = msg.sender;
     }
 
     // called once by the factory at time of deployment
-    function initialize(address _token0, address _token1, uint256 _tokenId0, uint256 _tokenId1) public payable {
+    function initialize(address _token0, address _token1, uint256 _tokenId0, uint256 _tokenId1) public {
         token0 = _token0;
         token1 = _token1;
         tokenId0 = _tokenId0;
         tokenId1 = _tokenId1;
     }
 
-    function setLpToken(address payable _tokenLib) public payable {
+    function setLpToken(address payable _tokenLib) public {
 
         string memory token0Name = NilCurrencyBase(token0).getCurrencyName();
         string memory token1Name = NilCurrencyBase(token1).getCurrencyName();
@@ -108,7 +109,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     }
 
     // this low-level function should be called from a contract which performs important safety checks
-    function mint(address to) public payable lock returns (uint liquidity) {
+    function mint(address to) public lock returns (uint liquidity) {
         (uint256 _reserve0, uint256 _reserve1) = getReserves(); // gas savings
         uint balance0 = Nil.currencyBalance(address(this), tokenId0);
         uint balance1 = Nil.currencyBalance(address(this), tokenId1);
@@ -139,7 +140,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     // this low-level function should be called from a contract which performs important safety checks
     function burn(
         address to
-    ) public payable lock returns (uint amount0, uint amount1) {
+    ) public lock returns (uint amount0, uint amount1) {
         (uint256 _reserve0, uint256 _reserve1) = getReserves(); // gas savings
         address _token0 = token0; // gas savings
         address _token1 = token1; // gas savings
@@ -173,7 +174,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         uint amount1Out,
         address to,
         bytes calldata data
-    ) public payable lock {
+    ) public lock {
         require(
             amount0Out > 0 || amount1Out > 0,
             "UniswapV2: INSUFFICIENT_OUTPUT_AMOUNT"
@@ -229,7 +230,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     }
 
     // force balances to match reserves
-    function skim(address to) public payable lock {
+    function skim(address to) public lock {
         address _token0 = token0; // gas savings
         address _token1 = token1; // gas savings
         _safeTransfer(
@@ -245,7 +246,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     }
 
     // force reserves to match balances
-    function sync() public payable lock {
+    function sync() public lock {
         _update(
             Nil.currencyBalance(address(this), tokenId0),
             Nil.currencyBalance(address(this), tokenId1),

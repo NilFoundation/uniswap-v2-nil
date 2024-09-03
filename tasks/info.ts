@@ -4,12 +4,9 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 task("info", "Fetch reserves and pair balances")
 .addParam("pair", "pair contract address")
-.addParam("lib", "token library contract address")
 .setAction(async (taskArgs, hre) => {
 	const pairAddress = taskArgs.pair;
-	const tokenLibAddress = taskArgs.lib;
 
-	const tokenLib = await hre.ethers.getContractAt("TokenLibrary", tokenLibAddress);
 	const Pair = await hre.ethers.getContractFactory("UniswapV2Pair");
 	const pair = Pair.attach(pairAddress) as UniswapV2Pair;
 

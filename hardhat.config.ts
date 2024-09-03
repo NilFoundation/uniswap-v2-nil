@@ -13,7 +13,11 @@ import "./tasks/swap";
 import "./tasks/info";
 import "./tasks/sync";
 import "./tasks/skim";
-import "./tasks/burn"
+import "./tasks/burn";
+import "./tasks/deploy_token";
+import "./tasks/mint_token";
+import "./tasks/deploy_factory";
+import "./tasks/deploy_pair";
 
 dotenv.config();
 
@@ -68,7 +72,7 @@ const config: NilHardhatUserConfig = {
     },
   },
   walletAddress: process.env.WALLET_ADDR,
-  directTxGasLimit: 500000
+  debug: true,
 };
 
 export default config;
