@@ -9,6 +9,4 @@ contract Token is NilCurrencyBase {
     constructor(string memory _tokenName) {
         tokenName = _tokenName;
     }
-
-    receive() payable external {}
 }

@@ -41,5 +41,5 @@ interface IUniswapV2Pair {
     function skim(address to) external;
     function sync() external;
     function initialize(address, address, uint256, uint256) external;
-    function setLpToken(address payable _tokenLib) external;
+    function setLpToken(address _tokenLib) external;
 }

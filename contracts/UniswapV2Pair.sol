@@ -59,7 +59,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         tokenId1 = _tokenId1;
     }
 
-    function setLpToken(address payable _tokenLib) public {
+    function setLpToken(address _tokenLib) public {
 
         string memory token0Name = NilCurrencyBase(token0).getCurrencyName();
         string memory token1Name = NilCurrencyBase(token1).getCurrencyName();
@@ -254,6 +254,4 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             reserve1
         );
     }
-
-    receive() external payable {}
 }
