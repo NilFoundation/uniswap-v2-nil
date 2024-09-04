@@ -44,16 +44,28 @@ contract UniswapV2Factory is IUniswapV2Factory {
         // assembly {
         //     pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
         //
-//        pair = address(new UniswapV2Pair());
+        pair = address(deployPair());
 
         // IUniswapV2Pair(pair).initialize(token0, token1);
         // IUniswapV2Pair(pair).setTokenLib(tokenLib);
 
         getPair[token0][token1] = pair;
-        getPair[token1][token0] = pair; // populate mapping in the reverse direction
+        getPair[token1][token0] = pair;
         allPairs.push(pair);
 
         emit PairCreated(token0, token1, pair, allPairs.length);
+    }
+
+    function getTokenPair(
+        address tokenA,
+        address tokenB
+    ) external view returns (address) {
+        require(tokenA != tokenB, "UniswapV2: IDENTICAL(_ADDRESSES");
+        (address token0, address token1) = tokenA < tokenB
+            ? (tokenA, tokenB)
+            : (tokenB, tokenA);
+        require(token0 != address(0), "UniswapV2: ZERO_ADDRESS");
+        return getPair[token0][token1];
     }
 
     function setFeeTo(address _feeTo) external {
@@ -64,5 +76,13 @@ contract UniswapV2Factory is IUniswapV2Factory {
     function setFeeToSetter(address _feeToSetter) external {
         require(msg.sender == feeToSetter, "UniswapV2: FORBIDDEN");
         feeToSetter = _feeToSetter;
+    }
+
+    function deployPair() private returns (address deployedAddress) {
+        bytes memory code = abi.encodePacked(type(UniswapV2Pair).creationCode, abi.encode(msg.sender));
+        assembly {
+            deployedAddress := create(callvalue(), add(code, 0x20), mload(code))
+        }
+        return deployedAddress;
     }
 }

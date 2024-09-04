@@ -18,9 +18,10 @@ import "./tasks/deploy_token";
 import "./tasks/mint_token";
 import "./tasks/deploy_factory";
 import "./tasks/deploy_pair";
+import "./tasks/get_pair";
+import "./tasks/token_info";
 
 dotenv.config();
-
 
 const config: NilHardhatUserConfig = {
   ignition: {
@@ -73,6 +74,7 @@ const config: NilHardhatUserConfig = {
   },
   walletAddress: process.env.WALLET_ADDR,
   debug: true,
+  shardId: 1,
 };
 
 export default config;

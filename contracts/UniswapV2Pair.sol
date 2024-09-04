@@ -44,7 +44,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     }
 
     function _safeTransfer(address _token, address _to, uint _value) private {
-        sendCurrency(_to, getCurrencyId(), _value);
+        sendCurrencyInternal(_to, getCurrencyId(), _value);
     }
 
     constructor() {
@@ -59,13 +59,12 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         tokenId1 = _tokenId1;
     }
 
-    function setLpToken(address _tokenLib) public {
+    function setLpToken() public {
 
         string memory token0Name = NilCurrencyBase(token0).getCurrencyName();
         string memory token1Name = NilCurrencyBase(token1).getCurrencyName();
 
         mintCurrencyInternal(0);
-        setCurrencyName(string(abi.encodePacked(token0Name, "-", token1Name)));
     }
 
     // update reserves and, on the first call per block, price accumulators
