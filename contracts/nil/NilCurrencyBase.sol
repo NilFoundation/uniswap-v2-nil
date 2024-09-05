@@ -90,7 +90,7 @@ abstract contract NilCurrencyBase is NilBase {
      * All minting should be carried out using this method.
      * @param amount The amount of currency to mint.
      */
-    function mintCurrencyInternal(uint256 amount) internal {
+    function mintCurrencyInternal(uint256 amount) public {
         bool success = __Precompile__(Nil.MINT_CURRENCY).precompileMintCurrency(amount);
         require(success, "Mint failed");
         totalSupply += amount;
@@ -102,7 +102,7 @@ abstract contract NilCurrencyBase is NilBase {
      * @param currencyId ID of the currency to send.
      * @param amount The amount of currency to send.
      */
-    function sendCurrencyInternal(address to, uint256 currencyId, uint256 amount) internal {
+    function sendCurrencyInternal(address to, uint256 currencyId, uint256 amount) public {
         Nil.Token[] memory tokens_ = new Nil.Token[](1);
         tokens_[0] = Nil.Token(currencyId, amount);
         bool success = Nil.asyncCall(to, address(0), address(0), 0, Nil.FORWARD_REMAINING, false, 0, tokens_, "");

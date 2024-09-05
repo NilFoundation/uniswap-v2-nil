@@ -20,6 +20,7 @@ import "./tasks/deploy_factory";
 import "./tasks/deploy_pair";
 import "./tasks/get_pair";
 import "./tasks/token_info";
+import "./tasks/send_token";
 
 dotenv.config();
 
