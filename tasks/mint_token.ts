@@ -8,12 +8,9 @@ task("mint_token", "Mint token")
         const contract = Token.attach(taskArgs.token) as Token;
         const result = await contract.mintCurrencyInternal(10000000);
 
-        await sleep(2000);
+        await sleep(1000);
 
         console.log("Balance" + await contract.getOwnCurrencyBalance());
-
-        // await contract.sendCurrencyInternal(taskArgs.to.toLowerCase(), await contract.getCurrencyId(), 1000000)
-
     });
 
 function sleep(ms: number): Promise<void> {

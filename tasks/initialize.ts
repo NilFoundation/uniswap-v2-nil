@@ -38,13 +38,13 @@ task("initialize", "Swap token0 to token1")
         await pair.setLpToken();
         console.log("Token lib set");
 
-        const token0Amount = hre.ethers.parseUnits(supply, 2);
-        const token1Amount = hre.ethers.parseUnits(supply, 2);
+        console.log("Balance0" + await token0Contract.getOwnCurrencyBalance());
+        console.log("Balance1" + await token1Contract.getOwnCurrencyBalance());
 
         console.log("Adding liquidity...");
-        await token0Contract.sendCurrencyInternal(pairAddress, token0Id, token0Amount);
+        await token0Contract.sendCurrencyInternal(pairAddress, token0Id, BigInt(supply));
         console.log("Adding liquidity 2...");
-        await token1Contract.sendCurrencyInternal(pairAddress, token1Id, token1Amount);
+        await token1Contract.sendCurrencyInternal(pairAddress, token1Id, BigInt(supply));
         console.log("Minting pair tokens");
         await pair.mint(walletAddress);
         console.log("Liqudity added...");
