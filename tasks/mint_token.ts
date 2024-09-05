@@ -3,7 +3,6 @@ import {Token} from "../typechain-types";
 
 task("mint_token", "Mint token")
     .addParam("token", "Token")
-    .addParam("to", "To")
     .setAction(async (taskArgs, hre) => {
         const Token = await hre.ethers.getContractFactory("Token");
         const contract = Token.attach(taskArgs.token) as Token;
@@ -11,7 +10,9 @@ task("mint_token", "Mint token")
 
         await sleep(2000);
 
-        await contract.sendCurrencyInternal(taskArgs.to.toLowerCase(), await contract.getCurrencyId(), 1000000)
+        console.log("Balance" + await contract.getOwnCurrencyBalance());
+
+        // await contract.sendCurrencyInternal(taskArgs.to.toLowerCase(), await contract.getCurrencyId(), 1000000)
 
     });
 
