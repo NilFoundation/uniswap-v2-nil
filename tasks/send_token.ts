@@ -17,13 +17,16 @@ task("send_token", "Send token")
         const Token0 = await hre.ethers.getContractFactory("Token");
         const tokenContract = Token0.attach(taskArgs.token) as Token;
 
-        const balance = await tokenContract.balanceOf(walletAddress.toLowerCase());
-        console.log("Balance " + JSON.stringify(balance));
+        const balance = await tokenContract.getOwnCurrencyBalance();
+        console.log("Balance " + balance);
 
         const tokenId = await tokenContract.getCurrencyId();
 
         console.log("tokenId " + tokenId);
 
         console.log("Sending...");
-        await tokenContract.sendCurrencyInternal(to, tokenId, BigInt(supply));
+        await tokenContract.sendCurrencyInternal(to, tokenId, supply);
+
+        const balance2 = await tokenContract.getOwnCurrencyBalance();
+        console.log("Balance2 " + balance2);
     });

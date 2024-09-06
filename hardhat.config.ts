@@ -21,6 +21,7 @@ import "./tasks/deploy_pair";
 import "./tasks/get_pair";
 import "./tasks/token_info";
 import "./tasks/send_token";
+import "./tasks/deploy_garbage_wallet";
 
 dotenv.config();
 

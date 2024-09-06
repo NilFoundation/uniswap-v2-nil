@@ -20,6 +20,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     address public token1;
     uint256 public tokenId0;
     uint256 public tokenId1;
+    address public burnAddress;
 
     uint256 private reserve0; // uses single storage slot, accessible via getReserves
     uint256 private reserve1; // uses single storage slot, accessible via getReserves
@@ -47,7 +48,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         sendCurrencyInternal(_to, getCurrencyId(), _value);
     }
 
-    constructor() {
+    constructor() payable {
         factory = msg.sender;
     }
 
@@ -59,12 +60,8 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         tokenId1 = _tokenId1;
     }
 
-    function setLpToken() public {
-
-        string memory token0Name = NilCurrencyBase(token0).getCurrencyName();
-        string memory token1Name = NilCurrencyBase(token1).getCurrencyName();
-
-        mintCurrencyInternal(0);
+    function setBurnAddress(address _burnAddress) public {
+        burnAddress = _burnAddress;
     }
 
     // update reserves and, on the first call per block, price accumulators
@@ -86,7 +83,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         uint256 _reserve0,
         uint256 _reserve1
     ) private returns (bool feeOn) {
-        address feeTo = address(0);
+        address feeTo = burnAddress;
         feeOn = false;
         uint _kLast = kLast; // gas savings
         if (feeOn) {
@@ -120,7 +117,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
             mintCurrencyInternal(MINIMUM_LIQUIDITY);
-            sendCurrencyInternal(address(0), getCurrencyId(), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
+//            sendCurrencyInternal(burnAddress, getCurrencyId(), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
             liquidity = Math.min(
                 amount0.mul(_totalSupply) / _reserve0,
@@ -155,7 +152,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             amount0 > 0 && amount1 > 0,
             "UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED"
         );
-        sendCurrencyInternal(address(0), getCurrencyId(), liquidity);
+        sendCurrencyInternal(burnAddress, getCurrencyId(), liquidity);
         totalSupply -= liquidity;
         _safeTransfer(_token0, to, amount0);
         _safeTransfer(_token1, to, amount1);
@@ -253,4 +250,6 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             reserve1
         );
     }
+
+    receive() external payable {}
 }

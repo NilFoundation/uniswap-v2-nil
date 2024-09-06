@@ -5,6 +5,7 @@ task("initialize", "Swap token0 to token1")
     .addParam("pair", "pair contract")
     .addParam("token0")
     .addParam("token1")
+    .addParam("toburn")
     .addParam("supply")
     .setAction(async (taskArgs, hre) => {
         const walletAddress = process.env.WALLET_ADDR;
@@ -33,24 +34,29 @@ task("initialize", "Swap token0 to token1")
 
         console.log("initialize ", pairAddress);
         await pair.initialize(token0, token1, token0Id, token1Id);
+        //
+        console.log("Setting burn address");
+        await pair.setBurnAddress(taskArgs.toburn);
 
-        console.log("Setting LP token");
-        await pair.setLpToken();
-        console.log("Token lib set");
+        console.log("Balance0 " + await token0Contract.getOwnCurrencyBalance());
+        console.log("Balance1 " + await token1Contract.getOwnCurrencyBalance());
 
-        console.log("Balance0" + await token0Contract.getOwnCurrencyBalance());
-        console.log("Balance1" + await token1Contract.getOwnCurrencyBalance());
+        console.log("PairBalance0 " + await token0Contract.getCurrencyBalanceOf(pairAddress));
+        console.log("PairBalance1 " + await token1Contract.getCurrencyBalanceOf(pairAddress));
 
         console.log("Adding liquidity...");
-        await token0Contract.sendCurrencyInternal(pairAddress, token0Id, BigInt(supply));
+        await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 100);
         console.log("Adding liquidity 2...");
-        await token1Contract.sendCurrencyInternal(pairAddress, token1Id, BigInt(supply));
+        await token1Contract.sendCurrencyInternal(pairAddress, token1Id, 100);
         console.log("Minting pair tokens");
         await pair.mint(walletAddress);
         console.log("Liqudity added...");
 
+        const lpBalance = await pair.getOwnCurrencyBalance();
+        console.log("lpBalance " + lpBalance);
+
         console.log("Trying to get reserves...");
         const reserves = await pair.getReserves();
-
+        //
         console.log("Reserves from pair: ", reserves[0], reserves[1]);
     });

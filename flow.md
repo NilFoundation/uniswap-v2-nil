@@ -1,4 +1,4 @@
-# flow
+# Flow
 
 
 Deploy token 
@@ -18,15 +18,21 @@ npx hardhat mint_token --network nil --token ...
 
 Deploy pair
 ```shell
-npx hardhat deploy_pair --network nil --token0 0x0001fedf8579f598e0d187a732406398140d11e1 --token1 0x00011cd49978ffb25bbeee6a6048e0cf6a75cf60 --factory 0x000112c0ded13e8f4478c963924c900722a69b40
+npx hardhat deploy_pair --network nil --token0 0x0001c467d4a788a5442c15b8ff47bf8b4e69be95 --token1 0x0001fe7727c76fb68a96bd7952f762ecb172b3c8 --factory 0x00010dd2c77d4e0c9172f1c5635caa240c95eb94
 ```
 
 Get pair
 ```shell
-npx hardhat get_pair --network nil --token0 0x0001fedf8579f598e0d187a732406398140d11e1 --token1 0x00011cd49978ffb25bbeee6a6048e0cf6a75cf60 --factory 0x000112c0ded13e8f4478c963924c900722a69b40
+npx hardhat get_pair --network nil --token0 0x0001c467d4a788a5442c15b8ff47bf8b4e69be95 --token1 0x0001fe7727c76fb68a96bd7952f762ecb172b3c8 --factory 0x00010dd2c77d4e0c9172f1c5635caa240c95eb94
 ```
 
 Init pair
 ```shell
-npx hardhat initialize --network nil --token0 0x0001fedf8579f598e0d187a732406398140d11e1 --token1 0x00011cd49978ffb25bbeee6a6048e0cf6a75cf60 --pair 0x000162185125DB14403426533dFf09CbAFc5a729 --supply 100
+npx hardhat initialize --network nil --token0 0x0001c467d4a788a5442c15b8ff47bf8b4e69be95 --token1 0x0001fe7727c76fb68a96bd7952f762ecb172b3c8 --pair 0x0001fD03948132a17CC8E8B1590299BaF48A02aD --supply 100
 ```
+
+# Issues
+
+- Impossible to send multicurrency tokens to zero or dead addresses
+
+
