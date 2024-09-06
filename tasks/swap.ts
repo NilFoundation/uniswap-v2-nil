@@ -45,13 +45,11 @@ task("swap", "Swap token0 to token1")
         console.log("Balance token1 before:", balanceToken1Before.toString());
 
         console.log("Send currency 0" + poolAmount);
-        await Token0.sendCurrency(pairAddress, token0Id, poolAmount);
-        console.log("Send currency 1" + poolAmount);
-        await Token0.sendCurrency(pairAddress, token1Id, poolAmount);
+        await Token1.sendCurrency(pairAddress, token1Id, poolAmount);
 
         console.log("Swapping...");
         try {
-            await pair.swap(0, expectedOutputAmount, walletAddress, '0x');
+            await pair.swap(expectedOutputAmount, 0, walletAddress, '0x');
         } catch (error: any) {
             console.log("USAOOOO")
             if (error?.error?.data?.message) {

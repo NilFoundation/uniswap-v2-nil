@@ -13,7 +13,8 @@ interface IUniswapV2Factory {
 
     function createPair(
         address tokenA,
-        address tokenB
+        address tokenB,
+        uint256 salt
     ) external returns (address pair);
 
     function setFeeTo(address) external;

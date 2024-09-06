@@ -117,7 +117,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
             mintCurrencyInternal(MINIMUM_LIQUIDITY);
-//            sendCurrencyInternal(burnAddress, getCurrencyId(), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
+            sendCurrencyInternal(burnAddress, getCurrencyId(), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
             liquidity = Math.min(
                 amount0.mul(_totalSupply) / _reserve0,

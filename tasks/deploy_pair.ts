@@ -9,5 +9,5 @@ task("deploy_pair", "Deploy pair")
 
         const Factory = await hre.ethers.getContractFactory("UniswapV2Factory");
         const factory = Factory.attach(taskArgs.factory) as UniswapV2Factory;
-        await factory.createPair(taskArgs.token0.toLowerCase(), taskArgs.token1.toLowerCase())
+        await factory.createPair(taskArgs.token0.toLowerCase(), taskArgs.token1.toLowerCase(), 10)
     });

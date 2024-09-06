@@ -41,13 +41,14 @@ task("initialize", "Swap token0 to token1")
         console.log("Balance0 " + await token0Contract.getOwnCurrencyBalance());
         console.log("Balance1 " + await token1Contract.getOwnCurrencyBalance());
 
+        console.log("Adding liquidity...");
+        await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 1000000);
+        console.log("Adding liquidity 2...");
+        await token1Contract.sendCurrencyInternal(pairAddress, token1Id, 1000000);
+
         console.log("PairBalance0 " + await token0Contract.getCurrencyBalanceOf(pairAddress));
         console.log("PairBalance1 " + await token1Contract.getCurrencyBalanceOf(pairAddress));
 
-        console.log("Adding liquidity...");
-        await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 100);
-        console.log("Adding liquidity 2...");
-        await token1Contract.sendCurrencyInternal(pairAddress, token1Id, 100);
         console.log("Minting pair tokens");
         await pair.mint(walletAddress);
         console.log("Liqudity added...");

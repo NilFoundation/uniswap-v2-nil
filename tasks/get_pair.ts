@@ -11,5 +11,8 @@ task("get_pair", "Get pair")
         const factory = Factory.attach(taskArgs.factory) as UniswapV2Factory;
         const result = await factory.getTokenPair(taskArgs.token0.toLowerCase(), taskArgs.token1.toLowerCase())
 
+        const pair = await factory.allPairsLength();
+        console.log(pair);
+
         console.log(JSON.stringify(result));
     });
