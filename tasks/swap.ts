@@ -1,5 +1,5 @@
 import {task} from "hardhat/config";
-import {UniswapV2Pair} from '../typechain-types';
+import {Token, UniswapV2Pair} from '../typechain-types';
 import {Faucet} from "../typechain-types";
 
 task("swap", "Swap token0 to token1")
@@ -20,8 +20,10 @@ task("swap", "Swap token0 to token1")
 
         const poolAmount = swapAmount + swapAmount;
 
-        const Token0 = await hre.ethers.getContractAt("Token", token0Address);
-        const Token1 = await hre.ethers.getContractAt("Token", token1Address);
+
+        const Token = await hre.ethers.getContractFactory("Token");
+        const Token0 = Token.attach(token0Address) as Token;
+        const Token1 = Token.attach(token1Address) as Token;
 
         const Pair = await hre.ethers.getContractFactory("UniswapV2Pair");
         const pair = Pair.attach(pairAddress) as UniswapV2Pair;
@@ -49,12 +51,12 @@ task("swap", "Swap token0 to token1")
         await Token1.mintCurrencyInternal(poolAmount);
 
         const balance0 = await Token0.getOwnCurrencyBalance();
-        console.log("BalanceToken1 " + balance0);
+        console.log("BalanceToken0 " + balance0);
         const balance = await Token1.getOwnCurrencyBalance();
         console.log("BalanceToken1 " + balance);
 
         console.log("Send currency " + poolAmount);
-        await Token1.sendCurrencyInternal(pairAddress, token0Id, poolAmount);
+        await Token1.sendCurrencyInternal(pairAddress, token1Id, poolAmount);
 
         console.log("Swapping...");
         try {
