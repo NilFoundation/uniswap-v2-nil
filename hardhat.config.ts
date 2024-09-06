@@ -23,6 +23,7 @@ import "./tasks/token_info";
 import "./tasks/send_token";
 import "./tasks/deploy_garbage_wallet";
 import "./tasks/pair_reserves";
+import "./tasks/faucet";
 
 dotenv.config();
 

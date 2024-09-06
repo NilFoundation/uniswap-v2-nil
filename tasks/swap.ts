@@ -1,5 +1,6 @@
 import {task} from "hardhat/config";
 import {UniswapV2Pair} from '../typechain-types';
+import {Faucet} from "../typechain-types";
 
 task("swap", "Swap token0 to token1")
     .addParam("pair", "pair contract")
@@ -15,7 +16,7 @@ task("swap", "Swap token0 to token1")
         const pairAddress = taskArgs.pair;
         const token0Address = taskArgs.token0;
         const token1Address = taskArgs.token1;
-        const swapAmount = hre.ethers.parseEther(taskArgs.amount);
+        const swapAmount = BigInt(taskArgs.amount);
 
         const poolAmount = swapAmount + swapAmount;
 
@@ -38,18 +39,26 @@ task("swap", "Swap token0 to token1")
         const expectedOutputAmount = calculateOutputAmount(swapAmount, reserve0, reserve1);
         console.log("expected output amount: ", expectedOutputAmount);
 
-        const balanceToken0Before = await Token0.balanceOf(walletAddress);
-        const balanceToken1Before = await Token1.balanceOf(walletAddress);
+        const balanceToken0Before = await Token0.getCurrencyBalanceOf(walletAddress);
+        const balanceToken1Before = await Token1.getCurrencyBalanceOf(walletAddress);
 
         console.log("Balance token0 before:", balanceToken0Before.toString());
         console.log("Balance token1 before:", balanceToken1Before.toString());
 
-        console.log("Send currency 0" + poolAmount);
-        await Token1.sendCurrency(pairAddress, token1Id, poolAmount);
+        console.log("Mint currency " + poolAmount);
+        await Token1.mintCurrencyInternal(poolAmount);
+
+        const balance0 = await Token0.getOwnCurrencyBalance();
+        console.log("BalanceToken1 " + balance0);
+        const balance = await Token1.getOwnCurrencyBalance();
+        console.log("BalanceToken1 " + balance);
+
+        console.log("Send currency " + poolAmount);
+        await Token1.sendCurrencyInternal(pairAddress, token0Id, poolAmount);
 
         console.log("Swapping...");
         try {
-            await pair.swap(expectedOutputAmount, 0, walletAddress, '0x');
+            await pair.swap(0, expectedOutputAmount, walletAddress, '0x');
         } catch (error: any) {
             console.log("USAOOOO")
             if (error?.error?.data?.message) {
@@ -59,11 +68,11 @@ task("swap", "Swap token0 to token1")
             }
         }
 
-        const balanceToken0After = await Token0.balanceOf(walletAddress);
-        const balanceToken1After = await Token1.balanceOf(walletAddress);
+        const balanceToken0After = await Token0.getCurrencyBalanceOf(walletAddress);
+        const balanceToken1After = await Token1.getCurrencyBalanceOf(walletAddress);
 
-        console.log("Balance token0 after:", JSON.stringify(balanceToken0After));
-        console.log("Balance token1 after:", JSON.stringify(balanceToken1After));
+        console.log("Balance token0 after:", balanceToken0After);
+        console.log("Balance token1 after:", balanceToken1After);
     });
 
 function calculateOutputAmount(amountIn: bigint, reserveIn: bigint, reserveOut: bigint): bigint {
