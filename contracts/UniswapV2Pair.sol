@@ -44,8 +44,8 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         _reserve1 = reserve1;
     }
 
-    function _safeTransfer(address _token, address _to, uint _value) private {
-        sendCurrencyInternal(_to, getCurrencyId(), _value);
+    function _safeTransfer(uint256 _tokenId, address _to, uint _value) private {
+        sendCurrencyInternal(_to, _tokenId, _value);
     }
 
     constructor() payable {
@@ -154,8 +154,8 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         );
         sendCurrencyInternal(burnAddress, getCurrencyId(), liquidity);
         totalSupply -= liquidity;
-        _safeTransfer(_token0, to, amount0);
-        _safeTransfer(_token1, to, amount1);
+        _safeTransfer(tokenId0, to, amount0);
+        _safeTransfer(tokenId1, to, amount1);
 
         balance0 = Nil.currencyBalance(address(this), tokenId0);
         balance1 = Nil.currencyBalance(address(this), tokenId1);
@@ -189,8 +189,8 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             address _token0 = token0;
             address _token1 = token1;
             require(to != _token0 && to != _token1, "UniswapV2: INVALID_TO");
-            if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); // optimistically transfer tokens
-            if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); // optimistically transfer tokens
+            if (amount0Out > 0) _safeTransfer(tokenId0, to, amount0Out); // optimistically transfer tokens
+            if (amount1Out > 0) _safeTransfer(tokenId1, to, amount1Out); // optimistically transfer tokens
             if (data.length > 0)
                 IUniswapV2Callee(to).uniswapV2Call(
                     msg.sender,
@@ -230,12 +230,12 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         address _token0 = token0; // gas savings
         address _token1 = token1; // gas savings
         _safeTransfer(
-            _token0,
+            tokenId0,
             to,
             Nil.currencyBalance(address(this), tokenId0).sub(reserve0)
         );
         _safeTransfer(
-            _token1,
+            tokenId1,
             to,
             Nil.currencyBalance(address(this), tokenId1).sub(reserve1)
         );

@@ -47,7 +47,9 @@ task("swap", "Swap token0 to token1")
         console.log("Balance token0 before:", balanceToken0Before.toString());
         console.log("Balance token1 before:", balanceToken1Before.toString());
 
-        console.log("Mint currency " + poolAmount);
+        console.log("Mint currency0 " + poolAmount);
+        await Token1.mintCurrencyInternal(poolAmount);
+        console.log("Mint currency1 " + poolAmount);
         await Token1.mintCurrencyInternal(poolAmount);
 
         const balance0 = await Token0.getOwnCurrencyBalance();
@@ -55,10 +57,22 @@ task("swap", "Swap token0 to token1")
         const balance = await Token1.getOwnCurrencyBalance();
         console.log("BalanceToken1 " + balance);
 
-        console.log("Send currency " + poolAmount);
+        console.log("Send currency0 " + poolAmount);
+        await Token0.sendCurrencyInternal(pairAddress, token0Id, poolAmount);
+
+        console.log("Send currency1 " + poolAmount);
         await Token1.sendCurrencyInternal(pairAddress, token1Id, poolAmount);
 
-        console.log("Swapping...");
+        const pairBalance0 = await Token0.getCurrencyBalanceOf(pairAddress.toLowerCase());
+        const pairBalance1 = await Token1.getCurrencyBalanceOf(pairAddress.toLowerCase());
+
+        console.log("Pair Balance0 ", pairBalance0.toString());
+        console.log("Pair Balance1 ", pairBalance1.toString());
+
+        const totalPairs = await pair.getCurrencyTotalSupply();
+        console.log("Total pairs tokens ", totalPairs.toString());
+
+        console.log(`Swapping... token0 ${0} and token1 ${expectedOutputAmount} to ${walletAddress}`);
         try {
             await pair.swap(0, expectedOutputAmount, walletAddress, '0x');
         } catch (error: any) {

@@ -36,11 +36,5 @@ npx hardhat initialize --network nil --token0 0x0001498110e9f756136c0a1f13f392c1
 - Impossible to send multicurrency tokens to zero or dead addresses
 
 
-USDT
-USDC
 
-100000010 1000001 -> 1000 1/1
-110 91 -> 1000 1.1/92
-100 100 -> 1000 1/1
-
-
+npx hardhat get_pair --network nil --token0 0x00018e6ca775664c1ba989261228bf29dc3ede88 --token1 0x0001fc2e06e40fc4f85ceb0307feb12afb674ec7 --factory 0x000164930a498798457cb0c1b98e5e9b2d89d8d8
