@@ -4,6 +4,10 @@ pragma solidity ^0.8.0;
 import './interfaces/IUniswapV2Router01.sol';
 import './interfaces/IUniswapV2Factory.sol';
 import './libraries/UniswapV2Library.sol';
+import './nil/NilCurrencyBase.sol';
+import './nil/Nil.sol';
+import "./nil/Nil.sol";
+import "./interfaces/IUniswapV2Pair.sol";
 
 contract UniswapV2Router01 is IUniswapV2Router01 {
     address public immutable override factory;
@@ -51,18 +55,25 @@ contract UniswapV2Router01 is IUniswapV2Router01 {
     function addLiquidity(
         address tokenA,
         address tokenB,
-        uint amountADesired,
-        uint amountBDesired,
-        uint amountAMin,
-        uint amountBMin,
         address to,
         uint deadline
     ) external override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
-        (amountA, amountB) = _addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin);
-        address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
-        TransferHelper.safeTransferFrom(tokenA, msg.sender, pair, amountA);
-        TransferHelper.safeTransferFrom(tokenB, msg.sender, pair, amountB);
+        address pair = IUniswapV2Factory(factory).getPair(tokenA, tokenB);
+        uint tokenAId = NilCurrencyBase(tokenA).getCurrencyId();
+        uint tokenBId = NilCurrencyBase(tokenB).getCurrencyId();
+
+        Token[] tokens = Nil.msgTokens();
+        if (tokens.length != 2) {
+            revert("Send only 2 tokens to add liquidity");
+        }
+        assert(tokenAId == tokens[0].id);
+        assert(tokenBId == tokens[1].id);
+
+        NilCurrencyBase.sendCurrencyInternal(pair, tokenAId, tokens[0].amount);
+        NilCurrencyBase.sendCurrencyInternal(pair, tokenBId, tokens[1].amount);
         liquidity = IUniswapV2Pair(pair).mint(to);
+        amountA = tokens[0].amount;
+        amountB = tokens[1].amount;
     }
 
     // **** REMOVE LIQUIDITY ****
@@ -75,7 +86,7 @@ contract UniswapV2Router01 is IUniswapV2Router01 {
         address to,
         uint deadline
     ) public override ensure(deadline) returns (uint amountA, uint amountB) {
-        address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
+        address pair = IUniswapV2Factory(factory).getPair(tokenA, tokenB);
         IUniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
         (uint amount0, uint amount1) = IUniswapV2Pair(pair).burn(to);
         (address token0,) = UniswapV2Library.sortTokens(tokenA, tokenB);
