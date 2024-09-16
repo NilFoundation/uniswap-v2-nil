@@ -52,6 +52,7 @@ contract UniswapV2Router01 is IUniswapV2Router01 {
             }
         }
     }
+
     function addLiquidity(
         address tokenA,
         address tokenB,
@@ -62,15 +63,19 @@ contract UniswapV2Router01 is IUniswapV2Router01 {
         uint tokenAId = NilCurrencyBase(tokenA).getCurrencyId();
         uint tokenBId = NilCurrencyBase(tokenB).getCurrencyId();
 
-        Token[] tokens = Nil.msgTokens();
+        Nil.Token[] memory tokens = Nil.msgTokens();
         if (tokens.length != 2) {
             revert("Send only 2 tokens to add liquidity");
         }
         assert(tokenAId == tokens[0].id);
         assert(tokenBId == tokens[1].id);
 
-        NilCurrencyBase.sendCurrencyInternal(pair, tokenAId, tokens[0].amount);
-        NilCurrencyBase.sendCurrencyInternal(pair, tokenBId, tokens[1].amount);
+        Nil.Token[] memory tokens = Nil.msgTokens();
+        if (tokens.length != 2) {
+            revert("UniswapV2Router: Expect 2 tokens to add liquidity");
+        }
+        NilCurrencyBase.sendCurrencyInternalSync(pair, tokenAId, tokens[0].amount);
+        NilCurrencyBase.sendCurrencyInternalSync(pair, tokenBId, tokens[1].amount);
         liquidity = IUniswapV2Pair(pair).mint(to);
         amountA = tokens[0].amount;
         amountB = tokens[1].amount;
@@ -87,28 +92,16 @@ contract UniswapV2Router01 is IUniswapV2Router01 {
         uint deadline
     ) public override ensure(deadline) returns (uint amountA, uint amountB) {
         address pair = IUniswapV2Factory(factory).getPair(tokenA, tokenB);
-        IUniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
-        (uint amount0, uint amount1) = IUniswapV2Pair(pair).burn(to);
         (address token0,) = UniswapV2Library.sortTokens(tokenA, tokenB);
+        (uint amount0, uint amount1) = IUniswapV2Pair(pair).burn(to);
         (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
         require(amountA >= amountAMin, 'UniswapV2Router: INSUFFICIENT_A_AMOUNT');
         require(amountB >= amountBMin, 'UniswapV2Router: INSUFFICIENT_B_AMOUNT');
-    }
-
-    function removeLiquidityWithPermit(
-        address tokenA,
-        address tokenB,
-        uint liquidity,
-        uint amountAMin,
-        uint amountBMin,
-        address to,
-        uint deadline,
-        bool approveMax, uint8 v, bytes32 r, bytes32 s
-    ) external override returns (uint amountA, uint amountB) {
-        address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
-        uint value = approveMax ? uint(-1) : liquidity;
-        IUniswapV2Pair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
-        (amountA, amountB) = removeLiquidity(tokenA, tokenB, liquidity, amountAMin, amountBMin, to, deadline);
+        Nil.Token[] memory tokens = Nil.msgTokens();
+        if (tokens.length != 1) {
+            revert("UniswapV2Router: should contains only pair token");
+        }
+        NilCurrencyBase.sendCurrencyInternalSync(pair, tokens[0].id, tokens[0].amount); // send liquidity to pair
     }
 
     // **** SWAP ****
@@ -119,10 +112,12 @@ contract UniswapV2Router01 is IUniswapV2Router01 {
             (address token0,) = UniswapV2Library.sortTokens(input, output);
             uint amountOut = amounts[i + 1];
             (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
-            address to = i < path.length - 2 ? UniswapV2Library.pairFor(factory, output, path[i + 2]) : _to;
-            IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output)).swap(amount0Out, amount1Out, to, new bytes(0));
+            address to = i < path.length - 2 ? IUniswapV2Factory(factory).getPair(output, path[i + 2]) : _to;
+            address pair = IUniswapV2Factory(factory).getPair(input, output);
+            IUniswapV2Pair(pair).swap(amount0Out, amount1Out, to);
         }
     }
+
     function swapExactTokensForTokens(
         uint amountIn,
         uint amountOutMin,
@@ -132,9 +127,12 @@ contract UniswapV2Router01 is IUniswapV2Router01 {
     ) external override ensure(deadline) returns (uint[] memory amounts) {
         amounts = UniswapV2Library.getAmountsOut(factory, amountIn, path);
         require(amounts[amounts.length - 1] >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');
-        TransferHelper.safeTransferFrom(path[0], msg.sender, UniswapV2Library.pairFor(factory, path[0], path[1]), amounts[0]);
+        address pair = IUniswapV2Factory(factory).getPair(path[0], path[1]);
+        Nil.Token[] memory tokens = Nil.msgTokens();
+        NilCurrencyBase(path[0]).sendCurrencyInternalSync(pair, tokens[0].id, amounts[0]);
         _swap(amounts, path, to);
     }
+
     function swapTokensForExactTokens(
         uint amountOut,
         uint amountInMax,
@@ -144,7 +142,9 @@ contract UniswapV2Router01 is IUniswapV2Router01 {
     ) external override ensure(deadline) returns (uint[] memory amounts) {
         amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path);
         require(amounts[0] <= amountInMax, 'UniswapV2Router: EXCESSIVE_INPUT_AMOUNT');
-        TransferHelper.safeTransferFrom(path[0], msg.sender, UniswapV2Library.pairFor(factory, path[0], path[1]), amounts[0]);
+        address pair = IUniswapV2Factory(factory).getPair(path[0], path[1]);
+        Nil.Token[] memory tokens = Nil.msgTokens();
+        NilCurrencyBase(path[0]).sendCurrencyInternalSync(pair, tokens[0].id, amounts[0]);
         _swap(amounts, path, to);
     }
 

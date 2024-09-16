@@ -45,7 +45,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     }
 
     function _safeTransfer(uint256 _tokenId, address _to, uint _value) private {
-        sendCurrencyInternal(_to, _tokenId, _value);
+        sendCurrencyInternalSync(_to, _tokenId, _value);
     }
 
     constructor() payable {
@@ -96,7 +96,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
                     uint liquidity = numerator / denominator;
                     if (liquidity > 0)
                         mintCurrencyInternal(liquidity);
-                    sendCurrencyInternal(feeTo, getCurrencyId(), liquidity);
+                    sendCurrencyInternalSync(feeTo, getCurrencyId(), liquidity);
                 }
             }
         } else if (_kLast != 0) {
@@ -117,7 +117,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
             mintCurrencyInternal(MINIMUM_LIQUIDITY);
-            sendCurrencyInternal(burnAddress, getCurrencyId(), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
+            sendCurrencyInternalSync(burnAddress, getCurrencyId(), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
         } else {
             liquidity = Math.min(
                 amount0.mul(_totalSupply) / _reserve0,
@@ -127,7 +127,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         require(liquidity > 0, "UniswapV2: INSUFFICIENT_LIQUIDITY_MINTED");
 
         mintCurrencyInternal(liquidity);
-        sendCurrencyInternal(to, getCurrencyId(), liquidity);
+        sendCurrencyInternalSync(to, getCurrencyId(), liquidity);
         _update(balance0, balance1, _reserve0, _reserve1);
         // if (feeOn) kLast = uint(reserve0).mul(reserve1); // reserve0 and reserve1 are p-to-date
         emit Mint(msg.sender, amount0, amount1);
@@ -152,7 +152,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             amount0 > 0 && amount1 > 0,
             "UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED"
         );
-        sendCurrencyInternal(burnAddress, getCurrencyId(), liquidity);
+        sendCurrencyInternalSync(burnAddress, getCurrencyId(), liquidity);
         totalSupply -= liquidity;
         _safeTransfer(tokenId0, to, amount0);
         _safeTransfer(tokenId1, to, amount1);
@@ -168,8 +168,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     function swap(
         uint amount0Out,
         uint amount1Out,
-        address to,
-        bytes calldata data
+        address to
     ) public lock {
         require(
             amount0Out > 0 || amount1Out > 0,
@@ -191,13 +190,6 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             require(to != _token0 && to != _token1, "UniswapV2: INVALID_TO");
             if (amount0Out > 0) _safeTransfer(tokenId0, to, amount0Out); // optimistically transfer tokens
             if (amount1Out > 0) _safeTransfer(tokenId1, to, amount1Out); // optimistically transfer tokens
-            if (data.length > 0)
-                IUniswapV2Callee(to).uniswapV2Call(
-                    msg.sender,
-                    amount0Out,
-                    amount1Out,
-                    data
-                );
             balance0 = Nil.currencyBalance(address(this), tokenId0);
             balance1 = Nil.currencyBalance(address(this), tokenId1);
         }

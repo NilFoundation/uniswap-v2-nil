@@ -96,6 +96,12 @@ abstract contract NilCurrencyBase is NilBase {
         Nil.asyncCall(to, address(0), address(0), 0, Nil.FORWARD_REMAINING, false, 0, tokens_, "");
     }
 
+    function sendCurrencyInternalSync(address to, uint256 currencyId, uint256 amount) public {
+        Nil.Token[] memory tokens_ = new Nil.Token[](1);
+        tokens_[0] = Nil.Token(currencyId, amount);
+        Nil.syncCall(to, msg.gas, msg.value, tokens_, "");
+    }
+
     /**
   * @dev Returns the balance of the currency for a given address.
      * @param account The address to check the balance for.
