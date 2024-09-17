@@ -3,13 +3,13 @@ pragma solidity ^0.8.0;
 
 
 interface IUniswapV2Router01 {
-    function factory() external pure returns (address);
 
     function addLiquidity(
         address tokenA,
         address tokenB,
         address to,
-        uint deadline
+        uint deadline,
+        uint salt
     ) external returns (uint amountA, uint amountB, uint liquidity);
     function removeLiquidity(
         address tokenA,

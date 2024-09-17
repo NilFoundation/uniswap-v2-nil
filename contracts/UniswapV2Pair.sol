@@ -20,7 +20,6 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     address public token1;
     uint256 public tokenId0;
     uint256 public tokenId1;
-    address public burnAddress;
 
     uint256 private reserve0; // uses single storage slot, accessible via getReserves
     uint256 private reserve1; // uses single storage slot, accessible via getReserves
@@ -60,10 +59,6 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         tokenId1 = _tokenId1;
     }
 
-    function setBurnAddress(address _burnAddress) public {
-        burnAddress = _burnAddress;
-    }
-
     // update reserves and, on the first call per block, price accumulators
     function _update(
         uint balance0,
@@ -83,7 +78,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         uint256 _reserve0,
         uint256 _reserve1
     ) private returns (bool feeOn) {
-        address feeTo = burnAddress;
+        address feeTo = address(0);
         feeOn = false;
         uint _kLast = kLast; // gas savings
         if (feeOn) {
@@ -117,7 +112,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
             mintCurrencyInternal(MINIMUM_LIQUIDITY);
-            sendCurrencyInternalSync(burnAddress, getCurrencyId(), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
+            burnCurrencyInternal(MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY
         } else {
             liquidity = Math.min(
                 amount0.mul(_totalSupply) / _reserve0,
@@ -152,7 +147,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             amount0 > 0 && amount1 > 0,
             "UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED"
         );
-        sendCurrencyInternalSync(burnAddress, getCurrencyId(), liquidity);
+        burnCurrencyInternal(liquidity);
         totalSupply -= liquidity;
         _safeTransfer(tokenId0, to, amount0);
         _safeTransfer(tokenId1, to, amount1);

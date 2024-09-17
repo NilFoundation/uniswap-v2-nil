@@ -65,6 +65,15 @@ abstract contract NilCurrencyBase is NilBase {
     }
 
     /**
+     * @dev Burns a specified amount of currency using external call.
+     * It is wrapper over `burnCurrencyInternal` method to provide access to the owner of the account.
+     * @param amount The amount of currency to burn.
+     */
+    function burnCurrency(uint256 amount) onlyExternal virtual public {
+        burnCurrencyInternal(amount);
+    }
+
+    /**
      * @dev Sends a specified amount of arbitrary currency to a given address.
      * It is wrapper over `sendCurrencyInternal` method to provide access to the owner of the account.
      * @param amount The amount of currency to mint.
@@ -79,9 +88,21 @@ abstract contract NilCurrencyBase is NilBase {
      * @param amount The amount of currency to mint.
      */
     function mintCurrencyInternal(uint256 amount) public {
-        bool success = __Precompile__(Nil.MINT_CURRENCY).precompileMintCurrency(amount);
+        bool success = __Precompile__(Nil.MANAGE_CURRENCY).precompileManageCurrency(amount, true);
         require(success, "Mint failed");
         totalSupply += amount;
+    }
+
+    /**
+     * @dev Burns a specified amount of currency and decreases the total supply.
+     * All burning should be carried out using this method.
+     * @param amount The amount of currency to mint.
+     */
+    function burnCurrencyInternal(uint256 amount) internal {
+        require(totalSupply >= amount, "Burn failed: not enough tokens");
+        bool success = __Precompile__(Nil.MANAGE_CURRENCY).precompileManageCurrency(amount, false);
+        require(success, "Burn failed");
+        totalSupply -= amount;
     }
 
     /**
@@ -99,7 +120,7 @@ abstract contract NilCurrencyBase is NilBase {
     function sendCurrencyInternalSync(address to, uint256 currencyId, uint256 amount) public {
         Nil.Token[] memory tokens_ = new Nil.Token[](1);
         tokens_[0] = Nil.Token(currencyId, amount);
-        Nil.syncCall(to, msg.gas, msg.value, tokens_, "");
+        Nil.syncCall(to, gasleft(), 0, tokens_, "");
     }
 
     /**
