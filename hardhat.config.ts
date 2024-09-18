@@ -1,16 +1,16 @@
-import '@nomicfoundation/hardhat-chai-matchers'
+import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomicfoundation/hardhat-ignition-ethers";
-import '@nomicfoundation/hardhat-ethers'
-import '@typechain/hardhat'
+import "@nomicfoundation/hardhat-ethers";
+import "@typechain/hardhat";
 import "@nomicfoundation/hardhat-ignition-ethers";
-import * as dotenv from "dotenv"
 import type { NilHardhatUserConfig } from "@nilfoundation/hardhat-plugin";
+import * as dotenv from "dotenv";
 import "@nilfoundation/hardhat-plugin";
 
 // Token Tasks
-import "./tasks/currency/info"
+import "./tasks/currency/info";
 import "./tasks/currency/send";
-import "./tasks/currency/mint"
+import "./tasks/currency/mint";
 
 // Other Tasks
 import "./tasks/initialize";
@@ -23,7 +23,6 @@ import "./tasks/get_pair";
 import "./tasks/pair_reserves";
 import "./tasks/flow_deploy_factory";
 import "./tasks/flow_swap";
-
 
 dotenv.config();
 
