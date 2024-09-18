@@ -1,38 +1,45 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+labels: Bug
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+# 🐞 Bug Report
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## 💻 **Describe the bug**
+<!-- --> A clear and concise description of the problem...
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+<pre><code> </code></pre>
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+<b> Has this worked before in a previous version? </b>
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+Yes, the previous version in which this bug was not present was:
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+<pre><code> </code></pre>
 
-**Additional context**
-Add any other context about the problem here.
+## 🔬 Minimal Reproduction
+
+<!-- -->  Please let us know how we can reproduce this issue
+<pre><code> </code></pre>
+
+## 🔥 Error
+<!-- ✍️--> If the issue is accompanied by an error, please share the error logs with us below. If you have a lot of logs, place make a paste bin with your logs and share the link with us here: 
+
+<pre><code> </code></pre>
+
+## 💡 Possible Solution
+<!-- --> If you have any ideas on how to fix this issue, feel free to share them here: 
+<pre><code> </code></pre>
+
+## 🌍 Environment
+<!-- --> Please provide the versions you're using and other relevant environment details: 
+<pre><code>1. Hardhat-Plugin: 
+2. Date when you were able to reproduce the issue: 
+3. Hardhat version: 
+4. Ethers version: 
+</code></pre>
+
+## 📄 Additional Context
+<!-- --> Add any other context or information that might help us understand the issue better: 
+<pre><code> </code></pre>
