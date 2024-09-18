@@ -21,11 +21,11 @@ import "./tasks/deploy_pair";
 import "./tasks/get_pair";
 import "./tasks/token_info";
 import "./tasks/send_token";
-import "./tasks/deploy_garbage_wallet";
 import "./tasks/pair_reserves";
 import "./tasks/faucet";
-import "./tasks/flow_1";
-import "./tasks/flow_2";
+import "./tasks/flow_deploy_factory";
+import "./tasks/flow_swap";
+import "./tasks/router_deploy";
 
 dotenv.config();
 

@@ -1,6 +1,6 @@
 import {task} from "hardhat/config";
 
-task("flow_1", "Deploy 2 tokens and factory")
+task("flow_deploy_factory", "Deploy 2 tokens and factory")
     .setAction(async (taskArgs, hre) => {
         const walletAddress = process.env.WALLET_ADDR!;
 

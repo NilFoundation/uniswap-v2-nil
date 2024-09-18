@@ -1,7 +1,7 @@
 import {task} from "hardhat/config";
 import {Token, UniswapV2Factory, UniswapV2Pair} from "../typechain-types";
 
-task("flow_2", "Init pair, mint tokens and run swap")
+task("flow_swp", "Init pair, mint tokens and run swap")
     .addParam("token0")
     .addParam("token1")
     .addParam("toburn")
@@ -43,9 +43,6 @@ task("flow_2", "Init pair, mint tokens and run swap")
         await pair.initialize(token0Address, token1Address, token0Id, token1Id);
         console.log("Inited pair")
 
-        await pair.setBurnAddress(taskArgs.toburn.toLowerCase());
-        console.log("Set burn address " + taskArgs.toburn.toLowerCase());
-
 
         // Mint tokens
         await token0Contract.mintCurrencyInternal(100000000)
@@ -80,7 +77,7 @@ task("flow_2", "Init pair, mint tokens and run swap")
         await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 10000)
         console.log("Sent token0 to the pair contract")
 
-        await pair.swap(0, 1000, walletAddress, '0x');
+        await pair.swap(0, 1000, walletAddress);
         console.log("Swapped")
         const balanceToken0After = await token0Contract.getCurrencyBalanceOf(walletAddress);
         const balanceToken1After = await token1Contract.getCurrencyBalanceOf(walletAddress);

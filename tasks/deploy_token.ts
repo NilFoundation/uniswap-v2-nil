@@ -6,7 +6,5 @@ task("deploy_token", "Deploy token")
         const Token = await hre.ethers.getContractFactory("Token");
         const contract = await Token.deploy("Token1");
 
-        // await contract.mintCurrency(1000000);
-
         console.log("Deployed " + JSON.stringify(contract));
     });
