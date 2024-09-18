@@ -15,4 +15,8 @@ task("currency_info", "Retrieve currency name and ID")
         // Call the getCurrencyId() function to retrieve the currency's unique ID
         const currencyId = await currency.getCurrencyId();
         console.log("Currency ID: " + currencyId);
+
+        // Retrieve the contract's own currency balance
+        const balance = await currency.getOwnCurrencyBalance();
+        console.log("Currency Balance: " + balance);
     });

@@ -39,7 +39,7 @@ Make sure to set the `currencyName` in your `./ignition/parameters.json` file be
 
 ### 2. Fetch Currency Data
 
-After deploying the currency contract, you can fetch the currency information (name and ID) by using the following command:
+After deploying the currency contract, you can fetch the currency information (name, ID, Balance) by using the following command:
 
 ```bash
 npx hardhat currency_info --address <Currency Address> --network nil
@@ -58,3 +58,14 @@ Run the following command to send currency:
 ```bash
 npx hardhat send_currency --network nil --to <Recipient Address> --address <Sender Contract Address> --amount <Amount>
 ```
+### 4. Mint Currency
+
+To mint additional currency, use the `mint_currency` task. You can mint any specified amount of currency to the contract:
+
+```bash
+npx hardhat mint_currency --network nil --address <Currency Contract Address> --amount <Amount>
+```
+
+This will mint the specified amount of native currency.
+
+---

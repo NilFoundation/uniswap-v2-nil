@@ -10,6 +10,7 @@ import "@nilfoundation/hardhat-plugin";
 // Token Tasks
 import "./tasks/currency/info"
 import "./tasks/currency/send";
+import "./tasks/currency/mint"
 
 // Other Tasks
 import "./tasks/initialize";
