@@ -1,6 +1,9 @@
 {
-  "name": "Uniswap V2",
-
+  "name": "Uniswap V2 on =nil;",
+  "version": "1.0.0",
+  "description": "This repository is an example repo to showcase how to migrate Uniswap V2 contracts to =nil; L2",
+  "author": "Nil Foundation",
+  "license": "GPL-3.0",
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test --network nil",
