@@ -1,0 +1,11 @@
+{
+  "DeployCurrency": {
+    "currencyName": "MyCurrency2"
+  },
+  "DeployFactory": {
+    "feeToSetter": "0x0000000000000000000000000000000000000000"
+  },
+  "DeployUniswapV2Router01": {
+    "factory": "0x0000000000000000000000000000000000000000"
+  }
+}
