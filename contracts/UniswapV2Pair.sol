@@ -183,8 +183,8 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             address _token0 = token0;
             address _token1 = token1;
             require(to != _token0 && to != _token1, "UniswapV2: INVALID_TO");
-            if (amount0Out > 0) _safeTransfer(tokenId0, to, amount0Out); // optimistically transfer tokens
-            if (amount1Out > 0) _safeTransfer(tokenId1, to, amount1Out); // optimistically transfer tokens
+            if (amount0Out > 0) _safeTransfer(tokenId0, to, amount0Out);
+            if (amount1Out > 0) _safeTransfer(tokenId1, to, amount1Out);
             balance0 = Nil.currencyBalance(address(this), tokenId0);
             balance1 = Nil.currencyBalance(address(this), tokenId1);
         }
