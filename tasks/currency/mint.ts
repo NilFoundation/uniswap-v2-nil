@@ -19,7 +19,7 @@ task("mint_currency", "Mint currency to the contract")
 
     // Mint the specified amount of currency
     console.log(`Minting ${mintAmount} currency...`);
-    await currencyContract.mintCurrencyInternal(mintAmount);
+    await currencyContract.mintCurrencyPublic(mintAmount);
 
     // Get the new balance after minting
     const newBalance = await currencyContract.getOwnCurrencyBalance();

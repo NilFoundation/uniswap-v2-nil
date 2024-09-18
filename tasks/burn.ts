@@ -27,7 +27,7 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
     console.log("Pair address", pairAddress);
     console.log("To address", toAddress);
 
-    await pair.mintCurrencyInternal(100);
+    await pair.mintCurrencyPublic(100);
 
     const liquidity = await pair.getOwnCurrencyBalance();
     console.log("Liquidity:", liquidity.toString());
@@ -53,7 +53,7 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
     const Wallet = await hre.ethers.getContractFactory("Wallet");
     const wallet = Wallet.attach(walletAddress) as Wallet;
 
-    const sentLp = await wallet.sendCurrencyInternal(
+    const sentLp = await wallet.sendCurrencyPublic(
       pairAddress.toLowerCase(),
       await pair.getCurrencyId(),
       100,

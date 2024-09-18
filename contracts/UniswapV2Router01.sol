@@ -4,9 +4,8 @@ pragma solidity ^0.8.0;
 import './interfaces/IUniswapV2Router01.sol';
 import './interfaces/IUniswapV2Factory.sol';
 import './libraries/UniswapV2Library.sol';
-import './nil/NilCurrencyBase.sol';
-import './nil/Nil.sol';
-import "./nil/Nil.sol";
+import "@nilfoundation/smart-contracts/contracts/NilCurrencyBase.sol";
+import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 
 contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {

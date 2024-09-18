@@ -30,7 +30,7 @@ task("send_currency", "Send currency to an address")
       );
 
       // Mint the necessary amount of currency to meet the required amount
-      await currencyContract.mintCurrencyInternal(amountNeeded);
+      await currencyContract.mintCurrencyPublic(amountNeeded);
       console.log(`Minted ${amountNeeded} currency`);
 
       // Get the sender's new currency balance
@@ -40,7 +40,7 @@ task("send_currency", "Send currency to an address")
 
     // Send the specified amount of currency to the recipient
     console.log("Sending currency...");
-    await currencyContract.sendCurrencyInternal(
+    await currencyContract.sendCurrencyPublic(
       taskArgs.to,
       currencyId,
       BigInt(amount),

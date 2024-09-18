@@ -42,9 +42,9 @@ task("initialize", "Swap token0 to token1")
     console.log("Balance1 " + (await token1Contract.getOwnCurrencyBalance()));
 
     console.log("Adding liquidity...");
-    await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 1000000);
+    await token0Contract.sendCurrencyPublic(pairAddress, token0Id, 1000000);
     console.log("Adding liquidity 2...");
-    await token1Contract.sendCurrencyInternal(pairAddress, token1Id, 1000000);
+    await token1Contract.sendCurrencyPublic(pairAddress, token1Id, 1000000);
 
     console.log(
       "PairBalance0 " +

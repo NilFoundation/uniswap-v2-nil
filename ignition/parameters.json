@@ -1,6 +1,6 @@
 {
   "DeployCurrency": {
-    "currencyName": "MyCurrency2"
+    "currencyName": "MyCurrency"
   },
   "DeployFactory": {
     "feeToSetter": "0x0000000000000000000000000000000000000000"

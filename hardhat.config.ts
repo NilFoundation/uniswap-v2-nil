@@ -14,7 +14,6 @@ import "./tasks/currency/mint";
 
 // Other Tasks
 import "./tasks/initialize";
-import "./tasks/swap";
 import "./tasks/sync";
 import "./tasks/skim";
 import "./tasks/burn";

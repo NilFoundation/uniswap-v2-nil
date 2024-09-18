@@ -64,11 +64,11 @@ task("flow_swp", "Init pair, mint tokens and run swap")
     console.log("Inited pair");
 
     // Mint tokens
-    await token0Contract.mintCurrencyInternal(100000000);
-    await token1Contract.mintCurrencyInternal(100000000);
+    await token0Contract.mintCurrencyPublic(100000000);
+    await token1Contract.mintCurrencyPublic(100000000);
     console.log("Minted token0 and token1");
-    await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 10000);
-    await token1Contract.sendCurrencyInternal(pairAddress, token1Id, 10000);
+    await token0Contract.mintCurrencyPublic(pairAddress, token0Id, 10000);
+    await token1Contract.mintCurrencyPublic(pairAddress, token1Id, 10000);
     console.log("Sent token0 and token1 to the pair contract");
 
     // Case 1: Mint pair tokens
@@ -103,7 +103,7 @@ task("flow_swp", "Init pair, mint tokens and run swap")
     console.log("User balance token0 before:", balanceToken0Before);
     console.log("User balance token1 before:", balanceToken1Before);
 
-    await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 10000);
+    await token0Contract.sendCurrencyPublic(pairAddress, token0Id, 10000);
     console.log("Sent token0 to the pair contract");
 
     await pair.swap(0, 1000, walletAddress);

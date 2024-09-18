@@ -4,9 +4,9 @@ pragma solidity ^0.8.0;
 import "./interfaces/IUniswapV2Pair.sol";
 import "./libraries/Math.sol";
 import "./interfaces/IUniswapV2Factory.sol";
-import {NilCurrencyBase} from "./nil/NilCurrencyBase.sol";
+import "@nilfoundation/smart-contracts/contracts/NilCurrencyBase.sol";
 import "./libraries/SafeMath.sol";
-import "./nil/Nil.sol";
+import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 
 contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     using SafeMath for uint;
