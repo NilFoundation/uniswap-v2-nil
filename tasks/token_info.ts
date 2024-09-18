@@ -13,5 +13,5 @@ task("token_info", "Token info")
 
         const result = await token.getCurrencyId();
 
-        console.log(result);
+        console.log("currency id: " + result);
     });
