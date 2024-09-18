@@ -7,7 +7,6 @@ import "./UniswapV2Pair.sol";
 contract UniswapV2Factory is IUniswapV2Factory {
     address public feeTo;
     address public feeToSetter;
-    address public tokenLib;
 
     mapping(address => mapping(address => address)) public getPair;
     address[] public allPairs;
@@ -19,19 +18,19 @@ contract UniswapV2Factory is IUniswapV2Factory {
         uint
     );
 
-    constructor(address _feeToSetter, address _tokenLib) payable {
+    constructor(address _feeToSetter) {
         feeToSetter = _feeToSetter;
-        tokenLib = _tokenLib;
     }
 
-    function allPairsLength() external view returns (uint) {
+    function allPairsLength() public view returns (uint) {
         return allPairs.length;
     }
 
     function createPair(
         address tokenA,
-        address tokenB
-    ) external payable returns (address pair) {
+        address tokenB,
+        uint256 salt
+    ) public returns (address pair) {
         require(tokenA != tokenB, "UniswapV2: IDENTICAL(_ADDRESSES");
         (address token0, address token1) = tokenA < tokenB
             ? (tokenA, tokenB)
@@ -41,34 +40,42 @@ contract UniswapV2Factory is IUniswapV2Factory {
             getPair[token0][token1] == address(0),
             "UniswapV2: PAIR_EXISTS"
         ); // single check is sufficient
-        // bytes memory bytecode = type(UniswapV2Pair).creationCode;
-        // bytes32 salt = keccak256(abi.encodePacked(token0, token1));
-        // assembly {
-        //     pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
-        //
-        pair = address(new UniswapV2Pair());
+        pair = address(deployPair(salt));
 
-        // IUniswapV2Pair(pair).initialize(token0, token1);
-        // IUniswapV2Pair(pair).setTokenLib(tokenLib);
 
         getPair[token0][token1] = pair;
-        getPair[token1][token0] = pair; // populate mapping in the reverse direction
+        getPair[token1][token0] = pair;
         allPairs.push(pair);
 
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
 
-    function setFeeTo(address _feeTo) external payable {
+    function getTokenPair(
+        address tokenA,
+        address tokenB
+    ) public view returns (address) {
+        require(tokenA != tokenB, "UniswapV2: IDENTICAL(_ADDRESSES");
+        (address token0, address token1) = tokenA < tokenB
+            ? (tokenA, tokenB)
+            : (tokenB, tokenA);
+        require(token0 != address(0), "UniswapV2: ZERO_ADDRESS");
+        return getPair[token0][token1];
+    }
+
+    function setFeeTo(address _feeTo) public {
         require(msg.sender == feeToSetter, "UniswapV2: FORBIDDEN");
         feeTo = _feeTo;
     }
 
-    function setFeeToSetter(address _feeToSetter) external payable {
+    function setFeeToSetter(address _feeToSetter) public {
         require(msg.sender == feeToSetter, "UniswapV2: FORBIDDEN");
         feeToSetter = _feeToSetter;
     }
 
-    function getTokenLib() public view returns (address) {
-        return tokenLib;
+    function deployPair(uint256 salt) private returns (address deployedAddress) {
+        bytes memory code = abi.encodePacked(type(UniswapV2Pair).creationCode, abi.encode(msg.sender));
+        address contractAddress = Nil.createAddress(1, code, salt);
+        Nil.asyncCall(contractAddress, address(0), msg.sender, 0, 0, true, 0, abi.encodePacked(code, salt));
+        return contractAddress;
     }
 }

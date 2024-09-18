@@ -9,7 +9,7 @@ This repository is an example repo to showcase how to migrate dApps from Ethereu
 2. How to utilize async calls.
 3. How to distribute load to multiple shards.
 
-## How to run
+## How to setup
 
 1) Clone the Nil repo and run a node. Instructions can be found [here](https://github.com/NilFoundation/nil).
 
@@ -38,21 +38,35 @@ PRIVATE_KEY=<your_private_key_here>
 
 Ensure to replace `<your_private_key_here>` with the actual private key without the `0x` prefix.
 
-4) Deploy the contracts:
+4) Enable debug logs. In `hardhat.config.ts` set `debug: true`.
+For now you can't see deployed contract addresses directly from hardhat results.
 
-Run the deployment command twice due to a known issue with deploying two contracts in the same script:
+
+## How to use
+
+1) First you need to deploy token contracts and factory(or use existing ones).
+In case of deployment new contracts please copy them from the debug logs.
 
 ```shell
-npx hardhat ignition deploy ./ignition/modules/amm.ts --network nil
+npx hardhat flow_1 --network nil 
 ```
 
-5) Execute commands such as `swap`, `info`, `sync`, `skim`, and `burn` using the appropriate pair and library addresses.
+Deployment log example
+```
+Response deployment {"hash":"0x0b788324e101a972c383d0a8ecd58084921d3ac84869b761c643317728eaf66d","address":"0x0001fd2e170eec3b3b538183c4d749adca5065b1"}
+```
 
-## Project Phases
+2) Run flow to check DEX flows. This task will init a pair contract(or fetch the existed).
+Then it mint pair tokens and run swap
+```shell
+npx hardhat flow_2 --network nil --token0 <token0address> --token1 <token1address> --toburn <burnaddress> --factory <factoryaddress>
+```
 
-1. Deploy Uniswap V2 pair and factory contract to a single shard with mock tokens.
-2. Replace mock tokens with Nil multicurrency.
-3. Design the architecture to utilize shards.
+## Current Issues
+
+1. Deployed contract address can be fetched only from debug logs
+2. No chained swaps support
+3. Security: no router contract to send tokens and call pair message in single transaction.
 
 ## License
 

@@ -13,10 +13,21 @@ import "./tasks/swap";
 import "./tasks/info";
 import "./tasks/sync";
 import "./tasks/skim";
-import "./tasks/burn"
+import "./tasks/burn";
+import "./tasks/deploy_token";
+import "./tasks/mint_token";
+import "./tasks/deploy_factory";
+import "./tasks/deploy_pair";
+import "./tasks/get_pair";
+import "./tasks/token_info";
+import "./tasks/send_token";
+import "./tasks/pair_reserves";
+import "./tasks/faucet";
+import "./tasks/flow_deploy_factory";
+import "./tasks/flow_swap";
+import "./tasks/router_deploy";
 
 dotenv.config();
-
 
 const config: NilHardhatUserConfig = {
   ignition: {
@@ -68,7 +79,7 @@ const config: NilHardhatUserConfig = {
     },
   },
   walletAddress: process.env.WALLET_ADDR,
-  directTxGasLimit: 500000
+  debug: true,
 };
 
 export default config;

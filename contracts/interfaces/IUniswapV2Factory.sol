@@ -4,7 +4,7 @@ interface IUniswapV2Factory {
     function feeTo() external view returns (address);
     function feeToSetter() external view returns (address);
 
-    function getPair(
+    function getTokenPair(
         address tokenA,
         address tokenB
     ) external view returns (address pair);
@@ -13,9 +13,10 @@ interface IUniswapV2Factory {
 
     function createPair(
         address tokenA,
-        address tokenB
-    ) external payable returns (address pair);
+        address tokenB,
+        uint256 salt
+    ) external returns (address pair);
 
-    function setFeeTo(address) external payable;
-    function setFeeToSetter(address) external payable;
+    function setFeeTo(address) external;
+    function setFeeToSetter(address) external;
 }
