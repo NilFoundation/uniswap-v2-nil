@@ -9,5 +9,5 @@ task("get_reserves", "Get reserver")
         const pair = Pair.attach(taskArgs.pair.toLowerCase()) as UniswapV2Pair;
         const result = await pair.getReserves();
 
-        console.log(result);
+        console.log("Reserves " + result);
     });
