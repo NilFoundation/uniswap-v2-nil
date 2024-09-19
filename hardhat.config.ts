@@ -10,7 +10,6 @@ import "@nilfoundation/hardhat-plugin";
 // Tasks
 import "./tasks/initialize";
 import "./tasks/swap";
-import "./tasks/info";
 import "./tasks/sync";
 import "./tasks/skim";
 import "./tasks/burn";
@@ -22,10 +21,11 @@ import "./tasks/get_pair";
 import "./tasks/token_info";
 import "./tasks/send_token";
 import "./tasks/pair_reserves";
-import "./tasks/faucet";
 import "./tasks/flow_deploy_factory";
 import "./tasks/flow_swap";
 import "./tasks/router_deploy";
+import "./tasks/router_init";
+import "./tasks/router_debug";
 
 dotenv.config();
 

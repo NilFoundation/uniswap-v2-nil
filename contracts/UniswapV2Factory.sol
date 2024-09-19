@@ -40,7 +40,7 @@ contract UniswapV2Factory is IUniswapV2Factory {
             getPair[token0][token1] == address(0),
             "UniswapV2: PAIR_EXISTS"
         ); // single check is sufficient
-        pair = address(deployPair(salt));
+        pair = deployPair(salt);
 
 
         getPair[token0][token1] = pair;
@@ -48,6 +48,7 @@ contract UniswapV2Factory is IUniswapV2Factory {
         allPairs.push(pair);
 
         emit PairCreated(token0, token1, pair, allPairs.length);
+        return pair;
     }
 
     function getTokenPair(

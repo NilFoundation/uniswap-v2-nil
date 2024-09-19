@@ -5,8 +5,6 @@ task("initialize", "Swap token0 to token1")
     .addParam("pair", "pair contract")
     .addParam("token0")
     .addParam("token1")
-    .addParam("toburn")
-    .addParam("supply")
     .setAction(async (taskArgs, hre) => {
         const walletAddress = process.env.WALLET_ADDR;
         if (!walletAddress) {
@@ -16,7 +14,6 @@ task("initialize", "Swap token0 to token1")
         const pairAddress = taskArgs.pair;
         const token0 = taskArgs.token0;
         const token1 = taskArgs.token1;
-        const supply = taskArgs.supply;
 
         const Token0 = await hre.ethers.getContractFactory("Token");
         const token0Contract = Token0.attach(taskArgs.token0) as Token;
@@ -34,17 +31,17 @@ task("initialize", "Swap token0 to token1")
 
         console.log("initialize ", pairAddress);
         await pair.initialize(token0, token1, token0Id, token1Id);
-        //
-        console.log("Setting burn address");
-        await pair.setBurnAddress(taskArgs.toburn);
 
         console.log("Balance0 " + await token0Contract.getOwnCurrencyBalance());
         console.log("Balance1 " + await token1Contract.getOwnCurrencyBalance());
 
+        await token0Contract.mintCurrencyInternal(100000000000);
+        await token1Contract.mintCurrencyInternal(100000000000);
+
         console.log("Adding liquidity...");
-        await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 1000000);
+        await token0Contract.sendCurrencyInternal(pairAddress, token0Id, 10000000000);
         console.log("Adding liquidity 2...");
-        await token1Contract.sendCurrencyInternal(pairAddress, token1Id, 1000000);
+        await token1Contract.sendCurrencyInternal(pairAddress, token1Id, 10000000000);
 
         console.log("PairBalance0 " + await token0Contract.getCurrencyBalanceOf(pairAddress));
         console.log("PairBalance1 " + await token1Contract.getCurrencyBalanceOf(pairAddress));

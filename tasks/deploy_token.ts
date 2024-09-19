@@ -1,4 +1,5 @@
 import {task} from "hardhat/config";
+import {Token} from "../typechain-types";
 
 task("deploy_token", "Deploy token")
     .setAction(async (taskArgs, hre) => {
