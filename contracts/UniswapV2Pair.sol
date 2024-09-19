@@ -4,10 +4,9 @@ pragma solidity ^0.8.0;
 import "./interfaces/IUniswapV2Pair.sol";
 import "./libraries/Math.sol";
 import "./interfaces/IUniswapV2Factory.sol";
-import "./interfaces/IUniswapV2Callee.sol";
-import {NilCurrencyBase} from "./nil/NilCurrencyBase.sol";
+import "@nilfoundation/smart-contracts/contracts/NilCurrencyBase.sol";
 import "./libraries/SafeMath.sol";
-import "./nil/Nil.sol";
+import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 
 contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     using SafeMath for uint;
@@ -44,7 +43,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     }
 
     function _safeTransfer(uint256 _tokenId, address _to, uint _value) private {
-        sendCurrencyInternalSync(_to, _tokenId, _value);
+        sendCurrencyInternal(_to, _tokenId, _value);
     }
 
     constructor() payable {
@@ -91,7 +90,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
                     uint liquidity = numerator / denominator;
                     if (liquidity > 0)
                         mintCurrencyInternal(liquidity);
-                    sendCurrencyInternalSync(feeTo, getCurrencyId(), liquidity);
+                    sendCurrencyInternal(feeTo, getCurrencyId(), liquidity);
                 }
             }
         } else if (_kLast != 0) {
@@ -122,7 +121,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         require(liquidity > 0, "UniswapV2: INSUFFICIENT_LIQUIDITY_MINTED");
 
         mintCurrencyInternal(liquidity);
-        sendCurrencyInternalSync(to, getCurrencyId(), liquidity);
+        sendCurrencyInternal(to, getCurrencyId(), liquidity);
         _update(balance0, balance1, _reserve0, _reserve1);
         // if (feeOn) kLast = uint(reserve0).mul(reserve1); // reserve0 and reserve1 are p-to-date
         emit Mint(msg.sender, amount0, amount1);

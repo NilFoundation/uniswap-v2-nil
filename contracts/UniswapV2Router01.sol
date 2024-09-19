@@ -4,9 +4,8 @@ pragma solidity ^0.8.0;
 import './interfaces/IUniswapV2Router01.sol';
 import './interfaces/IUniswapV2Factory.sol';
 import './libraries/UniswapV2Library.sol';
-import './nil/NilCurrencyBase.sol';
-import './nil/Nil.sol';
-import "./nil/Nil.sol";
+import "@nilfoundation/smart-contracts/contracts/NilCurrencyBase.sol";
+import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 
 contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
@@ -18,6 +17,9 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
     }
 
     constructor(address _factory) public {
+        // Revert if the factory address is the zero address or an empty string
+        require(_factory != address(0), "Factory address cannot be the zero address");
+
         factory = _factory;
     }
 
@@ -45,8 +47,8 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         if (tokens.length != 2) {
             revert("UniswapV2Router: Expect 2 tokens to add liquidity");
         }
-        sendCurrencyInternalSync(pair, tokenAId, tokens[0].amount);
-        sendCurrencyInternalSync(pair, tokenBId, tokens[1].amount);
+        sendCurrencyInternal(pair, tokenAId, tokens[0].amount);
+        sendCurrencyInternal(pair, tokenBId, tokens[1].amount);
         liquidity = IUniswapV2Pair(pair).mint(to);
         amountA = tokens[0].amount;
         amountB = tokens[1].amount;
@@ -72,7 +74,7 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         if (tokens.length != 1) {
             revert("UniswapV2Router: should contains only pair token");
         }
-        sendCurrencyInternalSync(pair, tokens[0].id, tokens[0].amount); // send liquidity to pair
+        sendCurrencyInternal(pair, tokens[0].id, tokens[0].amount); // send liquidity to pair
     }
 
     // **** SWAP ****
@@ -100,7 +102,7 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         require(amounts[amounts.length - 1] >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');
         address pair = IUniswapV2Factory(factory).getTokenPair(path[0], path[1]);
         Nil.Token[] memory tokens = Nil.msgTokens();
-        sendCurrencyInternalSync(pair, tokens[0].id, amounts[0]);
+        sendCurrencyInternal(pair, tokens[0].id, amounts[0]);
         _swap(amounts, path, to);
     }
 
@@ -115,7 +117,7 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         require(amounts[0] <= amountInMax, 'UniswapV2Router: EXCESSIVE_INPUT_AMOUNT');
         address pair = IUniswapV2Factory(factory).getTokenPair(path[0], path[1]);
         Nil.Token[] memory tokens = Nil.msgTokens();
-        sendCurrencyInternalSync(pair, tokens[0].id, amounts[0]);
+        sendCurrencyInternal(pair, tokens[0].id, amounts[0]);
         _swap(amounts, path, to);
     }
 
