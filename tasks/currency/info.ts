@@ -4,9 +4,11 @@ import type { Currency } from "../../typechain-types";
 task("currency_info", "Retrieve currency name and ID")
   .addParam("address", "The address of the deployed currency contract")
   .setAction(async (taskArgs, hre) => {
+    const address = taskArgs.address
+
     // Attach the Currency contract at the provided address
     const Currency = await hre.ethers.getContractFactory("Currency");
-    const currency = Currency.attach(taskArgs.address) as Currency;
+    const currency = Currency.attach(address) as Currency;
 
     // Retrieve the currency's name
     const currencyName = await currency.getCurrencyName();

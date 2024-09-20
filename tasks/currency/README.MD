@@ -45,13 +45,13 @@ After deploying the currency contract, you can fetch the currency information (n
 npx hardhat currency_info --address <Currency Address> --network nil
 ```
 
-Replace `<Currency Address>` with the actual deployed contract address.
+Replace `<Currency Address>` with the actual deployed contract address
 
 ### 3. Send Native Currency
 
 You can send native currency from one contract to another using the `send_currency` task. The task checks if the source contract has enough native currency, mints additional currency if necessary, and transfers it to the destination contract.
 
-The destination contract must be payable to accept the currency.
+The destination contract must be payable to accept the currency
 
 Run the following command to send currency:
 
@@ -66,6 +66,17 @@ To mint additional currency, use the `mint_currency` task. You can mint any spec
 npx hardhat mint_currency --network nil --address <Currency Contract Address> --amount <Amount>
 ```
 
-This will mint the specified amount of native currency.
+This will mint the specified amount of native currency
+
+### Mint and Send Currency to a Wallet
+
+To mint currency from two contracts and send it to a specified wallet, use the mint-wallet task:
+
+```bash
+npx hardhat mint-wallet --network nil --currency0 <Currency0 Address> --currency1 <Currency1 Address> --wallet <Wallet Address> --amount <Amount>
+
+```
+
+This will mint the specified amount of both currencies and send it to the specified wallet
 
 ---

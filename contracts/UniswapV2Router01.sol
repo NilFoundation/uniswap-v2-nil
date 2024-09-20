@@ -31,7 +31,7 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         uint salt
     ) external override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
         if (IUniswapV2Factory(factory).getTokenPair(tokenA, tokenB) == address(0)) {
-            IUniswapV2Factory(factory).createPair(tokenA, tokenB, salt);
+            IUniswapV2Factory(factory).createPair(tokenA, tokenB, 1, salt);
         }
         address pair = IUniswapV2Factory(factory).getTokenPair(tokenA, tokenB);
         uint tokenAId = NilCurrencyBase(tokenA).getCurrencyId();

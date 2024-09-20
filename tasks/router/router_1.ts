@@ -13,7 +13,7 @@ import {
   UniswapV2Factory,
   UniswapV2Pair,
   UniswapV2Router01,
-} from "../typechain-types";
+} from "../../typechain-types";
 
 task("router_1", "Router: init and add liquidity")
   .addParam("token0")
