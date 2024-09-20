@@ -40,11 +40,3 @@ npx hardhat get-pair --network nil --factory <Factory Address> --currency0 <Curr
 Replace `<Factory Address>`, `<Currency0 Address>`, and `<Currency1 Address>` with the actual addresses.
 
 ---
-
-### 4. Deploy a Currency Contract
-
-To deploy your own currency contract, use the following command:
-
-```bash
-npx hardhat ignition deploy ./ignition/modules/Currency.ts --network nil --parameters ./ignition/parameters.json
-```

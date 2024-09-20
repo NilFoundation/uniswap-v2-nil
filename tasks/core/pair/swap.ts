@@ -6,7 +6,7 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
 .addParam("wallet", "The address of the user which is swapping")
 .addParam("amount", "The amount of currency0 to swap")
 .setAction(async (taskArgs, hre) => {
-  // Normalize input addresses
+  // Destructure parameters for clarity
   const userWalletAddress = taskArgs.wallet.toLowerCase();
   const pairAddress = taskArgs.pair.toLowerCase();
   const swapAmount = BigInt(taskArgs.amount);
@@ -19,8 +19,8 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
   const currency0Address = await pair.token0();
   const currency1Address = await pair.token1();
 
-  console.log("Currency 0 Address: ", currency0Address.toString());
-  console.log("Currency 1 Address: ", currency1Address.toString());
+  console.log("Currency 0 Address:", currency0Address.toString());
+  console.log("Currency 1 Address:", currency1Address.toString());
 
   // Attach to the Currency contracts
   const CurrencyFactory = await hre.ethers.getContractFactory("Currency");

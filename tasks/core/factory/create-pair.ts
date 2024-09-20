@@ -1,28 +1,32 @@
 import { task } from "hardhat/config";
 import type { UniswapV2Factory, Currency, UniswapV2Pair } from "../../../typechain-types";
 
-task("deploy-pair", "Deploy and initialize a new Uniswap V2 pair")
+task("create-pair", "Deploy and initialize a new Uniswap V2 pair")
 .addParam("factory", "The address of the Uniswap V2 factory")
 .addParam("currency0", "The address of the first currency")
 .addParam("currency1", "The address of the second currency")
 .setAction(async (taskArgs, hre) => {
+  // Destructure parameters for clarity
+  const factoryAddress = taskArgs.factory;
+  const currency0Address = taskArgs.currency0;
+  const currency1Address = taskArgs.currency1;
+  const shardId = 1;
+
   // Attach to the Uniswap V2 Factory contract
   const factoryContract = await hre.ethers.getContractFactory("UniswapV2Factory");
-  const factory = factoryContract.attach(taskArgs.factory) as UniswapV2Factory;
-
-  const shardId = 1;
+  const factory = factoryContract.attach(factoryAddress) as UniswapV2Factory;
 
   // Create the pair and get its address
   await factory.createPair(
-      taskArgs.currency0.toLowerCase(),
-      taskArgs.currency1.toLowerCase(),
+      currency0Address.toLowerCase(),
+      currency1Address.toLowerCase(),
       Math.floor(Math.random() * 10000000),
       shardId,
   );
 
   const pairAddress = await factory.getTokenPair(
-      taskArgs.currency0.toLowerCase(),
-      taskArgs.currency1.toLowerCase()
+      currency0Address.toLowerCase(),
+      currency1Address.toLowerCase()
   );
 
   // Log the pair address
@@ -31,11 +35,11 @@ task("deploy-pair", "Deploy and initialize a new Uniswap V2 pair")
   // Attach to the Currency contract for both currencies
   const currencyContract = await hre.ethers.getContractFactory("Currency");
 
-  const firstCurrency = currencyContract.attach(taskArgs.currency0) as Currency;
+  const firstCurrency = currencyContract.attach(currency0Address) as Currency;
   const firstCurrencyId = await firstCurrency.getCurrencyId();
   console.log(`First currency ID: ${firstCurrencyId}`);
 
-  const secondCurrency = currencyContract.attach(taskArgs.currency1) as Currency;
+  const secondCurrency = currencyContract.attach(currency1Address) as Currency;
   const secondCurrencyId = await secondCurrency.getCurrencyId();
   console.log(`Second currency ID: ${secondCurrencyId}`);
 
@@ -45,8 +49,8 @@ task("deploy-pair", "Deploy and initialize a new Uniswap V2 pair")
 
   // Initialize the pair with currency addresses and IDs
   await pair.initialize(
-      taskArgs.currency0,
-      taskArgs.currency1,
+      currency0Address,
+      currency1Address,
       firstCurrencyId,
       secondCurrencyId
   );

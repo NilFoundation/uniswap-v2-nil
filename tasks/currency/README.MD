@@ -74,7 +74,6 @@ To mint currency from two contracts and send it to a specified wallet, use the m
 
 ```bash
 npx hardhat mint-wallet --network nil --currency0 <Currency0 Address> --currency1 <Currency1 Address> --wallet <Wallet Address> --amount <Amount>
-
 ```
 
 This will mint the specified amount of both currencies and send it to the specified wallet
