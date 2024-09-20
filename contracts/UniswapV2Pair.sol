@@ -110,8 +110,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
 
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
-            mintCurrencyInternal(MINIMUM_LIQUIDITY);
-            burnCurrencyInternal(MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY
+            totalSupply = totalSupply + liquidity; // permanently lock the first MINIMUM_LIQUIDITY
         } else {
             liquidity = Math.min(
                 amount0.mul(_totalSupply) / _reserve0,
@@ -147,7 +146,6 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
             "UniswapV2: INSUFFICIENT_LIQUIDITY_BURNED"
         );
         burnCurrencyInternal(liquidity);
-        totalSupply -= liquidity;
         _safeTransfer(tokenId0, to, amount0);
         _safeTransfer(tokenId1, to, amount1);
 

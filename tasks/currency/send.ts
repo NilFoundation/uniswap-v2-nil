@@ -6,12 +6,15 @@ task("send_currency", "Send currency to an address")
   .addParam("address", "The contract address of the currency")
   .addParam("amount", "The amount of currency to send")
   .setAction(async (taskArgs, hre) => {
+    // Destructure parameters for clarity
+    const recipientAddress = taskArgs.to;
+    const currencyAddress = taskArgs.address;
     const amount = BigInt(taskArgs.amount);
 
     // Attach the Currency contract at the provided address
     const CurrencyFactory = await hre.ethers.getContractFactory("Currency");
     const currencyContract = CurrencyFactory.attach(
-      taskArgs.address,
+      currencyAddress,
     ) as Currency;
 
     // Get the sender's current currency balance
@@ -41,9 +44,9 @@ task("send_currency", "Send currency to an address")
     // Send the specified amount of currency to the recipient
     console.log("Sending currency...");
     await currencyContract.sendCurrencyPublic(
-      taskArgs.to,
+      recipientAddress,
       currencyId,
-      BigInt(amount),
+      amount,
     );
 
     // Get the new balance after sending the currency
@@ -51,8 +54,7 @@ task("send_currency", "Send currency to an address")
     console.log("New Balance: " + newBalance);
 
     // Verify the balance of the recipient contract using getCurrencyBalanceOf
-    const recipientBalance = await currencyContract.getCurrencyBalanceOf(
-      taskArgs.to,
-    );
+    const recipientBalance =
+      await currencyContract.getCurrencyBalanceOf(recipientAddress);
     console.log("Recipient balance after transfer: " + recipientBalance);
   });
