@@ -10,9 +10,7 @@ task("mint_currency", "Mint currency to the contract")
 
     // Attach the Currency contract at the provided address
     const CurrencyFactory = await hre.ethers.getContractFactory("Currency");
-    const currencyContract = CurrencyFactory.attach(
-        address,
-    ) as Currency;
+    const currencyContract = CurrencyFactory.attach(address) as Currency;
 
     // Get the balance before minting
     const balance = await currencyContract.getOwnCurrencyBalance();
