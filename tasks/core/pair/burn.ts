@@ -1,8 +1,8 @@
+import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
 import type { Currency, UniswapV2Pair } from "../../../typechain-types";
-import {waitTillCompleted} from "@nilfoundation/niljs";
-import {createClient} from "../../util/client";
-import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import { createClient } from "../../util/client";
 
 task("burn", "Burn liquidity tokens and print balances and reserves")
   .addParam("pair", "The address of the pair contract")
@@ -13,7 +13,7 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
       throw new Error("WALLET_ADDR is not set in environment variables");
     }
 
-    const {wallet, publicClient} = await createClient();
+    const { wallet, publicClient } = await createClient();
 
     // Destructure parameters for clarity
     const pairAddress = taskArgs.pair;
@@ -65,7 +65,6 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
       userBalanceToken1.toString(),
     );
 
-
     const lpAddress = await pair.getCurrencyId();
     const userLpBalance = await pair.getCurrencyBalanceOf(walletAddress);
     console.log("Total LP balance for user wallet:", userLpBalance.toString());
@@ -80,15 +79,11 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
         {
           id: lpAddress,
           amount: BigInt(userLpBalance),
-        }
-      ]
+        },
+      ],
     });
 
-    await waitTillCompleted(
-        publicClient,
-        shardNumber(walletAddress),
-        hash,
-    );
+    await waitTillCompleted(publicClient, shardNumber(walletAddress), hash);
 
     // Execute burn
     console.log("Executing burn...");

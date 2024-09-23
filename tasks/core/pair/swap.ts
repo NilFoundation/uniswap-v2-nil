@@ -1,11 +1,8 @@
+import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
-import type {
-  Currency,
-  UniswapV2Pair,
-} from "../../../typechain-types";
-import {createClient} from "../../util/client";
-import {waitTillCompleted} from "@nilfoundation/niljs";
-import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import type { Currency, UniswapV2Pair } from "../../../typechain-types";
+import { createClient } from "../../util/client";
 
 task("swap", "Swap currency0 for currency1 in the Uniswap pair")
   .addParam("pair", "The address of the Uniswap pair contract")
@@ -17,7 +14,7 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
       throw new Error("WALLET_ADDR is not set in environment variables");
     }
 
-    const {wallet, publicClient} = await createClient();
+    const { wallet, publicClient } = await createClient();
 
     // Destructure parameters for clarity
     const pairAddress = taskArgs.pair.toLowerCase();
@@ -91,15 +88,11 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
         {
           id: currency0Id,
           amount: BigInt(swapAmount),
-        }
-      ]
+        },
+      ],
     });
 
-    await waitTillCompleted(
-        publicClient,
-        shardNumber(walletAddress),
-        hash,
-    );
+    await waitTillCompleted(publicClient, shardNumber(walletAddress), hash);
 
     console.log(
       `Sent ${swapAmount.toString()} of currency0 to the pair contract.`,

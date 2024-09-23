@@ -1,14 +1,11 @@
+import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
-import type {
-  Currency,
-  UniswapV2Pair,
-} from "../../../typechain-types";
-import {createClient} from "../../util/client";
-import {waitTillCompleted} from "@nilfoundation/niljs";
-import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import type { Currency, UniswapV2Pair } from "../../../typechain-types";
+import { createClient } from "../../util/client";
 
 task("mint", "Mint currencies and add liquidity to the pair")
-.addParam("pair", "The address of the pair contract")
+  .addParam("pair", "The address of the pair contract")
   .addParam("amount0", "The amount of the first currency to mint")
   .addParam("amount1", "The amount of the second currency to mint")
   .setAction(async (taskArgs, hre) => {
@@ -18,7 +15,7 @@ task("mint", "Mint currencies and add liquidity to the pair")
       throw new Error("WALLET_ADDR is not set in environment variables");
     }
 
-    const {wallet, publicClient} = await createClient();
+    const { wallet, publicClient } = await createClient();
 
     // Destructure parameters for clarity
     const pairAddress = taskArgs.pair;
@@ -49,7 +46,9 @@ task("mint", "Mint currencies and add liquidity to the pair")
     console.log("Currency 1 ID:", currency1Id);
 
     // Send currency amounts to the pair contract
-    console.log(`Sending ${amount0} currency0 and ${amount1} currency1 to ${pairAddress}...`);
+    console.log(
+      `Sending ${amount0} currency0 and ${amount1} currency1 to ${pairAddress}...`,
+    );
     const hash = await wallet.sendMessage({
       // @ts-ignore
       to: pairAddress,
@@ -64,15 +63,11 @@ task("mint", "Mint currencies and add liquidity to the pair")
         {
           id: currency1Id,
           amount: BigInt(amount1),
-        }
-      ]
+        },
+      ],
     });
 
-    await waitTillCompleted(
-        publicClient,
-        shardNumber(walletAddress),
-        hash,
-    );
+    await waitTillCompleted(publicClient, shardNumber(walletAddress), hash);
 
     // Log balances in the pair contract
     const pairCurrency0Balance =
