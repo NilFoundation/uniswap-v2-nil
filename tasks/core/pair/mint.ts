@@ -2,18 +2,26 @@ import { task } from "hardhat/config";
 import type {
   Currency,
   UniswapV2Pair,
-  UserWallet,
 } from "../../../typechain-types";
+import {createClient} from "../../util/client";
+import {waitTillCompleted} from "@nilfoundation/niljs";
+import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 
 task("mint", "Mint currencies and add liquidity to the pair")
-  .addParam("pair", "The address of the pair contract")
-  .addParam("wallet", "The address of the user contract")
+.addParam("pair", "The address of the pair contract")
   .addParam("amount0", "The amount of the first currency to mint")
   .addParam("amount1", "The amount of the second currency to mint")
   .setAction(async (taskArgs, hre) => {
+    const walletAddress = process.env.WALLET_ADDR;
+
+    if (!walletAddress) {
+      throw new Error("WALLET_ADDR is not set in environment variables");
+    }
+
+    const {wallet, publicClient} = await createClient();
+
     // Destructure parameters for clarity
     const pairAddress = taskArgs.pair;
-    const walletAddress = taskArgs.wallet;
     const amount0 = taskArgs.amount0;
     const amount1 = taskArgs.amount1;
 
@@ -40,16 +48,31 @@ task("mint", "Mint currencies and add liquidity to the pair")
     const currency1Id = await currency1.getCurrencyId();
     console.log("Currency 1 ID:", currency1Id);
 
-    // Attach to the UserWallet contract
-    const UserFactory = await hre.ethers.getContractFactory("UserWallet");
-    const user = UserFactory.attach(walletAddress) as UserWallet;
-
     // Send currency amounts to the pair contract
-    console.log(`Sending ${amount0} of currency0 to ${pairAddress}...`);
-    await user.sendCurrencyPublic(pairAddress, currency0Id, amount0);
+    console.log(`Sending ${amount0} currency0 and ${amount1} currency1 to ${pairAddress}...`);
+    const hash = await wallet.sendMessage({
+      // @ts-ignore
+      to: pairAddress,
+      feeCredit: BigInt(10_000_000),
+      value: BigInt(0),
+      refundTo: wallet.address,
+      tokens: [
+        {
+          id: currency0Id,
+          amount: BigInt(amount0),
+        },
+        {
+          id: currency1Id,
+          amount: BigInt(amount1),
+        }
+      ]
+    });
 
-    console.log(`Sending ${amount1} of currency1 to ${pairAddress}...`);
-    await user.sendCurrencyPublic(pairAddress, currency1Id, amount1);
+    await waitTillCompleted(
+        publicClient,
+        shardNumber(walletAddress),
+        hash,
+    );
 
     // Log balances in the pair contract
     const pairCurrency0Balance =

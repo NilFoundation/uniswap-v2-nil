@@ -2,16 +2,24 @@ import { task } from "hardhat/config";
 import type {
   Currency,
   UniswapV2Pair,
-  UserWallet,
 } from "../../../typechain-types";
+import {createClient} from "../../util/client";
+import {waitTillCompleted} from "@nilfoundation/niljs";
+import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 
 task("swap", "Swap currency0 for currency1 in the Uniswap pair")
   .addParam("pair", "The address of the Uniswap pair contract")
-  .addParam("wallet", "The address of the user which is swapping")
   .addParam("amount", "The amount of currency0 to swap")
   .setAction(async (taskArgs, hre) => {
+    const walletAddress = process.env.WALLET_ADDR;
+
+    if (!walletAddress) {
+      throw new Error("WALLET_ADDR is not set in environment variables");
+    }
+
+    const {wallet, publicClient} = await createClient();
+
     // Destructure parameters for clarity
-    const userWalletAddress = taskArgs.wallet.toLowerCase();
     const pairAddress = taskArgs.pair.toLowerCase();
     const swapAmount = BigInt(taskArgs.amount);
 
@@ -61,9 +69,9 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
 
     // Log balances before the swap
     const balanceCurrency0Before =
-      await currency0Contract.getCurrencyBalanceOf(userWalletAddress);
+      await currency0Contract.getCurrencyBalanceOf(walletAddress);
     const balanceCurrency1Before =
-      await currency1Contract.getCurrencyBalanceOf(userWalletAddress);
+      await currency1Contract.getCurrencyBalanceOf(walletAddress);
     console.log(
       "Balance of currency0 before swap:",
       balanceCurrency0Before.toString(),
@@ -73,28 +81,40 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
       balanceCurrency1Before.toString(),
     );
 
-    // Attach to the UserWallet contract
-    const UserWalletFactory = await hre.ethers.getContractFactory("UserWallet");
-    const userWallet = UserWalletFactory.attach(
-      userWalletAddress,
-    ) as UserWallet;
+    const hash = await wallet.sendMessage({
+      // @ts-ignore
+      to: pairAddress,
+      feeCredit: BigInt(10_000_000),
+      value: BigInt(0),
+      refundTo: wallet.address,
+      tokens: [
+        {
+          id: currency0Id,
+          amount: BigInt(swapAmount),
+        }
+      ]
+    });
 
-    // Send currency0 to the pair contract
-    await userWallet.sendCurrencyPublic(pairAddress, currency0Id, swapAmount);
+    await waitTillCompleted(
+        publicClient,
+        shardNumber(walletAddress),
+        hash,
+    );
+
     console.log(
       `Sent ${swapAmount.toString()} of currency0 to the pair contract.`,
     );
 
     // Execute the swap
     console.log("Executing swap...");
-    await pair.swap(0, expectedOutputAmount, userWalletAddress);
+    await pair.swap(0, expectedOutputAmount, walletAddress);
     console.log("Swap executed successfully.");
 
     // Log balances after the swap
     const balanceCurrency0After =
-      await currency0Contract.getCurrencyBalanceOf(userWalletAddress);
+      await currency0Contract.getCurrencyBalanceOf(walletAddress);
     const balanceCurrency1After =
-      await currency1Contract.getCurrencyBalanceOf(userWalletAddress);
+      await currency1Contract.getCurrencyBalanceOf(walletAddress);
     console.log(
       "Balance of currency0 after swap:",
       balanceCurrency0After.toString(),
