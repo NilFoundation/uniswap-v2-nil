@@ -15,9 +15,15 @@ export async function createClient(): Promise<{
     throw new Error("WALLET_ADDR is not set in environment variables");
   }
 
+  const url = process.env.NIL_RPC_ENDPOINT;
+
+  if (!url) {
+    throw new Error("NIL_RPC_ENDPOINT is not set in environment variables");
+  }
+
   const publicClient = new PublicClient({
     transport: new HttpTransport({
-      endpoint: process.env.NIL_RPC_ENDPOINT!,
+      endpoint: url,
     }),
     shardId: 1,
   });
