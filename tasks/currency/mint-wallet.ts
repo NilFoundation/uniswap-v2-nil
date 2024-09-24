@@ -1,5 +1,11 @@
 import { task } from "hardhat/config";
 import type { Currency } from "../../typechain-types";
+import { createClient } from "../util/client";
+import {
+  faucetWithdrawal,
+  mintAndSendCurrency,
+  sleep,
+} from "../util/currencyUtils";
 
 task(
   "mint-wallet",
@@ -7,43 +13,91 @@ task(
 )
   .addParam("currency0", "The contract address of the first currency")
   .addParam("currency1", "The contract address of the second currency")
-  .addParam("wallet", "The address of the wallet to receive the currency")
   .addParam("amount", "The amount of currency to mint and send")
   .setAction(async (taskArgs, hre) => {
+    const walletAddress = process.env.WALLET_ADDR;
+
+    if (!walletAddress) {
+      throw new Error("WALLET_ADDR is not set in environment variables");
+    }
+
+    const faucetAddress = process.env.FAUCET_ADDR;
+
+    if (!faucetAddress) {
+      throw new Error("FAUCET_ADDR is not set in environment variables");
+    }
+
+    const { wallet, publicClient, signer } = await createClient();
+
     // Destructure parameters for clarity
     const mintAmount = BigInt(taskArgs.amount);
     const currency0Address = taskArgs.currency0;
     const currency1Address = taskArgs.currency1;
-    const walletAddress = taskArgs.wallet;
 
-    // Attach to the Currency contracts
+    console.log(
+      `Starting mint and transfer process for currencies ${currency0Address} and ${currency1Address}`,
+    );
+
+    // Withdraw from faucet for both currencies
+    console.log(
+      `Withdrawing from faucet for currency 0 (${currency0Address})...`,
+    );
+    await faucetWithdrawal(
+      currency0Address,
+      100000000000n,
+      faucetAddress,
+      hre,
+      publicClient,
+    );
+
+    // Sleep for 2 second
+    console.log("Waiting 2 second to prevent sequence issues..");
+    await sleep(2000);
+
+    console.log(
+      `Withdrawing from faucet for currency 1 (${currency1Address})...`,
+    );
+    await faucetWithdrawal(
+      currency1Address,
+      100000000000n,
+      faucetAddress,
+      hre,
+      publicClient,
+    );
+
+    // Attach to Currency contracts
     const CurrencyFactory = await hre.ethers.getContractFactory("Currency");
     const currency0 = CurrencyFactory.attach(currency0Address) as Currency;
     const currency1 = CurrencyFactory.attach(currency1Address) as Currency;
 
-    // Mint and send Currency0
-    console.log(
-      `Minting ${mintAmount} Currency0 to wallet ${walletAddress}...`,
-    );
-    await currency0.mintCurrencyPublic(mintAmount);
-    await currency0.sendCurrencyPublic(
+    // Mint and send currency for both contracts using the refactored utility function
+    console.log(`Minting and sending currency 0 (${currency0Address})...`);
+    await mintAndSendCurrency({
+      publicClient,
+      signer,
+      currencyContract: currency0,
+      contractAddress: currency0Address,
       walletAddress,
-      await currency0.getCurrencyId(),
       mintAmount,
-    );
+      hre,
+    });
 
-    // Mint and send Currency1
-    console.log(
-      `Minting ${mintAmount} Currency1 to wallet ${walletAddress}...`,
-    );
-    await currency1.mintCurrencyPublic(mintAmount);
-    await currency1.sendCurrencyPublic(
+    // Sleep for 2 second
+    console.log("Waiting 2 second to prevent sequence issues...");
+    await sleep(2000);
+
+    console.log(`Minting and sending currency 1 (${currency1Address})...`);
+    await mintAndSendCurrency({
+      publicClient,
+      signer,
+      currencyContract: currency1,
+      contractAddress: currency1Address,
       walletAddress,
-      await currency1.getCurrencyId(),
       mintAmount,
-    );
+      hre,
+    });
 
-    // Verify the balance of the recipient wallet for both currencies
+    // Verify recipient balances
     const recipientBalanceCurrency0 =
       await currency0.getCurrencyBalanceOf(walletAddress);
     const recipientBalanceCurrency1 =

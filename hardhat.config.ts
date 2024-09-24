@@ -9,8 +9,6 @@ import * as dotenv from "dotenv";
 
 // Currency Tasks
 import "./tasks/currency/info";
-import "./tasks/currency/send";
-import "./tasks/currency/mint";
 import "./tasks/currency/mint-wallet";
 
 // Core Tasks
