@@ -5,13 +5,19 @@ import {HardhatRuntimeEnvironment} from "hardhat/types";
 
 task("demo", "Run demo for Uniswap Pairs and Factory")
     .setAction(async (taskArgs, hre) => {
-        const walletAddress = process.env.WALLET_ADDR!;
         const wallet = new hre.ethers.Wallet(process.env.PRIVATE_KEY!);
         const shardId = 1;
         const mintAmount = 100000;
         const mintCurrency0Amount = 10000;
         const mintCurrency1Amount = 10000;
         const swapAmount = 1000;
+
+        const {
+            deployedContract: UserWalletContract,
+            contractAddress: walletAddress,
+        } = await deployNilContract(hre, "UserWallet", [wallet.signingKey.publicKey]);
+
+        console.log("UserWallet deployed " + walletAddress);
 
         const {
             deployedContract: factoryContract,
@@ -29,13 +35,6 @@ task("demo", "Run demo for Uniswap Pairs and Factory")
         console.log("Factory deployed " + factoryAddress);
         console.log("Currency0 deployed " + currency0Address);
         console.log("Currency1 deployed " + currency1Address);
-
-        const {
-            deployedContract: UserWalletContract,
-            contractAddress: userWalletAddress,
-        } = await deployNilContract(hre, "UserWallet", [wallet.signingKey.publicKey]);
-
-        console.log("UserWallet deployed " + userWalletAddress);
 
         const factory = factoryContract as UniswapV2Factory;
 
@@ -154,9 +153,9 @@ task("demo", "Run demo for Uniswap Pairs and Factory")
 
         // Log balances before the swap
         const balanceCurrency0Before =
-            await firstCurrency.getCurrencyBalanceOf(userWalletAddress);
+            await firstCurrency.getCurrencyBalanceOf(walletAddress);
         const balanceCurrency1Before =
-            await secondCurrency.getCurrencyBalanceOf(userWalletAddress);
+            await secondCurrency.getCurrencyBalanceOf(walletAddress);
         console.log(
             "Balance of currency0 before swap:",
             balanceCurrency0Before.toString(),
@@ -174,14 +173,14 @@ task("demo", "Run demo for Uniswap Pairs and Factory")
 
         // Execute the swap
         console.log("Executing swap...");
-        await pair.swap(0, expectedOutputAmount, userWalletAddress);
+        await pair.swap(0, expectedOutputAmount, walletAddress);
         console.log("Swap executed successfully.");
 
         // Log balances after the swap
         const balanceCurrency0After =
-            await firstCurrency.getCurrencyBalanceOf(userWalletAddress);
+            await firstCurrency.getCurrencyBalanceOf(walletAddress);
         const balanceCurrency1After =
-            await secondCurrency.getCurrencyBalanceOf(userWalletAddress);
+            await secondCurrency.getCurrencyBalanceOf(walletAddress);
         console.log(
             "SWAP RESULT: Balance of currency0 after swap:",
             balanceCurrency0After.toString(),
