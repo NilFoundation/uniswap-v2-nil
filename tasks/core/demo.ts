@@ -9,8 +9,8 @@ import type {
   UniswapV2Pair,
 } from "../../typechain-types";
 import { createClient } from "../util/client";
-import {calculateOutputAmount} from "../util/math";
-import {deployNilContract} from "../util/deploy";
+import { deployNilContract } from "../util/deploy";
+import { calculateOutputAmount } from "../util/math";
 
 task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
   async (taskArgs, hre) => {
@@ -345,4 +345,3 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
     );
   },
 );
-
