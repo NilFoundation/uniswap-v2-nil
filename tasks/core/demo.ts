@@ -9,6 +9,8 @@ import type {
   UniswapV2Pair,
 } from "../../typechain-types";
 import { createClient } from "../util/client";
+import {calculateOutputAmount} from "../util/math";
+import {deployNilContract} from "../util/deploy";
 
 task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
   async (taskArgs, hre) => {
@@ -344,34 +346,3 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
   },
 );
 
-export async function deployNilContract(
-  hre: HardhatRuntimeEnvironment,
-  name: string,
-  args: string[] = [],
-) {
-  const factory = await hre.ethers.getContractFactory(name);
-  assert.ok(factory.runner);
-  assert.ok(factory.runner.sendTransaction);
-
-  const deployTx = await factory.getDeployTransaction(...args);
-  const sentTx = await factory.runner.sendTransaction(deployTx);
-  const txReceipt = await sentTx.wait();
-
-  if (!txReceipt || !txReceipt.contractAddress) {
-    throw new Error("Contract deployment failed");
-  }
-
-  const deployedContract = factory.attach(txReceipt.contractAddress);
-  return { deployedContract, contractAddress: txReceipt.contractAddress };
-}
-
-function calculateOutputAmount(
-  amountIn: bigint,
-  reserveIn: bigint,
-  reserveOut: bigint,
-): bigint {
-  const amountInWithFee = amountIn * BigInt(997);
-  const numerator = amountInWithFee * reserveOut;
-  const denominator = reserveIn * BigInt(1000) + amountInWithFee;
-  return numerator / denominator;
-}
