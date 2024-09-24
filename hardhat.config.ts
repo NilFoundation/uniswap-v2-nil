@@ -21,6 +21,9 @@ import "./tasks/core/pair/swap";
 import "./tasks/core/factory/get-pair";
 import "./tasks/core/factory/create-pair";
 
+// Demo Tasks
+import "./tasks/core/demo";
+
 dotenv.config();
 
 const config: NilHardhatUserConfig = {
