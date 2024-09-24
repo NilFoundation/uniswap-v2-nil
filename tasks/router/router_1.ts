@@ -9,7 +9,7 @@ import {
 import { task } from "hardhat/config";
 import { encodeFunctionData } from "viem";
 import {
-  Token,
+  Currency,
   UniswapV2Factory,
   UniswapV2Pair,
   UniswapV2Router01,

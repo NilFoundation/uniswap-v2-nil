@@ -1,21 +1,21 @@
 import * as assert from "node:assert";
 import {task} from "hardhat/config";
-import type {Currency, UniswapV2Factory, UniswapV2Pair, UserWallet} from "../../typechain-types";
+import type {Currency, UniswapV2Factory, UniswapV2Pair} from "../../typechain-types";
 import {HardhatRuntimeEnvironment} from "hardhat/types";
+import {createClient} from "../util/client";
+import {waitTillCompleted} from "@nilfoundation/niljs";
+import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 
 task("demo", "Run demo for Uniswap Pairs and Factory")
     .setAction(async (taskArgs, hre) => {
-        const wallet = new hre.ethers.Wallet(process.env.PRIVATE_KEY!);
+        const walletAddress = process.env.WALLET_ADDR!
         const shardId = 1;
         const mintAmount = 100000;
         const mintCurrency0Amount = 10000;
         const mintCurrency1Amount = 10000;
         const swapAmount = 1000;
 
-        const {
-            deployedContract: UserWalletContract,
-            contractAddress: walletAddress,
-        } = await deployNilContract(hre, "UserWallet", [wallet.signingKey.publicKey]);
+        const {wallet, publicClient} = await createClient();
 
         console.log("UserWallet deployed " + walletAddress);
 
@@ -106,16 +106,32 @@ task("demo", "Run demo for Uniswap Pairs and Factory")
 
 
         // 3. PAIR: MINT
-        const user = UserWalletContract as UserWallet;
 
         // Send currency amounts to the pair contract
-        console.log(`Sending ${mintCurrency0Amount} of currency0 to ${pairAddress}...`);
-        await user.sendCurrencyPublic(pairAddress, await firstCurrency.getCurrencyId(), mintCurrency0Amount);
+        console.log(
+            `Sending ${mintCurrency0Amount} currency0 and ${mintCurrency1Amount} currency1 to ${pairAddress}...`,
+        );
+        const hash = await wallet.sendMessage({
+            // @ts-ignore
+            to: pairAddress,
+            feeCredit: BigInt(10_000_000),
+            value: BigInt(0),
+            refundTo: wallet.address,
+            tokens: [
+                {
+                    id: await firstCurrency.getCurrencyId(),
+                    amount: BigInt(mintCurrency0Amount),
+                },
+                {
+                    id: await secondCurrency.getCurrencyId(),
+                    amount: BigInt(mintCurrency1Amount),
+                },
+            ],
+        });
 
-        console.log(`Sending ${mintCurrency1Amount} of currency1 to ${pairAddress}...`);
-        const sendtx = await user.sendCurrencyPublic(pairAddress, await secondCurrency.getCurrencyId(), mintCurrency1Amount);
+        await waitTillCompleted(publicClient, shardNumber(walletAddress), hash);
 
-        console.log("sendtx " + sendtx.hash)
+
         // Log balances in the pair contract
         const pairCurrency0Balance = await firstCurrency.getCurrencyBalanceOf(pairAddress);
         console.log("Pair Balance of Currency0:", pairCurrency0Balance.toString());
@@ -168,7 +184,22 @@ task("demo", "Run demo for Uniswap Pairs and Factory")
         // Attach to the UserWallet contract
 
         // Send currency0 to the pair contract
-        await user.sendCurrencyPublic(pairAddress, await firstCurrency.getCurrencyId(), swapAmount);
+        const hash2 = await wallet.sendMessage({
+            // @ts-ignore
+            to: pairAddress,
+            feeCredit: BigInt(10_000_000),
+            value: BigInt(0),
+            refundTo: wallet.address,
+            tokens: [
+                {
+                    id: await firstCurrency.getCurrencyId(),
+                    amount: BigInt(swapAmount),
+                },
+            ],
+        });
+
+        await waitTillCompleted(publicClient, shardNumber(walletAddress), hash2);
+
         console.log(`Sent ${swapAmount.toString()} of currency0 to the pair contract.`);
 
         // Execute the swap
@@ -229,11 +260,21 @@ task("demo", "Run demo for Uniswap Pairs and Factory")
         console.log("Total LP balance for user wallet:", userLpBalance.toString());
 
         // Send LP tokens to the user wallet
-        await user.sendCurrencyPublic(
-            pairAddress.toLowerCase(),
-            lpAddress,
-            userLpBalance,
-        );
+        const hash3 = await wallet.sendMessage({
+            // @ts-ignore
+            to: pairAddress,
+            feeCredit: BigInt(10_000_000),
+            value: BigInt(0),
+            refundTo: walletAddress,
+            tokens: [
+                {
+                    id: lpAddress,
+                    amount: BigInt(userLpBalance),
+                },
+            ],
+        });
+
+        await waitTillCompleted(publicClient, shardNumber(walletAddress), hash3);
 
         // Execute burn
         console.log("Executing burn...");

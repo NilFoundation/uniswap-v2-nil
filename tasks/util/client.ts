@@ -17,7 +17,7 @@ export async function createClient(): Promise<{
 
   const publicClient = new PublicClient({
     transport: new HttpTransport({
-      endpoint: walletAddress,
+      endpoint: process.env.NIL_RPC_ENDPOINT!,
     }),
     shardId: 1,
   });
