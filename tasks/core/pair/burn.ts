@@ -1,14 +1,22 @@
+import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
 import type { Currency, UniswapV2Pair } from "../../../typechain-types";
-import type { UserWallet } from "../../../typechain-types";
+import { createClient } from "../../util/client";
 
 task("burn", "Burn liquidity tokens and print balances and reserves")
   .addParam("pair", "The address of the pair contract")
-  .addParam("wallet", "The address to transfer the burned tokens to")
   .setAction(async (taskArgs, hre) => {
+    const walletAddress = process.env.WALLET_ADDR;
+
+    if (!walletAddress) {
+      throw new Error("WALLET_ADDR is not set in environment variables");
+    }
+
+    const { wallet, publicClient } = await createClient();
+
     // Destructure parameters for clarity
     const pairAddress = taskArgs.pair;
-    const walletAddress = taskArgs.wallet;
 
     // Attach to the Uniswap V2 Pair contract
     const Pair = await hre.ethers.getContractFactory("UniswapV2Pair");
@@ -57,20 +65,25 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
       userBalanceToken1.toString(),
     );
 
-    // Attach to the UserWallet contract
-    const UserFactory = await hre.ethers.getContractFactory("UserWallet");
-    const user = UserFactory.attach(walletAddress) as UserWallet;
-
     const lpAddress = await pair.getCurrencyId();
     const userLpBalance = await pair.getCurrencyBalanceOf(walletAddress);
     console.log("Total LP balance for user wallet:", userLpBalance.toString());
 
-    // Send LP tokens to the user wallet
-    await user.sendCurrencyPublic(
-      pairAddress.toLowerCase(),
-      lpAddress,
-      userLpBalance,
-    );
+    const hash = await wallet.sendMessage({
+      // @ts-ignore
+      to: pairAddress,
+      feeCredit: BigInt(10_000_000),
+      value: BigInt(0),
+      refundTo: walletAddress,
+      tokens: [
+        {
+          id: lpAddress,
+          amount: BigInt(userLpBalance),
+        },
+      ],
+    });
+
+    await waitTillCompleted(publicClient, shardNumber(walletAddress), hash);
 
     // Execute burn
     console.log("Executing burn...");
