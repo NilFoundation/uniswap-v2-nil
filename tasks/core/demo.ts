@@ -14,6 +14,7 @@ import {
 } from "../util/currencyUtils";
 import { deployNilContract } from "../util/deploy";
 import { calculateOutputAmount } from "../util/math";
+import { encodeFunctionData } from "viem";
 
 task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
   async (taskArgs, hre) => {
@@ -157,17 +158,20 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
     );
 
     // 3. PAIR: MINT
+    const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
 
-    // Send currency amounts to the pair contract
-    console.log(
-      `Sending ${mintCurrency0Amount} currency0 and ${mintCurrency1Amount} currency1 to ${pairAddress}...`,
-    );
+    // Mint liquidity
+    console.log("Minting pair tokens...");
     const hash = await wallet.sendMessage({
-      // @ts-ignore
       to: pairAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
       refundTo: wallet.address,
+      data: encodeFunctionData({
+        abi: pairArtifact.abi,
+        functionName: "mint",
+        args: [walletAddress],
+      }),
       tokens: [
         {
           id: await firstCurrency.getCurrencyId(),
@@ -191,9 +195,6 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
       await secondCurrency.getCurrencyBalanceOf(pairAddress);
     console.log("Pair Balance of Currency1:", pairCurrency1Balance.toString());
 
-    // Mint liquidity
-    console.log("Minting pair tokens...");
-    await pair.mint(walletAddress);
     console.log("Liquidity added...");
 
     // Retrieve and log reserves from the pair
@@ -241,14 +242,19 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
       balanceCurrency1Before.toString(),
     );
 
-    // Attach to the UserWallet contract
+    // Execute the swap
+    console.log("Executing swap...");
 
     // Send currency0 to the pair contract
     const hash2 = await wallet.sendMessage({
-      // @ts-ignore
       to: pairAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
+      data: encodeFunctionData({
+        abi: pairArtifact.abi,
+        functionName: "swap",
+        args: [0, expectedOutputAmount, walletAddress],
+      }),
       refundTo: wallet.address,
       tokens: [
         {
@@ -264,9 +270,6 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
       `Sent ${swapAmount.toString()} of currency0 to the pair contract.`,
     );
 
-    // Execute the swap
-    console.log("Executing swap...");
-    await pair.swap(0, expectedOutputAmount, walletAddress);
     console.log("Swap executed successfully.");
 
     // Log balances after the swap
@@ -320,13 +323,19 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
     const lpAddress = await pair.getCurrencyId();
     const userLpBalance = await pair.getCurrencyBalanceOf(walletAddress);
     console.log("Total LP balance for user wallet:", userLpBalance.toString());
-
+    // Execute burn
+    console.log("Executing burn...");
     // Send LP tokens to the user wallet
     const hash3 = await wallet.sendMessage({
       // @ts-ignore
       to: pairAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
+      data: encodeFunctionData({
+        abi: pairArtifact.abi,
+        functionName: "burn",
+        args: [walletAddress],
+      }),
       refundTo: walletAddress,
       tokens: [
         {
@@ -338,11 +347,7 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
 
     await waitTillCompleted(publicClient, shardNumber(walletAddress), hash3);
 
-    // Execute burn
-    console.log("Executing burn...");
-    await pair.burn(walletAddress);
     console.log("Burn executed.");
-    console.log("Built tokens");
 
     // Log balances after burn
     const balanceToken0 = await firstCurrency.getCurrencyBalanceOf(
