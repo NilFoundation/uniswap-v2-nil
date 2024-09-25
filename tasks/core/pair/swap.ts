@@ -1,6 +1,7 @@
 import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
+import { encodeFunctionData } from "viem";
 import type { Currency, UniswapV2Pair } from "../../../typechain-types";
 import { createClient } from "../../util/client";
 
@@ -13,6 +14,8 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
     if (!walletAddress) {
       throw new Error("WALLET_ADDR is not set in environment variables");
     }
+
+    const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
 
     const { wallet, publicClient } = await createClient();
 
@@ -78,11 +81,19 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
       balanceCurrency1Before.toString(),
     );
 
+    // Execute the swap
+    console.log("Executing swap...");
+
     const hash = await wallet.sendMessage({
       // @ts-ignore
       to: pairAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
+      data: encodeFunctionData({
+        abi: pairArtifact.abi,
+        functionName: "swap",
+        args: [0, expectedOutputAmount, walletAddress],
+      }),
       refundTo: wallet.address,
       tokens: [
         {
@@ -98,9 +109,6 @@ task("swap", "Swap currency0 for currency1 in the Uniswap pair")
       `Sent ${swapAmount.toString()} of currency0 to the pair contract.`,
     );
 
-    // Execute the swap
-    console.log("Executing swap...");
-    await pair.swap(0, expectedOutputAmount, walletAddress);
     console.log("Swap executed successfully.");
 
     // Log balances after the swap
