@@ -1,6 +1,7 @@
 import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
+import { encodeFunctionData } from "viem";
 import type {
   Currency,
   UniswapV2Factory,
@@ -14,7 +15,6 @@ import {
 } from "../util/currencyUtils";
 import { deployNilContract } from "../util/deploy";
 import { calculateOutputAmount } from "../util/math";
-import { encodeFunctionData } from "viem";
 
 task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
   async (taskArgs, hre) => {

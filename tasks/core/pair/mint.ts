@@ -1,9 +1,9 @@
 import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
+import { encodeFunctionData } from "viem";
 import type { Currency, UniswapV2Pair } from "../../../typechain-types";
 import { createClient } from "../../util/client";
-import {encodeFunctionData} from "viem";
 
 task("mint", "Mint currencies and add liquidity to the pair")
   .addParam("pair", "The address of the pair contract")
