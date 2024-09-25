@@ -4,7 +4,7 @@ import type { HardhatRuntimeEnvironment } from "hardhat/types";
 export async function deployNilContract(
   hre: HardhatRuntimeEnvironment,
   name: string,
-  args: string[] = [],
+  args: unknown[] = [],
 ) {
   const factory = await hre.ethers.getContractFactory(name);
   assert.ok(factory.runner);

@@ -1,14 +1,17 @@
-import * as assert from "node:assert";
 import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
-import type { HardhatRuntimeEnvironment } from "hardhat/types";
 import type {
   Currency,
   UniswapV2Factory,
   UniswapV2Pair,
 } from "../../typechain-types";
 import { createClient } from "../util/client";
+import {
+  faucetWithdrawal,
+  mintAndSendCurrency,
+  sleep,
+} from "../util/currencyUtils";
 import { deployNilContract } from "../util/deploy";
 import { calculateOutputAmount } from "../util/math";
 
@@ -19,15 +22,15 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
       throw new Error("WALLET_ADDR is not set in environment variables");
     }
 
+    const faucetAddress = process.env.FAUCET_ADDR;
+
     const shardId = 1;
     const mintAmount = 100000;
     const mintCurrency0Amount = 10000;
     const mintCurrency1Amount = 10000;
     const swapAmount = 1000;
 
-    const { wallet, publicClient } = await createClient();
-
-    console.log("UserWallet deployed " + walletAddress);
+    const { wallet, publicClient, signer } = await createClient();
 
     const {
       deployedContract: factoryContract,
@@ -36,11 +39,17 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
     const {
       deployedContract: Currency0Contract,
       contractAddress: currency0Address,
-    } = await deployNilContract(hre, "Currency", ["currency0"]);
+    } = await deployNilContract(hre, "Currency", [
+      "currency0",
+      await signer.getPublicKey(),
+    ]);
     const {
       deployedContract: Currency1Contract,
       contractAddress: currency1Address,
-    } = await deployNilContract(hre, "Currency", ["currency1"]);
+    } = await deployNilContract(hre, "Currency", [
+      "currency1",
+      await signer.getPublicKey(),
+    ]);
 
     console.log("Factory deployed " + factoryAddress);
     console.log("Currency0 deployed " + currency0Address);
@@ -88,27 +97,54 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
 
     console.log(`Pair initialized successfully at address: ${pairAddress}`);
 
+    // Prepare currencies
+    await faucetWithdrawal(
+      currency0Address.toLowerCase(),
+      100000000000n,
+      faucetAddress,
+      hre,
+      publicClient,
+    );
+
+    await sleep(2000);
+
+    await faucetWithdrawal(
+      currency1Address.toLowerCase(),
+      100000000000n,
+      faucetAddress,
+      hre,
+      publicClient,
+    );
+
+    await sleep(2000);
+
     // 2. MINT CURRENCIES
     console.log(
       `Minting ${mintAmount} Currency0 to wallet ${walletAddress}...`,
     );
-    await firstCurrency.mintCurrencyPublic(mintAmount);
-    await firstCurrency.sendCurrencyPublic(
+    await mintAndSendCurrency({
+      publicClient,
+      signer,
+      currencyContract: firstCurrency,
+      contractAddress: currency0Address.toLowerCase(),
       walletAddress,
-      await firstCurrency.getCurrencyId(),
       mintAmount,
-    );
+      hre,
+    });
 
     // Mint and send Currency1
     console.log(
       `Minting ${mintAmount} Currency1 to wallet ${walletAddress}...`,
     );
-    await secondCurrency.mintCurrencyPublic(mintAmount);
-    await secondCurrency.sendCurrencyPublic(
+    await mintAndSendCurrency({
+      publicClient,
+      signer,
+      currencyContract: secondCurrency,
+      contractAddress: currency1Address.toLowerCase(),
       walletAddress,
-      await secondCurrency.getCurrencyId(),
       mintAmount,
-    );
+      hre,
+    });
 
     // Verify the balance of the recipient wallet for both currencies
     const recipientBalanceCurrency0 =
