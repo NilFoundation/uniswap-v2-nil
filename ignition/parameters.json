@@ -1,6 +1,7 @@
 {
   "DeployCurrency": {
-    "currencyName": "MyCurrency"
+    "currencyName": "MyCurrency",
+    "pubkey": "0x0000000000000000000000000000000000000000"
   },
   "DeployFactory": {
     "feeToSetter": "0x0000000000000000000000000000000000000000"

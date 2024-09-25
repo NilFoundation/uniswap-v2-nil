@@ -8,6 +8,7 @@ import {
 export async function createClient(): Promise<{
   wallet: WalletV1;
   publicClient: PublicClient;
+  signer: LocalECDSAKeySigner;
 }> {
   const walletAddress = process.env.WALLET_ADDR;
 
@@ -15,15 +16,15 @@ export async function createClient(): Promise<{
     throw new Error("WALLET_ADDR is not set in environment variables");
   }
 
-  const url = process.env.NIL_RPC_ENDPOINT;
+  const endpoint = process.env.NIL_RPC_ENDPOINT;
 
-  if (!url) {
+  if (!endpoint) {
     throw new Error("NIL_RPC_ENDPOINT is not set in environment variables");
   }
 
   const publicClient = new PublicClient({
     transport: new HttpTransport({
-      endpoint: url,
+      endpoint: endpoint,
     }),
     shardId: 1,
   });
@@ -40,5 +41,5 @@ export async function createClient(): Promise<{
     signer,
   });
 
-  return { wallet, publicClient };
+  return { wallet, publicClient, signer };
 }
