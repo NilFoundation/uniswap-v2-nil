@@ -11,10 +11,6 @@ import "./interfaces/IUniswapV2Pair.sol";
 contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
     address public immutable factory;
 
-    modifier ensure(uint deadline) {
-        require(deadline >= block.timestamp, 'UniswapV2Router: EXPIRED');
-        _;
-    }
 
     constructor(address _factory) public {
         // Revert if the factory address is the zero address or an empty string
@@ -24,57 +20,36 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
     }
 
     function addLiquidity(
-        address tokenA,
-        address tokenB,
-        address to,
-        uint deadline,
-        uint salt
-    ) external override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
-        if (IUniswapV2Factory(factory).getTokenPair(tokenA, tokenB) == address(0)) {
-            IUniswapV2Factory(factory).createPair(tokenA, tokenB, 1, salt);
-        }
-        address pair = IUniswapV2Factory(factory).getTokenPair(tokenA, tokenB);
-        uint tokenAId = NilCurrencyBase(tokenA).getCurrencyId();
-        uint tokenBId = NilCurrencyBase(tokenB).getCurrencyId();
-
+        address pair,
+        address to
+    ) external override {
         Nil.Token[] memory tokens = Nil.msgTokens();
         if (tokens.length != 2) {
             revert("Send only 2 tokens to add liquidity");
         }
-        assert(tokenAId == tokens[0].id);
-        assert(tokenBId == tokens[1].id);
+        // TODO: Probably check that tokens are sent to the right pair
 
-        if (tokens.length != 2) {
-            revert("UniswapV2Router: Expect 2 tokens to add liquidity");
-        }
-        sendCurrencyInternal(pair, tokenAId, tokens[0].amount);
-        sendCurrencyInternal(pair, tokenBId, tokens[1].amount);
-        liquidity = IUniswapV2Pair(pair).mint(to);
-        amountA = tokens[0].amount;
-        amountB = tokens[1].amount;
+        smartCall(pair, tokens, abi.encodeWithSignature("mint(address)", to));
     }
 
     // **** REMOVE LIQUIDITY ****
     function removeLiquidity(
-        address tokenA,
-        address tokenB,
-        uint liquidity,
-        uint amountAMin,
-        uint amountBMin,
-        address to,
-        uint deadline
-    ) public override ensure(deadline) returns (uint amountA, uint amountB) {
-        address pair = IUniswapV2Factory(factory).getTokenPair(tokenA, tokenB);
-        (address token0,) = UniswapV2Library.sortTokens(tokenA, tokenB);
-        (uint amount0, uint amount1) = IUniswapV2Pair(pair).burn(to);
-        (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
-        require(amountA >= amountAMin, 'UniswapV2Router: INSUFFICIENT_A_AMOUNT');
-        require(amountB >= amountBMin, 'UniswapV2Router: INSUFFICIENT_B_AMOUNT');
+        address pair,
+        address to
+    ) public override {
         Nil.Token[] memory tokens = Nil.msgTokens();
         if (tokens.length != 1) {
             revert("UniswapV2Router: should contains only pair token");
         }
-        sendCurrencyInternal(pair, tokens[0].id, tokens[0].amount); // send liquidity to pair
+        smartCall(pair, tokens, abi.encodeWithSignature("burn(address)", to));
+    }
+
+    function swap(address to, address pair) public override {
+        Nil.Token[] memory tokens = Nil.msgTokens();
+        if (tokens.length != 1) {
+            revert("UniswapV2Router: should contains only pair token");
+        }
+        // TODO
     }
 
     // **** SWAP ****
@@ -142,5 +117,15 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
     }
 
     receive() external payable {
+    }
+
+    function smartCall(address dst, Nil.Token[] memory tokens, bytes memory callData) private returns (bool) {
+        if (Nil.getShardId(dst) == Nil.getShardId(address(dst))) {
+            (bool success, ) = Nil.syncCall(dst, gasleft(), 0, tokens, callData);
+            return success;
+        } else {
+            Nil.asyncCall(dst, address(0), address(0), 0, Nil.FORWARD_REMAINING, false, 0, tokens, callData);
+            return true;
+        }
     }
 }
