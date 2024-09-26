@@ -1,74 +1,83 @@
 
-# Uniswap V2 =nil;
+<div align="center">
+  <h1>Uniswap V2 =nil;</h1>
+</div>
 
-## Overview
+## 📋 Overview
 
-This repository is an example repo to showcase how to migrate dApps from Ethereum-like networks to =nil;. Uniswap V2 serves as a great base to demonstrate the following:
+This repository showcases the migration of Uniswap V2 to the =nil; We have adapted Uniswap’s core contracts — Factory, Pair, and Router — to work seamlessly with the unique capabilities of =nil; 
+By using this example, developers can learn how to migrate dApps from Ethereum compatible networks to the =nil; and take advantage of its features, such as:
+1. **Multi-Currency Support:** Learn how =nil; supports multiple currencies natively and how they replace the ERC20 standard
+2. **Async/Sync Calls:** Discover how to effectively utilize async and sync messaging between shards, making the protocol both scalable and performant
+3. **Load Distribution:** Understand how to distribute operations across multiple shards, enhancing parallel processing and scalability
 
-1. How to work with =nil; multi-currencies.
-2. How to utilize async calls.
-3. How to distribute load to multiple shards.
+This repository also aims to spark discussion on the potential of running DeFi protocols on sharded architectures, demonstrating their feasibility and advantages
 
-## How to setup
+## ⚙️ Prerequirements
 
-1) Clone the Nil repo and run a node. Instructions can be found [here](https://github.com/NilFoundation/nil).
+Before working with this repository, ensure that you have properly set up your environment:
 
-```shell
-git clone https://github.com/NilFoundation/nil
-cd nil
-git checkout a3a99e1
-```
+1. **.env Configuration**:  
+   Make sure to create a `.env` file in the root directory. All required environment variables are listed in the `.env.example` file, which you can use as a reference. [Link to `.env.example`](./.env.example)
 
-2) Configure the node and create a new wallet:
+2. **Getting an RPC Endpoint**:  
+   To request an RPC endpoint:
+    - Join our Telegram chat: [https://t.me/nilfoundation](https://t.me/nilfoundation)
+    - Request access, and our DevRel team will assist you.
 
-```shell
-./build/bin/nil_cli config init
-./build/bin/nil_cli config set rpc_endpoint NIL_ENDPOINT
-./build/bin/nil_cli keygen new
-./build/bin/nil_cli wallet new
-```
-
-3) Create a `.env` file in the root of the project with the following configuration:
-
-```bash
-NIL_RPC_ENDPOINT=http://127.0.0.1:8529
-WALLET_ADDR=0x0001111111111111111111111111111111111111
-PRIVATE_KEY=<your_private_key_here>
-```
-
-Ensure to replace `<your_private_key_here>` with the actual private key without the `0x` prefix.
-
-4) Enable debug logs. In `hardhat.config.ts` set `debug: true`.
-For now you can't see deployed contract addresses directly from hardhat results.
+3. **Obtaining a Private Key and Wallet**:
+    - Download the `nil` CLI: [https://github.com/NilFoundation/nil_cli](https://github.com/NilFoundation/nil_cli)
+    - Follow the setup instructions in our documentation: [nil CLI Docs](https://docs.nil.foundation/nil/getting-started/nil-101)
 
 
-## How to use
 
-1) First you need to deploy token contracts and factory(or use existing ones).
-In case of deployment new contracts please copy them from the debug logs.
 
-```shell
-npx hardhat flow_1 --network nil 
-```
+## 🎯 Usage
 
-Deployment log example
-```
-Response deployment {"hash":"0x0b788324e101a972c383d0a8ecd58084921d3ac84869b761c643317728eaf66d","address":"0x0001fd2e170eec3b3b538183c4d749adca5065b1"}
-```
+To help you get started quickly, we provide two demo tasks that showcase the full lifecycle from deployment to execution. These tasks cover deploying and initializing all necessary contracts, 
+as well as performing operations like minting, swapping, and burning
 
-2) Run flow to check DEX flows. This task will init a pair contract(or fetch the existed).
-Then it mint pair tokens and run swap
-```shell
-npx hardhat flow_2 --network nil --token0 <token0address> --token1 <token1address> --toburn <burnaddress> --factory <factoryaddress>
-```
+### Demo Tasks
+1. **Using Factory and Pair Contracts Only**  
+   This demo handles deploying the Factory and Pair contracts and executing a complete flow of operations  
+   [View the demo task](https://github.com/NilFoundation/uniswap-v2-nil/blob/main/tasks/core/demo.ts)
 
-## Current Issues
+2. **Using Factory, Pair, and Router Contracts**  
+   This demo includes an additional layer by utilizing the Router contract along with Factory and Pair 
+   [View the demo-router task](https://github.com/NilFoundation/uniswap-v2-nil/blob/main/tasks/core/demo-router.ts)
 
-1. Deployed contract address can be fetched only from debug logs
-2. No chained swaps support
-3. Security: no router contract to send tokens and call pair message in single transaction.
+### Running the Demo Tasks
+1. **Compile the Project**:
+   ```bash
+   npx hardhat compile
+   ```
+2. **Run the Demo Tasks**:
+   - For the core demo (Factory and Pair):
+     ```bash
+     npx hardhat demo --network nil
+     ```
+   - For the demo with Router (Factory, Pair, and Router):
+     ```bash
+     npx hardhat demo-router --network nil
+     ```
+
+### Manual Setup
+If you prefer to run everything manually, we provide Ignition modules for each contract:
+[Ignition Modules](https://github.com/NilFoundation/uniswap-v2-nil/tree/main/ignition)
+
+Additionally, all crucial contract methods have corresponding tasks:
+[Tasks](https://github.com/NilFoundation/uniswap-v2-nil/tree/main/tasks)
+
+Each subdirectory contains a README explaining the details of the tasks
+
+## 🤝 Contributing
+
+We welcome contributions from the community to make this project even better! If you have suggestions, improvements, or find any bugs, please feel free to submit a pull request or open an issue.
+
+Check out our open issues and improvements in the [GitHub Issues](https://github.com/NilFoundation/uniswap-v2-nil/issues) section. If you're new to the project, look for issues labeled as `good first issue` — they're a great place to start.
+
+Your input and contributions are greatly appreciated!
 
 ## License
-
 This project is licensed under the GPL-3.0 License. See the [LICENSE](./LICENSE) file for more details. Portions of this project are derived from [Uniswap V2](https://github.com/Uniswap/v2-core) and are also subject to the GPL-3.0 License.
 
