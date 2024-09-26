@@ -1,21 +1,22 @@
-import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
-import { waitTillCompleted } from "@nilfoundation/niljs";
-import { task } from "hardhat/config";
+import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import {waitTillCompleted} from "@nilfoundation/niljs";
+import {task} from "hardhat/config";
+import {encodeFunctionData} from "viem";
 import type {
   Currency,
   UniswapV2Factory,
   UniswapV2Pair,
 } from "../../typechain-types";
-import { createClient } from "../util/client";
+import {createClient} from "../util/client";
 import {
   faucetWithdrawal,
   mintAndSendCurrency,
   sleep,
 } from "../util/currencyUtils";
-import { deployNilContract } from "../util/deploy";
-import { calculateOutputAmount } from "../util/math";
+import {deployNilContract} from "../util/deploy";
+import {calculateOutputAmount} from "../util/math";
 
-task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
+task("demo-router", "Run demo with Uniswap Router").setAction(
   async (taskArgs, hre) => {
     const walletAddress = process.env.WALLET_ADDR;
     if (!walletAddress) {
@@ -30,16 +31,12 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
     const mintCurrency1Amount = 10000;
     const swapAmount = 1000;
 
-    const { wallet, publicClient, signer } = await createClient();
+    const {wallet, publicClient, signer} = await createClient();
 
     const {
       deployedContract: factoryContract,
       contractAddress: factoryAddress,
     } = await deployNilContract(hre, "UniswapV2Factory", [walletAddress]);
-    const {
-      deployedContract: routerContract,
-      contractAddress: routerAddress,
-    } = await deployNilContract(hre, "UniswapV2Router01", [walletAddress, "0x0000000000000000000000000000000000000000"]);
     const {
       deployedContract: Currency0Contract,
       contractAddress: currency0Address,
@@ -58,6 +55,15 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
     console.log("Factory deployed " + factoryAddress);
     console.log("Currency0 deployed " + currency0Address);
     console.log("Currency1 deployed " + currency1Address);
+
+    const {
+      deployedContract: RouterContract,
+      contractAddress: routerAddress,
+    } = await deployNilContract(hre, "UniswapV2Router01", [
+      factoryAddress.toLowerCase(),
+    ]);
+
+    console.log("Router deployed " + routerAddress);
 
     const factory = factoryContract as UniswapV2Factory;
 
@@ -160,18 +166,23 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
       `Recipient balance after transfer - Currency0: ${recipientBalanceCurrency0}, Currency1: ${recipientBalanceCurrency1}`,
     );
 
-    // 3. PAIR: MINT
+    // 3. ROUTER: ADD LIQUIDITY
+    const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
+    const routerArtifact = await hre.artifacts.readArtifact("UniswapV2Router01");
 
-    // Send currency amounts to the pair contract
-    console.log(
-      `Sending ${mintCurrency0Amount} currency0 and ${mintCurrency1Amount} currency1 to ${pairAddress}...`,
-    );
+    // Mint liquidity
+    console.log("Adding liquidity...");
+
     const hash = await wallet.sendMessage({
-      // @ts-ignore
-      to: pairAddress,
+      to: routerAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
       refundTo: wallet.address,
+      data: encodeFunctionData({
+        abi: routerArtifact.abi,
+        functionName: "addLiquidity",
+        args: [pairAddress, walletAddress],
+      }),
       tokens: [
         {
           id: await firstCurrency.getCurrencyId(),
@@ -195,32 +206,29 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
       await secondCurrency.getCurrencyBalanceOf(pairAddress);
     console.log("Pair Balance of Currency1:", pairCurrency1Balance.toString());
 
-    // Mint liquidity
-    console.log("Minting pair tokens...");
-    await pair.mint(walletAddress);
     console.log("Liquidity added...");
 
     // Retrieve and log reserves from the pair
     const [reserve0, reserve1] = await pair.getReserves();
     console.log(
-      `MINT RESULT: Reserves - Currency0: ${reserve0.toString()}, Currency1: ${reserve1.toString()}`,
+      `ADDLIQUIDITY RESULT: Reserves - Currency0: ${reserve0.toString()}, Currency1: ${reserve1.toString()}`,
     );
 
     // Check and log liquidity provider balance
     const lpBalance = await pair.getCurrencyBalanceOf(walletAddress);
     console.log(
-      "MINT RESULT: Liquidity provider balance in wallet:",
+      "ADDLIQUIDITY RESULT: Liquidity provider balance in wallet:",
       lpBalance.toString(),
     );
 
     // Retrieve and log total supply for the pair
     const totalSupply = await pair.getCurrencyTotalSupply();
     console.log(
-      "MINT RESULT: Total supply of pair tokens:",
+      "ADDLIQUIDITY RESULT: Total supply of pair tokens:",
       totalSupply.toString(),
     );
 
-    // 4. PAIR: SWAP
+    // 4. ROUTER: SWAP
     const expectedOutputAmount = calculateOutputAmount(
       BigInt(swapAmount),
       reserve0,
@@ -245,14 +253,19 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
       balanceCurrency1Before.toString(),
     );
 
-    // Attach to the UserWallet contract
+    // Execute the swap
+    console.log("Executing swap...");
 
     // Send currency0 to the pair contract
     const hash2 = await wallet.sendMessage({
-      // @ts-ignore
-      to: pairAddress,
+      to: routerAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
+      data: encodeFunctionData({
+        abi: routerArtifact.abi,
+        functionName: "swap",
+        args: [walletAddress, pairAddress, 0, expectedOutputAmount],
+      }),
       refundTo: wallet.address,
       tokens: [
         {
@@ -268,9 +281,6 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
       `Sent ${swapAmount.toString()} of currency0 to the pair contract.`,
     );
 
-    // Execute the swap
-    console.log("Executing swap...");
-    await pair.swap(0, expectedOutputAmount, walletAddress);
     console.log("Swap executed successfully.");
 
     // Log balances after the swap
@@ -287,7 +297,7 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
       balanceCurrency1After.toString(),
     );
 
-    // 5. PAIR: BURN
+    // 5. ROUTER: REMOVE LIQUIDITY
     const total = await pair.getCurrencyTotalSupply();
     console.log("Total supply:", total.toString());
 
@@ -324,13 +334,19 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
     const lpAddress = await pair.getCurrencyId();
     const userLpBalance = await pair.getCurrencyBalanceOf(walletAddress);
     console.log("Total LP balance for user wallet:", userLpBalance.toString());
-
+    // Execute burn
+    console.log("Executing burn...");
     // Send LP tokens to the user wallet
     const hash3 = await wallet.sendMessage({
       // @ts-ignore
-      to: pairAddress,
+      to: routerAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
+      data: encodeFunctionData({
+        abi: routerArtifact.abi,
+        functionName: "removeLiquidity",
+        args: [pairAddress, walletAddress],
+      }),
       refundTo: walletAddress,
       tokens: [
         {
@@ -342,11 +358,7 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
 
     await waitTillCompleted(publicClient, shardNumber(walletAddress), hash3);
 
-    // Execute burn
-    console.log("Executing burn...");
-    await pair.burn(walletAddress);
     console.log("Burn executed.");
-    console.log("Built tokens");
 
     // Log balances after burn
     const balanceToken0 = await firstCurrency.getCurrencyBalanceOf(
@@ -356,11 +368,11 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
       pairAddress.toLowerCase(),
     );
     console.log(
-      "BURN RESULT: Pair Balance token0 after burn:",
+      "REMOVELIQUIDITY RESULT: Pair Balance token0 after burn:",
       balanceToken0.toString(),
     );
     console.log(
-      "BURN RESULT: Pair Balance token1 after burn:",
+      "REMOVELIQUIDITY RESULT: Pair Balance token1 after burn:",
       balanceToken1.toString(),
     );
 
@@ -368,18 +380,18 @@ task("demo-router", "Run demo for Uniswap Pairs and Factory").setAction(
     userBalanceToken1 =
       await secondCurrency.getCurrencyBalanceOf(walletAddress);
     console.log(
-      "BURN RESULT: User Balance token0 after burn:",
+      "REMOVELIQUIDITY RESULT: User Balance token0 after burn:",
       userBalanceToken0.toString(),
     );
     console.log(
-      "BURN RESULT: User Balance token1 after burn:",
+      "REMOVELIQUIDITY RESULT: User Balance token1 after burn:",
       userBalanceToken1.toString(),
     );
 
     // Fetch and log reserves after burn
     const reserves = await pair.getReserves();
     console.log(
-      "BURN RESULT: Reserves from pair after burn:",
+      "REMOVELIQUIDITY RESULT: Reserves from pair after burn:",
       reserves[0].toString(),
       reserves[1].toString(),
     );
