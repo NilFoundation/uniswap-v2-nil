@@ -115,7 +115,7 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
     }
 
     function smartCall(address dst, Nil.Token[] memory tokens, bytes memory callData) private returns (bool) {
-        if (Nil.getShardId(dst) == Nil.getShardId(address(dst))) {
+        if (Nil.getShardId(dst) == Nil.getShardId(address(this))) {
             (bool success,) = Nil.syncCall(dst, gasleft(), 0, tokens, callData);
             return success;
         } else {
