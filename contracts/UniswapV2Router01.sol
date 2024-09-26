@@ -27,8 +27,6 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         if (tokens.length != 2) {
             revert("Send only 2 tokens to add liquidity");
         }
-        // TODO: Probably check that tokens are sent to the right pair
-
         smartCall(pair, tokens, abi.encodeWithSignature("mint(address)", to));
     }
 
