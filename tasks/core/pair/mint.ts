@@ -1,6 +1,7 @@
 import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
+import { encodeFunctionData } from "viem";
 import type { Currency, UniswapV2Pair } from "../../../typechain-types";
 import { createClient } from "../../util/client";
 
@@ -14,6 +15,8 @@ task("mint", "Mint currencies and add liquidity to the pair")
     if (!walletAddress) {
       throw new Error("WALLET_ADDR is not set in environment variables");
     }
+
+    const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
 
     const { wallet, publicClient } = await createClient();
 
@@ -49,12 +52,20 @@ task("mint", "Mint currencies and add liquidity to the pair")
     console.log(
       `Sending ${amount0} currency0 and ${amount1} currency1 to ${pairAddress}...`,
     );
+
+    // Mint liquidity
+    console.log("Minting pair tokens...");
+
     const hash = await wallet.sendMessage({
-      // @ts-ignore
       to: pairAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
       refundTo: wallet.address,
+      data: encodeFunctionData({
+        abi: pairArtifact.abi,
+        functionName: "mint",
+        args: [walletAddress],
+      }),
       tokens: [
         {
           id: currency0Id,
@@ -78,9 +89,6 @@ task("mint", "Mint currencies and add liquidity to the pair")
       await currency1.getCurrencyBalanceOf(pairAddress);
     console.log("Pair Balance 1:", pairCurrency1Balance.toString());
 
-    // Mint liquidity
-    console.log("Minting pair tokens...");
-    await pair.mint(walletAddress);
     console.log("Liquidity added...");
 
     // Retrieve and log reserves from the pair

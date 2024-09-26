@@ -1,6 +1,7 @@
 import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
+import { encodeFunctionData } from "viem";
 import type { Currency, UniswapV2Pair } from "../../../typechain-types";
 import { createClient } from "../../util/client";
 
@@ -12,6 +13,8 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
     if (!walletAddress) {
       throw new Error("WALLET_ADDR is not set in environment variables");
     }
+
+    const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
 
     const { wallet, publicClient } = await createClient();
 
@@ -69,11 +72,19 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
     const userLpBalance = await pair.getCurrencyBalanceOf(walletAddress);
     console.log("Total LP balance for user wallet:", userLpBalance.toString());
 
+    // Execute burn
+    console.log("Executing burn...");
+
     const hash = await wallet.sendMessage({
       // @ts-ignore
       to: pairAddress,
       feeCredit: BigInt(10_000_000),
       value: BigInt(0),
+      data: encodeFunctionData({
+        abi: pairArtifact.abi,
+        functionName: "burn",
+        args: [walletAddress],
+      }),
       refundTo: walletAddress,
       tokens: [
         {
@@ -85,9 +96,6 @@ task("burn", "Burn liquidity tokens and print balances and reserves")
 
     await waitTillCompleted(publicClient, shardNumber(walletAddress), hash);
 
-    // Execute burn
-    console.log("Executing burn...");
-    await pair.burn(walletAddress);
     console.log("Burn executed.");
     console.log("Built tokens");
 
