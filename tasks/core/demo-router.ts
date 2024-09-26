@@ -1,20 +1,20 @@
-import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
-import {waitTillCompleted} from "@nilfoundation/niljs";
-import {task} from "hardhat/config";
-import {encodeFunctionData} from "viem";
+import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import { waitTillCompleted } from "@nilfoundation/niljs";
+import { task } from "hardhat/config";
+import { encodeFunctionData } from "viem";
 import type {
   Currency,
   UniswapV2Factory,
   UniswapV2Pair,
 } from "../../typechain-types";
-import {createClient} from "../util/client";
+import { createClient } from "../util/client";
 import {
   faucetWithdrawal,
   mintAndSendCurrency,
   sleep,
 } from "../util/currencyUtils";
-import {deployNilContract} from "../util/deploy";
-import {calculateOutputAmount} from "../util/math";
+import { deployNilContract } from "../util/deploy";
+import { calculateOutputAmount } from "../util/math";
 
 task("demo-router", "Run demo with Uniswap Router").setAction(
   async (taskArgs, hre) => {
@@ -31,7 +31,7 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
     const mintCurrency1Amount = 10000;
     const swapAmount = 1000;
 
-    const {wallet, publicClient, signer} = await createClient();
+    const { wallet, publicClient, signer } = await createClient();
 
     const {
       deployedContract: factoryContract,
@@ -56,12 +56,10 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
     console.log("Currency0 deployed " + currency0Address);
     console.log("Currency1 deployed " + currency1Address);
 
-    const {
-      deployedContract: RouterContract,
-      contractAddress: routerAddress,
-    } = await deployNilContract(hre, "UniswapV2Router01", [
-      factoryAddress.toLowerCase(),
-    ]);
+    const { deployedContract: RouterContract, contractAddress: routerAddress } =
+      await deployNilContract(hre, "UniswapV2Router01", [
+        factoryAddress.toLowerCase(),
+      ]);
 
     console.log("Router deployed " + routerAddress);
 
@@ -168,7 +166,8 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
 
     // 3. ROUTER: ADD LIQUIDITY
     const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
-    const routerArtifact = await hre.artifacts.readArtifact("UniswapV2Router01");
+    const routerArtifact =
+      await hre.artifacts.readArtifact("UniswapV2Router01");
 
     // Mint liquidity
     console.log("Adding liquidity...");
