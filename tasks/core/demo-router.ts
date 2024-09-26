@@ -166,7 +166,8 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
 
     // 3. ROUTER: ADD LIQUIDITY
     const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
-    const routerArtifact = await hre.artifacts.readArtifact("UniswapV2Router01");
+    const routerArtifact =
+      await hre.artifacts.readArtifact("UniswapV2Router01");
 
     // Mint liquidity
     console.log("Adding liquidity...");
