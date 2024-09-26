@@ -166,8 +166,7 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
 
     // 3. ROUTER: ADD LIQUIDITY
     const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
-    const routerArtifact =
-      await hre.artifacts.readArtifact("UniswapV2Router01");
+    const routerArtifact = await hre.artifacts.readArtifact("UniswapV2Router01");
 
     // Mint liquidity
     console.log("Adding liquidity...");
@@ -277,7 +276,7 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
     await waitTillCompleted(publicClient, shardNumber(walletAddress), hash2);
 
     console.log(
-      `Sent ${swapAmount.toString()} of currency0 to the pair contract.`,
+      `Sent ${swapAmount.toString()} of currency0 to the pair contract. Tx - ${hash2}`,
     );
 
     console.log("Swap executed successfully.");

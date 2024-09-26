@@ -47,7 +47,7 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         if (tokens.length != 1) {
             revert("UniswapV2Router: should contains only pair token");
         }
-        smartCall(pair, tokens, abi.encodeWithSignature("swap(address)", amount0Out, amount1Out, to));
+        smartCall(pair, tokens, abi.encodeWithSignature("swap(uint,uint,address)", amount0Out, amount1Out, to));
     }
 
     // TODO: This method are used for swapping via multiple pairs. Not supported in nil for now
