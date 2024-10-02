@@ -8,10 +8,24 @@ interface IUniswapV2Router01 {
         address pair,
         address to
     ) external;
+    function addLiquiditySync(
+        address pair,
+        address to,
+        uint amountADesired,
+        uint amountBDesired,
+        uint amountAMin,
+        uint amountBMin
+    ) external returns (uint amountA, uint amountB);
     function removeLiquidity(
         address pair,
         address to
     ) external;
+    function removeLiquiditySync(
+        address pair,
+        address to,
+        uint amountAMin,
+        uint amountBMin
+    ) external returns (uint amountA, uint amountB);
     function swap(
         address to,
         address pair,
@@ -19,20 +33,11 @@ interface IUniswapV2Router01 {
         uint amount1Out
     ) external;
 
-    function swapExactTokensForTokens(
-        uint amountIn,
+    function swapExactTokenForTokenSync(
+        address pair,
         uint amountOutMin,
-        address[] calldata path,
-        address to,
-        uint deadline
-    ) external returns (uint[] memory amounts);
-    function swapTokensForExactTokens(
-        uint amountOut,
-        uint amountInMax,
-        address[] calldata path,
-        address to,
-        uint deadline
-    ) external returns (uint[] memory amounts);
+        address to
+    ) external returns (uint amount);
 
     function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
     function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
