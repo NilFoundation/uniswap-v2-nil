@@ -47,7 +47,6 @@ const config: NilHardhatUserConfig = {
     },
   },
   walletAddress: process.env.WALLET_ADDR,
-
 };
 
 export default config;
