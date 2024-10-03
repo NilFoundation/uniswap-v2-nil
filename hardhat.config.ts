@@ -30,7 +30,16 @@ const config: NilHardhatUserConfig = {
   ignition: {
     requiredConfirmations: 1,
   },
-  solidity: "0.8.24",
+  solidity: {
+    version: "0.8.24", // or your desired version
+    settings: {
+      viaIR: true, // needed to compile router
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   networks: {
     nil: {
       url: process.env.NIL_RPC_ENDPOINT,
@@ -38,6 +47,7 @@ const config: NilHardhatUserConfig = {
     },
   },
   walletAddress: process.env.WALLET_ADDR,
+
 };
 
 export default config;

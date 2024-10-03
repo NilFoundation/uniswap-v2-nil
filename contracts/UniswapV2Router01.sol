@@ -149,9 +149,12 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         (uint reserveA, uint reserveB) = UniswapV2Library.getReserves(pair, tokens[0].id, tokenBId);
         amount = UniswapV2Library.getAmountOut(tokens[0].amount, reserveA, reserveB);
         require(amount >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');
-        uint amount0Out = tokens[0].id == token0Id ? tokens[0].amount : amount;
-        uint amount1Out = tokens[0].id != token0Id ? tokens[0].amount : amount;
-        smartCall(pair, tokens, abi.encodeWithSignature("swap(uint256,uint256,address)", amount0Out, amount1Out, to));
+        uint amount0Out = tokens[0].id == token0Id ? 0 : amount;
+        uint amount1Out = tokens[0].id != token0Id ? 0 : amount;
+        (bool success, bytes memory result) = smartCall(pair, tokens, abi.encodeWithSignature("swap(uint256,uint256,address)", amount0Out, amount1Out, to));
+        if (!success) {
+            revert("UniswapV2Router: should get success swap result");
+        }
     }
 
     function quote(uint amountA, uint reserveA, uint reserveB) public pure override returns (uint amountB) {
