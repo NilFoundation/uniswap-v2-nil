@@ -9,6 +9,7 @@ import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 
 contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
+    // not used now
     address public immutable factory;
 
 

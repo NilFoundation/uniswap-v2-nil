@@ -3,7 +3,8 @@
 
 ## Overview
 
-This repository is an example repo to showcase how to migrate dApps from Ethereum-like networks to =nil;. Uniswap V2 serves as a great base to demonstrate the following:
+This repository is an example repo to showcase how to migrate dApps from Ethereum-like networks to =nil;.
+Uniswap V2 serves as a great base to demonstrate the following:
 
 1. How to work with =nil; multi-currencies.
 2. How to utilize async calls.
@@ -15,17 +16,15 @@ This repository is an example repo to showcase how to migrate dApps from Ethereu
 
 ```shell
 git clone https://github.com/NilFoundation/nil
-cd nil
-git checkout a3a99e1
 ```
 
 2) Configure the node and create a new wallet:
 
 ```shell
-./build/bin/nil_cli config init
-./build/bin/nil_cli config set rpc_endpoint NIL_ENDPOINT
-./build/bin/nil_cli keygen new
-./build/bin/nil_cli wallet new
+./build/bin/nil config init
+./build/bin/nil config set rpc_endpoint NIL_ENDPOINT
+./build/bin/nil keygen new
+./build/bin/nil wallet new
 ```
 
 3) Create a `.env` file in the root of the project with the following configuration:
@@ -41,34 +40,58 @@ Ensure to replace `<your_private_key_here>` with the actual private key without 
 4) Enable debug logs. In `hardhat.config.ts` set `debug: true`.
 For now you can't see deployed contract addresses directly from hardhat results.
 
+## How to Use
 
-## How to use
-
-1) First you need to deploy token contracts and factory(or use existing ones).
-In case of deployment new contracts please copy them from the debug logs.
+### 1. Run Demo with Direct Messages to the Pair Contract
+This demo task demonstrates how to create a `UniswapV2Pair` for two currencies,
+add liquidity to the LP, perform swaps, and remove liquidity by directly calling `UniswapV2Pair`.
 
 ```shell
-npx hardhat flow_1 --network nil 
+npx hardhat demo --network nil 
 ```
 
-Deployment log example
-```
-Response deployment {"hash":"0x0b788324e101a972c383d0a8ecd58084921d3ac84869b761c643317728eaf66d","address":"0x0001fd2e170eec3b3b538183c4d749adca5065b1"}
-```
+#### Important:
+- The `UniswapV2Pair` is deployed on the same shard as the `UniswapV2Factory`.
+- Calculations are processed on the user's side.
+- Both the currency address and its ID are stored.
 
-2) Run flow to check DEX flows. This task will init a pair contract(or fetch the existed).
-Then it mint pair tokens and run swap
+### 2. Run Demo with Async Router Calls
+This demo task shows how to deploy the `UniswapV2Router01` contract
+and use it as a proxy for adding/removing liquidity and performing swaps.
+Async calls are used, meaning `UniswapV2Router01` can be deployed on a different shard than the core contracts.
+
 ```shell
-npx hardhat flow_2 --network nil --token0 <token0address> --token1 <token1address> --toburn <burnaddress> --factory <factoryaddress>
+npx hardhat demo-router --network nil 
 ```
+
+#### Important:
+- The `UniswapV2Factory` is used for creating new pairs. `UniswapV2Router01` calls already deployed pair contracts.
+- `UniswapV2Router01` can be deployed on a different shard.
+- Vulnerability: no checks are performed during adding/removing liquidity and swaps.
+Rates and output amounts are entirely calculated on the user side.
+
+### 3. Run Demo with Sync Router Calls (1 Shard)
+This demo task shows how to deploy the `UniswapV2Router01` contract
+and use it as a proxy for adding/removing liquidity and swaps via sync calls.
+It allows checks on amounts before pair calls and maintains currency rates.
+
+```shell
+npx hardhat demo-router-sync --network nil 
+```
+
+#### Important:
+- `UniswapV2Router01` should be deployed on the same shard as the pair contract.
+- It maintains the currency exchange rate when adding/removing liquidity.
+- It supports limit checks for currency amounts.
 
 ## Current Issues
 
-1. Deployed contract address can be fetched only from debug logs
-2. No chained swaps support
-3. Security: no router contract to send tokens and call pair message in single transaction.
+1. Use Nil.js wallet to attach tokens to the transaction message.
+2. No support for chained swaps on the Nil network.
+3. Fee collection is not implemented.
 
 ## License
 
-This project is licensed under the GPL-3.0 License. See the [LICENSE](./LICENSE) file for more details. Portions of this project are derived from [Uniswap V2](https://github.com/Uniswap/v2-core) and are also subject to the GPL-3.0 License.
-
+This project is licensed under the GPL-3.0 License.
+See the [LICENSE](./LICENSE) file for more details. Portions of this project
+are derived from [Uniswap V2](https://github.com/Uniswap/v2-core) and are also subject to the GPL-3.0 License.
