@@ -21,6 +21,8 @@ interface IUniswapV2Pair {
     function factory() external view returns (address);
     function token0() external view returns (address);
     function token1() external view returns (address);
+    function token0Id() external view returns (uint256);
+    function token1Id() external view returns (uint256);
     function getReserves()
         external
         view

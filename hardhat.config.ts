@@ -22,6 +22,7 @@ import "./tasks/core/factory/create-pair";
 // Demo Tasks
 import "./tasks/core/demo";
 import "./tasks/core/demo-router";
+import "./tasks/core/demo-router-sync";
 
 dotenv.config();
 
@@ -29,7 +30,16 @@ const config: NilHardhatUserConfig = {
   ignition: {
     requiredConfirmations: 1,
   },
-  solidity: "0.8.24",
+  solidity: {
+    version: "0.8.24", // or your desired version
+    settings: {
+      viaIR: true, // needed to compile router
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
   networks: {
     nil: {
       url: process.env.NIL_RPC_ENDPOINT,

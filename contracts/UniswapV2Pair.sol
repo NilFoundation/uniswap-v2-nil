@@ -235,5 +235,12 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         );
     }
 
+    function token0Id() external view returns (uint256) {
+        return tokenId0;
+    }
+    function token1Id() external view returns (uint256) {
+        return tokenId1;
+    }
+
     receive() external payable {}
 }

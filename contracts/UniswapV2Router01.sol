@@ -9,14 +9,10 @@ import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 
 contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
-    address public immutable factory;
 
-
-    constructor(address _factory) public {
-        // Revert if the factory address is the zero address or an empty string
-        require(_factory != address(0), "Factory address cannot be the zero address");
-
-        factory = _factory;
+    modifier sameShard(address _addr) {
+        require(Nil.getShardId(_addr) == Nil.getShardId(address(this)), "Sync calls require same shard for all contracts");
+        _;
     }
 
     function addLiquidity(
@@ -28,6 +24,67 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
             revert("Send only 2 tokens to add liquidity");
         }
         smartCall(pair, tokens, abi.encodeWithSignature("mint(address)", to));
+    }
+
+    function addLiquiditySync(
+        address pair,
+        address to,
+        uint amountADesired,
+        uint amountBDesired,
+        uint amountAMin,
+        uint amountBMin
+    ) public override sameShard(pair) returns (uint amountA, uint amountB) {
+        Nil.Token[] memory tokens = Nil.msgTokens();
+        if (tokens.length != 2) {
+            revert("Send only 2 tokens to add liquidity");
+        }
+        (amountA, amountB) = _addLiquiditySync(pair, tokens[0].id, tokens[1].id, amountADesired, amountBDesired, amountAMin, amountBMin);
+
+        if (amountA < tokens[0].amount) {
+            Nil.Token[] memory tokenAReturns = new Nil.Token[](1);
+            tokenAReturns[0].id = tokens[0].id;
+            tokenAReturns[0].amount = tokens[0].amount - amountA;
+            smartCall(to, tokenAReturns, "");
+        }
+        if (amountB < tokens[1].amount) {
+            Nil.Token[] memory tokenBReturns = new Nil.Token[](1);
+            tokenBReturns[0].id = tokens[1].id;
+            tokenBReturns[0].amount = tokens[1].amount - amountB;
+            smartCall(to, tokenBReturns, "");
+        }
+
+        Nil.Token[] memory tokensToSend = new Nil.Token[](2);
+        tokensToSend[0].id = tokens[0].id;
+        tokensToSend[0].amount = amountA;
+        tokensToSend[1].id = tokens[1].id;
+        tokensToSend[1].amount = amountA;
+        smartCall(pair, tokensToSend, abi.encodeWithSignature("mint(address)", to));
+    }
+
+    function _addLiquiditySync(
+        address pair,
+        uint256 tokenA,
+        uint256 tokenB,
+        uint amountADesired,
+        uint amountBDesired,
+        uint amountAMin,
+        uint amountBMin
+    ) private returns (uint amountA, uint amountB) {
+        (uint reserveA, uint reserveB) = UniswapV2Library.getReserves(pair, tokenA, tokenB);
+        if (reserveA == 0 && reserveB == 0) {
+            (amountA, amountB) = (amountADesired, amountBDesired);
+        } else {
+            uint amountBOptimal = UniswapV2Library.quote(amountADesired, reserveA, reserveB);
+            if (amountBOptimal <= amountBDesired) {
+                require(amountBOptimal >= amountBMin, 'UniswapV2Router: INSUFFICIENT_B_AMOUNT');
+                (amountA, amountB) = (amountADesired, amountBOptimal);
+            } else {
+                uint amountAOptimal = UniswapV2Library.quote(amountBDesired, reserveB, reserveA);
+                assert(amountAOptimal <= amountADesired);
+                require(amountAOptimal >= amountAMin, 'UniswapV2Router: INSUFFICIENT_A_AMOUNT');
+                (amountA, amountB) = (amountAOptimal, amountBDesired);
+            }
+        }
     }
 
     // **** REMOVE LIQUIDITY ****
@@ -42,6 +99,24 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         smartCall(pair, tokens, abi.encodeWithSignature("burn(address)", to));
     }
 
+    function removeLiquiditySync(
+        address pair,
+        address to,
+        uint amountAMin,
+        uint amountBMin
+    ) public override sameShard(pair) returns (uint amountA, uint amountB) {
+        Nil.Token[] memory tokens = Nil.msgTokens();
+        if (tokens.length != 1) {
+            revert("UniswapV2Router: should contains only pair token");
+        }
+        (bool success, bytes memory result) = smartCall(pair, tokens, abi.encodeWithSignature("burn(address)", to));
+        if (success) {
+            (amountA, amountB) = abi.decode(result, (uint256, uint256));
+        } else {
+            revert("Burn call is not successful");
+        }
+    }
+
     function swap(address to, address pair, uint amount0Out, uint amount1Out) public override {
         Nil.Token[] memory tokens = Nil.msgTokens();
         if (tokens.length != 1) {
@@ -50,51 +125,27 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         smartCall(pair, tokens, abi.encodeWithSignature("swap(uint256,uint256,address)", amount0Out, amount1Out, to));
     }
 
-    // TODO: This method are used for swapping via multiple pairs. Not supported in nil for now
-    // **** SWAP ****
-    // requires the initial amount to have already been sent to the first pair
-    function _swap(uint[] memory amounts, address[] memory path, address _to) private {
-        for (uint i; i < path.length - 1; i++) {
-            (address input, address output) = (path[i], path[i + 1]);
-            (address token0,) = UniswapV2Library.sortTokens(input, output);
-            uint amountOut = amounts[i + 1];
-            (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
-            address to = i < path.length - 2 ? IUniswapV2Factory(factory).getTokenPair(output, path[i + 2]) : _to;
-            address pair = IUniswapV2Factory(factory).getTokenPair(input, output);
-            IUniswapV2Pair(pair).swap(amount0Out, amount1Out, to);
-        }
-    }
-
-    // TODO: This method are used for swapping via multiple pairs. Not supported in nil for now
-    function swapExactTokensForTokens(
-        uint amountIn,
+    function swapExactTokenForTokenSync(
+        address pair,
         uint amountOutMin,
-        address[] calldata path,
-        address to,
-        uint deadline
-    ) external override returns (uint[] memory amounts) {
-        amounts = UniswapV2Library.getAmountsOut(factory, amountIn, path);
-        require(amounts[amounts.length - 1] >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');
-        address pair = IUniswapV2Factory(factory).getTokenPair(path[0], path[1]);
+        address to
+    ) external override sameShard(pair) returns (uint amount) {
         Nil.Token[] memory tokens = Nil.msgTokens();
-        sendCurrencyInternal(pair, tokens[0].id, amounts[0]);
-        _swap(amounts, path, to);
-    }
-
-    // TODO: This method are used for swapping via multiple pairs. Not supported in nil for now
-    function swapTokensForExactTokens(
-        uint amountOut,
-        uint amountInMax,
-        address[] calldata path,
-        address to,
-        uint deadline
-    ) external override returns (uint[] memory amounts) {
-        amounts = UniswapV2Library.getAmountsIn(factory, amountOut, path);
-        require(amounts[0] <= amountInMax, 'UniswapV2Router: EXCESSIVE_INPUT_AMOUNT');
-        address pair = IUniswapV2Factory(factory).getTokenPair(path[0], path[1]);
-        Nil.Token[] memory tokens = Nil.msgTokens();
-        sendCurrencyInternal(pair, tokens[0].id, amounts[0]);
-        _swap(amounts, path, to);
+        if (tokens.length != 1) {
+            revert("UniswapV2Router: should contains only pair token");
+        }
+        uint256 token0Id = IUniswapV2Pair(pair).token0Id();
+        uint256 token1Id = IUniswapV2Pair(pair).token1Id();
+        uint256 tokenBId = tokens[0].id != token0Id ? token0Id : token1Id;
+        (uint reserveA, uint reserveB) = UniswapV2Library.getReserves(pair, tokens[0].id, tokenBId);
+        amount = UniswapV2Library.getAmountOut(tokens[0].amount, reserveA, reserveB);
+        require(amount >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');
+        uint amount0Out = tokens[0].id == token0Id ? 0 : amount;
+        uint amount1Out = tokens[0].id != token0Id ? 0 : amount;
+        (bool success, bytes memory result) = smartCall(pair, tokens, abi.encodeWithSignature("swap(uint256,uint256,address)", amount0Out, amount1Out, to));
+        if (!success) {
+            revert("UniswapV2Router: should get success swap result");
+        }
     }
 
     function quote(uint amountA, uint reserveA, uint reserveB) public pure override returns (uint amountB) {
@@ -112,13 +163,13 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
     receive() external payable {
     }
 
-    function smartCall(address dst, Nil.Token[] memory tokens, bytes memory callData) private returns (bool) {
+    function smartCall(address dst, Nil.Token[] memory tokens, bytes memory callData) private returns (bool, bytes memory) {
         if (Nil.getShardId(dst) == Nil.getShardId(address(this))) {
-            (bool success,) = Nil.syncCall(dst, gasleft(), 0, tokens, callData);
-            return success;
+            (bool success, bytes memory result) = Nil.syncCall(dst, gasleft(), 0, tokens, callData);
+            return (success, result);
         } else {
             Nil.asyncCall(dst, address(0), address(0), 0, Nil.FORWARD_REMAINING, false, 0, tokens, callData);
-            return true;
+            return (true, "");
         }
     }
 }
