@@ -43,9 +43,8 @@ as well as performing operations like minting, swapping, and burning
    [View the demo task](https://github.com/NilFoundation/uniswap-v2-nil/blob/main/tasks/core/demo.ts)
    
    **Important:**
-   - The `UniswapV2Pair` is deployed on the same shard as the `UniswapV2Factory`.
    - Calculations are processed on the user's side.
-   - Both the currency address and its ID are stored.
+   - Both the currency address and its ID are stored in the pair contract.
 
 
 2. **Using Factory, Pair, and Router Contracts**  

@@ -57,9 +57,7 @@ task(
   console.log("Currency1 deployed " + currency1Address);
 
   const { deployedContract: RouterContract, contractAddress: routerAddress } =
-    await deployNilContract(hre, "UniswapV2Router01", [
-      factoryAddress.toLowerCase(),
-    ]);
+    await deployNilContract(hre, "UniswapV2Router01");
 
   console.log("Router deployed " + routerAddress);
 

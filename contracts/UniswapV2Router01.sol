@@ -9,16 +9,6 @@ import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 
 contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
-    // not used now
-    address public immutable factory;
-
-
-    constructor(address _factory) public {
-        // Revert if the factory address is the zero address or an empty string
-        require(_factory != address(0), "Factory address cannot be the zero address");
-
-        factory = _factory;
-    }
 
     modifier sameShard(address _addr) {
         require(Nil.getShardId(_addr) == Nil.getShardId(address(this)), "Sync calls require same shard for all contracts");
