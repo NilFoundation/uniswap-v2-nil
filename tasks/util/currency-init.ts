@@ -25,6 +25,11 @@ export async function initCurrency(
     await signer.getPublicKey(),
   ]);
 
+  const contract = CurrencyContract.attach(currencyAddress.toLowerCase()) as Currency;
+  const id = await contract.getCurrencyId();
+
+  console.log(`Deployed token ${name}, address - ${currencyAddress}, id - ${id}`)
+
   await sleep(2000)
 
   // Prepare currencies
@@ -49,12 +54,10 @@ export async function initCurrency(
     hre,
   });
 
-  const contract = CurrencyContract as Currency;
-
   return {
     address: currencyAddress.toLowerCase(),
     currency: contract,
-    id: await contract.getCurrencyId()
+    id: id,
   }
 }
 

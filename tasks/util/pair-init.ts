@@ -29,7 +29,7 @@ export async function initPair(
 
   const currencyContract = await hre.ethers.getContractFactory("Currency");
   const token0Contract = currencyContract.attach(token0) as Currency;
-  const token1Contract = currencyContract.attach(token0) as Currency;
+  const token1Contract = currencyContract.attach(token1) as Currency;
 
   await pair.initialize(
     token0.toLowerCase(),

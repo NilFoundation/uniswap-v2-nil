@@ -25,8 +25,7 @@ task(
 
   const {wallet, publicClient} = await createClient();
 
-
-  const {factory, factoryAddress, router, routerAddress} = await deployDex(hre);
+  const {factory, routerAddress} = await deployDex(hre);
   console.log("Dex deployed, router - " + routerAddress);
 
   const {
@@ -190,89 +189,89 @@ task(
     balanceCurrency1After.toString(),
   );
 
-  // // 5. ROUTER: REMOVE LIQUIDITY
-  // const total = await pair.getCurrencyTotalSupply();
-  // console.log("Total supply:", total.toString());
-  //
-  // // Fetch and log pair balances before burn
-  // const pairBalanceToken0 = await token0Contract.getCurrencyBalanceOf(
-  //   pairAddress.toLowerCase(),
-  // );
-  // const pairBalanceToken1 = await token1Contract.getCurrencyBalanceOf(
-  //   pairAddress.toLowerCase(),
-  // );
-  // console.log("Pair Balance token0 before burn:", pairBalanceToken0.toString());
-  // console.log("Pair Balance token1 before burn:", pairBalanceToken1.toString());
-  //
-  // // Fetch and log user balances before burn
-  // let userBalanceToken0 =
-  //   await token0Contract.getCurrencyBalanceOf(walletAddress);
-  // let userBalanceToken1 =
-  //   await token1Contract.getCurrencyBalanceOf(walletAddress);
-  // console.log("User Balance token0 before burn:", userBalanceToken0.toString());
-  // console.log("User Balance token1 before burn:", userBalanceToken1.toString());
-  //
-  // const lpAddress = await pair.getCurrencyId();
-  // const userLpBalance = await pair.getCurrencyBalanceOf(walletAddress);
-  // console.log("Total LP balance for user wallet:", userLpBalance.toString());
-  // // Execute burn
-  // console.log("Executing burn...");
-  // // Send LP tokens to the user wallet
-  // const hash3 = await wallet.sendMessage({
-  //   // @ts-ignore
-  //   to: routerAddress,
-  //   feeCredit: BigInt(10_000_000),
-  //   value: BigInt(0),
-  //   data: encodeFunctionData({
-  //     abi: routerAbi,
-  //     functionName: "removeLiquiditySync",
-  //     args: [pairAddress.toLowerCase(), walletAddress, 100, 100],
-  //   }),
-  //   refundTo: walletAddress,
-  //   tokens: [
-  //     {
-  //       id: lpAddress,
-  //       amount: BigInt(userLpBalance),
-  //     },
-  //   ],
-  // });
-  //
-  // await waitTillCompleted(publicClient, shardNumber(walletAddress), hash3);
-  //
-  // console.log("Burn executed.");
-  //
-  // // Log balances after burn
-  // const balanceToken0 = await token0Contract.getCurrencyBalanceOf(
-  //   pairAddress.toLowerCase(),
-  // );
-  // const balanceToken1 = await token1Contract.getCurrencyBalanceOf(
-  //   pairAddress.toLowerCase(),
-  // );
-  // console.log(
-  //   "REMOVELIQUIDITY RESULT: Pair Balance token0 after burn:",
-  //   balanceToken0.toString(),
-  // );
-  // console.log(
-  //   "REMOVELIQUIDITY RESULT: Pair Balance token1 after burn:",
-  //   balanceToken1.toString(),
-  // );
-  //
-  // userBalanceToken0 = await token0Contract.getCurrencyBalanceOf(walletAddress);
-  // userBalanceToken1 = await token1Contract.getCurrencyBalanceOf(walletAddress);
-  // console.log(
-  //   "REMOVELIQUIDITY RESULT: User Balance token0 after burn:",
-  //   userBalanceToken0.toString(),
-  // );
-  // console.log(
-  //   "REMOVELIQUIDITY RESULT: User Balance token1 after burn:",
-  //   userBalanceToken1.toString(),
-  // );
-  //
-  // // Fetch and log reserves after burn
-  // const reserves = await pair.getReserves();
-  // console.log(
-  //   "REMOVELIQUIDITY RESULT: Reserves from pair after burn:",
-  //   reserves[0].toString(),
-  //   reserves[1].toString(),
-  // );
+  // 5. ROUTER: REMOVE LIQUIDITY
+  const total = await pair.getCurrencyTotalSupply();
+  console.log("Total supply:", total.toString());
+
+  // Fetch and log pair balances before burn
+  const pairBalanceToken0 = await token0Contract.getCurrencyBalanceOf(
+    pairAddress.toLowerCase(),
+  );
+  const pairBalanceToken1 = await token1Contract.getCurrencyBalanceOf(
+    pairAddress.toLowerCase(),
+  );
+  console.log("Pair Balance token0 before burn:", pairBalanceToken0.toString());
+  console.log("Pair Balance token1 before burn:", pairBalanceToken1.toString());
+
+  // Fetch and log user balances before burn
+  let userBalanceToken0 =
+    await token0Contract.getCurrencyBalanceOf(walletAddress);
+  let userBalanceToken1 =
+    await token1Contract.getCurrencyBalanceOf(walletAddress);
+  console.log("User Balance token0 before burn:", userBalanceToken0.toString());
+  console.log("User Balance token1 before burn:", userBalanceToken1.toString());
+
+  const lpAddress = await pair.getCurrencyId();
+  const userLpBalance = await pair.getCurrencyBalanceOf(walletAddress);
+  console.log("Total LP balance for user wallet:", userLpBalance.toString());
+  // Execute burn
+  console.log("Executing burn...");
+  // Send LP tokens to the user wallet
+  const hash3 = await wallet.sendMessage({
+    // @ts-ignore
+    to: routerAddress,
+    feeCredit: BigInt(10_000_000),
+    value: BigInt(0),
+    data: encodeFunctionData({
+      abi: routerAbi,
+      functionName: "removeLiquiditySync",
+      args: [pairAddress.toLowerCase(), walletAddress, 100, 100],
+    }),
+    refundTo: walletAddress,
+    tokens: [
+      {
+        id: lpAddress,
+        amount: BigInt(userLpBalance),
+      },
+    ],
+  });
+
+  await waitTillCompleted(publicClient, shardNumber(walletAddress), hash3);
+
+  console.log("Burn executed.");
+
+  // Log balances after burn
+  const balanceToken0 = await token0Contract.getCurrencyBalanceOf(
+    pairAddress.toLowerCase(),
+  );
+  const balanceToken1 = await token1Contract.getCurrencyBalanceOf(
+    pairAddress.toLowerCase(),
+  );
+  console.log(
+    "REMOVELIQUIDITY RESULT: Pair Balance token0 after burn:",
+    balanceToken0.toString(),
+  );
+  console.log(
+    "REMOVELIQUIDITY RESULT: Pair Balance token1 after burn:",
+    balanceToken1.toString(),
+  );
+
+  userBalanceToken0 = await token0Contract.getCurrencyBalanceOf(walletAddress);
+  userBalanceToken1 = await token1Contract.getCurrencyBalanceOf(walletAddress);
+  console.log(
+    "REMOVELIQUIDITY RESULT: User Balance token0 after burn:",
+    userBalanceToken0.toString(),
+  );
+  console.log(
+    "REMOVELIQUIDITY RESULT: User Balance token1 after burn:",
+    userBalanceToken1.toString(),
+  );
+
+  // Fetch and log reserves after burn
+  const reserves = await pair.getReserves();
+  console.log(
+    "REMOVELIQUIDITY RESULT: Reserves from pair after burn:",
+    reserves[0].toString(),
+    reserves[1].toString(),
+  );
 });

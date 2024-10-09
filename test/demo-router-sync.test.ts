@@ -1,11 +1,12 @@
 import {createClient} from "../tasks/util/client";
-import {deployNilContract} from "../tasks/util/deploy";
-import type {Currency, UniswapV2Factory, UniswapV2Pair} from "../typechain-types";
-import {faucetWithdrawal, mintAndSendCurrency, sleep} from "../tasks/util/currencyUtils";
+import {mintAndSendCurrency} from "../tasks/util/currencyUtils";
 import {encodeFunctionData} from "viem";
 import {waitTillCompleted} from "@nilfoundation/niljs";
 import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 import {calculateOutputAmount} from "../tasks/util/math";
+import {deployDex} from "../tasks/util/dex-deployment";
+import {initCurrency} from "../tasks/util/currency-init";
+import {initPair} from "../tasks/util/pair-init";
 
 const hre = require("hardhat");
 const { expect } = require("chai");
@@ -17,9 +18,6 @@ describe("Uniswap with Router (Sync)", async function  ()  {
     throw new Error("WALLET_ADDR is not set in environment variables");
   }
 
-  const faucetAddress = process.env.FAUCET_ADDR;
-
-  const shardId = 1;
   const mintAmount = 100000;
   const mintCurrency0Amount = 10000;
   const mintCurrency1Amount = 10000;
@@ -28,11 +26,16 @@ describe("Uniswap with Router (Sync)", async function  ()  {
   let routerAddress: string;
   let RouterContract: any;
   let pairAddress: string;
-  let firstCurrency: any;
-  let secondCurrency: any;
+  let token0Contract: any;
+  let token1Contract: any;
+  let token0Id: bigint;
+  let token1Id: bigint;
+  let token0Address: any;
+  let token1Address: any;
   let pair: any;
   let reserve0: any;
   let reserve1: any;
+  let factory: any;
 
   // DEPLOYMENT
   const { wallet, publicClient, signer } = await createClient();
@@ -40,102 +43,32 @@ describe("Uniswap with Router (Sync)", async function  ()  {
   before(async function () {
     this.timeout(120000);
 
-    const { deployedContract: factoryContract, contractAddress: factoryAddress } =
-      await deployNilContract(hre, "UniswapV2Factory", [walletAddress]);
-    const {
-      deployedContract: Currency0Contract,
-      contractAddress: currency0Address,
-    } = await deployNilContract(hre, "Currency", [
-      "currency0",
-      await signer.getPublicKey(),
-    ]);
-    const {
-      deployedContract: Currency1Contract,
-      contractAddress: currency1Address,
-    } = await deployNilContract(hre, "Currency", [
-      "currency1",
-      await signer.getPublicKey(),
-    ]);
+    const {wallet, publicClient} = await createClient();
 
-    console.log("Factory deployed " + factoryAddress);
-    console.log("Currency0 deployed " + currency0Address);
-    console.log("Currency1 deployed " + currency1Address);
+    ({factory, routerAddress} = await deployDex(hre));
+    console.log("Dex deployed, router - " + routerAddress);
 
-    ({ deployedContract: RouterContract, contractAddress: routerAddress } =
-      await deployNilContract(hre, "UniswapV2Router01"));
+    ({
+      address: token0Address,
+      currency: token0Contract,
+      id: token0Id
+    } = await initCurrency("Token0", mintAmount, hre));
+    ({
+      address: token1Address,
+      currency: token1Contract,
+      id: token1Id
+    } = await initCurrency("Token1", mintAmount, hre));
 
-    console.log("Router deployed " + routerAddress);
-
-    const factory = factoryContract as UniswapV2Factory;
-
-    // 1. CREATE PAIR
-    await factory.createPair(
-      currency0Address.toLowerCase(),
-      currency1Address.toLowerCase(),
-      Math.floor(Math.random() * 10000000),
-      shardId,
-    );
-
-    pairAddress = await factory.getTokenPair(
-      currency0Address.toLowerCase(),
-      currency1Address.toLowerCase(),
-    );
-
-    // Log the pair address
-    console.log(`Pair created successfully at address: ${pairAddress}`);
-
-    // Attach to the Currency contract for both currencies
-
-    firstCurrency = Currency0Contract as Currency;
-    const firstCurrencyId = await firstCurrency.getCurrencyId();
-    console.log(`First currency ID: ${firstCurrencyId}`);
-
-    secondCurrency = Currency1Contract as Currency;
-    const secondCurrencyId = await secondCurrency.getCurrencyId();
-    console.log(`Second currency ID: ${secondCurrencyId}`);
-
-    // Attach to the newly created Uniswap V2 Pair contract
-    const pairContract = await hre.ethers.getContractFactory("UniswapV2Pair");
-    pair = pairContract.attach(pairAddress) as UniswapV2Pair;
-
-    // Initialize the pair with currency addresses and IDs
-    await pair.initialize(
-      currency0Address.toLowerCase(),
-      currency1Address.toLowerCase(),
-      firstCurrencyId,
-      secondCurrencyId,
-    );
-
-    console.log(`Pair initialized successfully at address: ${pairAddress}`);
-
-    // Prepare currencies
-    await faucetWithdrawal(
-      currency0Address.toLowerCase(),
-      100000000000n,
-      faucetAddress,
-      hre,
-      publicClient,
-    );
-
-    await sleep(2000);
-
-    await faucetWithdrawal(
-      currency1Address.toLowerCase(),
-      100000000000n,
-      faucetAddress,
-      hre,
-      publicClient,
-    );
-
-    await sleep(2000);
+    ({ address: pairAddress, pair} = await initPair(token0Address, token1Address, factory, hre));
+    console.log("Pair deployed " + pairAddress);
 
     // 2. MINT CURRENCIES
     console.log(`Minting ${mintAmount} Currency0 to wallet ${walletAddress}...`);
     await mintAndSendCurrency({
       publicClient,
       signer,
-      currencyContract: firstCurrency,
-      contractAddress: currency0Address.toLowerCase(),
+      currencyContract: token0Contract,
+      contractAddress: token0Address,
       walletAddress,
       mintAmount,
       hre,
@@ -146,8 +79,8 @@ describe("Uniswap with Router (Sync)", async function  ()  {
     await mintAndSendCurrency({
       publicClient,
       signer,
-      currencyContract: secondCurrency,
-      contractAddress: currency1Address.toLowerCase(),
+      currencyContract: token1Contract,
+      contractAddress: token1Address,
       walletAddress,
       mintAmount,
       hre,
@@ -155,9 +88,9 @@ describe("Uniswap with Router (Sync)", async function  ()  {
 
     // Verify the balance of the recipient wallet for both currencies
     const recipientBalanceCurrency0 =
-      await firstCurrency.getCurrencyBalanceOf(walletAddress);
+      await token0Contract.getCurrencyBalanceOf(walletAddress);
     const recipientBalanceCurrency1 =
-      await secondCurrency.getCurrencyBalanceOf(walletAddress);
+      await token1Contract.getCurrencyBalanceOf(walletAddress);
 
     console.log(
       `Recipient balance after transfer - Currency0: ${recipientBalanceCurrency0}, Currency1: ${recipientBalanceCurrency1}`,
@@ -168,6 +101,28 @@ describe("Uniswap with Router (Sync)", async function  ()  {
     // Mint liquidity
     const routerArtifact = await hre.artifacts.readArtifact("UniswapV2Router01");
     console.log("Adding liquidity...");
+
+    console.log("DEBUG " + [
+      pairAddress,
+      walletAddress,
+      mintCurrency0Amount,
+      mintCurrency1Amount,
+      1,
+      1,
+    ]);
+
+    console.log("DEBUG " + routerAddress + " " + wallet.address);
+
+    console.log("DEBUG " + [
+      {
+        id: token0Id,
+        amount: BigInt(mintCurrency0Amount),
+      },
+      {
+        id: token1Id,
+        amount: BigInt(mintCurrency1Amount),
+      },
+    ]);
 
     const hash = await wallet.sendMessage({
       to: routerAddress,
@@ -188,11 +143,11 @@ describe("Uniswap with Router (Sync)", async function  ()  {
       }),
       tokens: [
         {
-          id: await firstCurrency.getCurrencyId(),
+          id: token0Id,
           amount: BigInt(mintCurrency0Amount),
         },
         {
-          id: await secondCurrency.getCurrencyId(),
+          id: token1Id,
           amount: BigInt(mintCurrency1Amount),
         },
       ],
@@ -242,7 +197,7 @@ describe("Uniswap with Router (Sync)", async function  ()  {
       refundTo: wallet.address,
       tokens: [
         {
-          id: await firstCurrency.getCurrencyId(),
+          id: token0Id,
           amount: BigInt(swapAmount),
         },
       ],
@@ -254,11 +209,11 @@ describe("Uniswap with Router (Sync)", async function  ()  {
 
     // Log balances after the swap
     const balanceCurrency0After =
-      await firstCurrency.getCurrencyBalanceOf(walletAddress);
+      await token0Contract.getCurrencyBalanceOf(walletAddress);
     const balanceCurrency1After =
-      await secondCurrency.getCurrencyBalanceOf(walletAddress);
-    expect(balanceCurrency0After).eq(89000);
-    expect(balanceCurrency1After).eq(90906);
+      await token1Contract.getCurrencyBalanceOf(walletAddress);
+    expect(balanceCurrency0After).eq(189000);
+    expect(balanceCurrency1After).eq(190906);
   });
 
   it("Remove Liquidity", async function () {
@@ -295,10 +250,10 @@ describe("Uniswap with Router (Sync)", async function  ()  {
 
     console.log("Burn executed.");
 
-    const userBalanceToken0 = await firstCurrency.getCurrencyBalanceOf(walletAddress);
-    const userBalanceToken1 = await secondCurrency.getCurrencyBalanceOf(walletAddress);
-    expect(userBalanceToken0).eq(94500)
-    expect(userBalanceToken1).eq(95453)
+    const userBalanceToken0 = await token0Contract.getCurrencyBalanceOf(walletAddress);
+    const userBalanceToken1 = await token1Contract.getCurrencyBalanceOf(walletAddress);
+    expect(userBalanceToken0).eq(194500)
+    expect(userBalanceToken1).eq(195453)
 
     // Fetch and log reserves after burn
     const reserves = await pair.getReserves();
