@@ -1,13 +1,13 @@
-import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
-import {waitTillCompleted} from "@nilfoundation/niljs";
-import {task} from "hardhat/config";
-import {encodeFunctionData} from "viem";
-import {createClient} from "../util/client";
-import {calculateOutputAmount} from "../util/math";
-import {deployDex} from "../util/dex-deployment";
-import {initCurrency} from "../util/currency-init";
-import {initPair} from "../util/pair-init";
-import {sleep} from "../util/currencyUtils";
+import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import { waitTillCompleted } from "@nilfoundation/niljs";
+import { task } from "hardhat/config";
+import { encodeFunctionData } from "viem";
+import { createClient } from "../util/client";
+import { initCurrency } from "../util/currency-init";
+import { sleep } from "../util/currencyUtils";
+import { deployDex } from "../util/dex-deployment";
+import { calculateOutputAmount } from "../util/math";
+import { initPair } from "../util/pair-init";
 
 task(
   "demo-router-sync",
@@ -23,23 +23,28 @@ task(
   const mintCurrency1Amount = 10000;
   const swapAmount = 1000;
 
-  const {wallet, publicClient} = await createClient();
+  const { wallet, publicClient } = await createClient();
 
-  const {factory, routerAddress} = await deployDex(hre);
+  const { factory, routerAddress } = await deployDex(hre);
   console.log("Dex deployed, router - " + routerAddress);
 
   const {
     address: token0Address,
     currency: token0Contract,
-    id: token0Id
+    id: token0Id,
   } = await initCurrency("Token0", mintAmount, hre);
   const {
     address: token1Address,
     currency: token1Contract,
-    id: token1Id
+    id: token1Id,
   } = await initCurrency("Token1", mintAmount, hre);
 
-  const {address: pairAddress, pair} = await initPair(token0Address, token1Address, factory, hre);
+  const { address: pairAddress, pair } = await initPair(
+    token0Address,
+    token1Address,
+    factory,
+    hre,
+  );
   console.log("Pair deployed " + pairAddress);
 
   // Verify the balance of the recipient wallet for both currencies

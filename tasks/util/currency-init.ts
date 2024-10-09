@@ -1,12 +1,12 @@
-import {deployNilContract} from "./deploy";
-import type {Currency} from "../../typechain-types";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
-import {faucetWithdrawal, mintAndSendCurrency, sleep} from "./currencyUtils";
-import {createClient} from "./client";
+import type { HardhatRuntimeEnvironment } from "hardhat/types";
+import type { Currency } from "../../typechain-types";
+import { createClient } from "./client";
+import { faucetWithdrawal, mintAndSendCurrency, sleep } from "./currencyUtils";
+import { deployNilContract } from "./deploy";
 
 export async function initCurrency(
   name: string,
-  mintAmount: any,
+  mintAmount: number,
   hre: HardhatRuntimeEnvironment,
 ): Promise<CurrencyResult> {
   const walletAddress = process.env.WALLET_ADDR;
@@ -25,12 +25,16 @@ export async function initCurrency(
     await signer.getPublicKey(),
   ]);
 
-  const contract = CurrencyContract.attach(currencyAddress.toLowerCase()) as Currency;
+  const contract = CurrencyContract.attach(
+    currencyAddress.toLowerCase(),
+  ) as Currency;
   const id = await contract.getCurrencyId();
 
-  console.log(`Deployed token ${name}, address - ${currencyAddress}, id - ${id}`)
+  console.log(
+    `Deployed token ${name}, address - ${currencyAddress}, id - ${id}`,
+  );
 
-  await sleep(2000)
+  await sleep(2000);
 
   // Prepare currencies
   await faucetWithdrawal(
@@ -41,7 +45,7 @@ export async function initCurrency(
     publicClient,
   );
 
-  await sleep(2000)
+  await sleep(2000);
 
   console.log(`Minting ${mintAmount} ${name} to wallet ${walletAddress}...`);
   await mintAndSendCurrency({
@@ -58,11 +62,11 @@ export async function initCurrency(
     address: currencyAddress.toLowerCase(),
     currency: contract,
     id: id,
-  }
+  };
 }
 
 export interface CurrencyResult {
   address: string;
   currency: Currency;
-  id: bigint,
+  id: bigint;
 }

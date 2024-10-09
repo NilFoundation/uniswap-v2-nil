@@ -1,6 +1,9 @@
-import {deployNilContract} from "./deploy";
-import type {UniswapV2Factory, UniswapV2Router01} from "../../typechain-types";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
+import type { HardhatRuntimeEnvironment } from "hardhat/types";
+import type {
+  UniswapV2Factory,
+  UniswapV2Router01,
+} from "../../typechain-types";
+import { deployNilContract } from "./deploy";
 
 export async function deployDex(
   hre: HardhatRuntimeEnvironment,
@@ -27,8 +30,8 @@ export async function deployDex(
     factory,
     factoryAddress,
     router,
-    routerAddress
-  }
+    routerAddress,
+  };
 }
 
 export interface DexDeploymentResult {

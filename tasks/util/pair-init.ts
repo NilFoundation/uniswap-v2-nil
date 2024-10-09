@@ -1,12 +1,16 @@
-import type {Currency, UniswapV2Factory, UniswapV2Pair} from "../../typechain-types";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
+import type { HardhatRuntimeEnvironment } from "hardhat/types";
+import type {
+  Currency,
+  UniswapV2Factory,
+  UniswapV2Pair,
+} from "../../typechain-types";
 
 export async function initPair(
   token0: string,
   token1: string,
   factory: UniswapV2Factory,
   hre: HardhatRuntimeEnvironment,
-  shardId: number = 1,
+  shardId = 1,
 ): Promise<PairInitResult> {
   const walletAddress = process.env.WALLET_ADDR;
   if (!walletAddress) {
@@ -41,7 +45,7 @@ export async function initPair(
   return {
     pair,
     address: pairAddress,
-  }
+  };
 }
 
 export interface PairInitResult {
