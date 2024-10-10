@@ -36,12 +36,12 @@ Before working with this repository, ensure that you have properly set up your e
 
 To help you get started quickly, we provide two demo tasks that showcase the full lifecycle from deployment to execution. These tasks cover deploying and initializing all necessary contracts,
 as well as performing operations like minting, swapping, and burning
- ![alt text](/public/image.png)
 
 ### Demo Tasks
 1. **Using Factory and Pair Contracts Only**
    This demo handles deploying the Factory and Pair contracts and executing a complete flow of operations
    [View the demo task](https://github.com/NilFoundation/uniswap-v2-nil/blob/main/tasks/core/demo.ts)
+    ![alt text](/public/demo.png)
 
 
    **Important:**
@@ -52,6 +52,7 @@ as well as performing operations like minting, swapping, and burning
 2. **Using Factory, Pair, and Router Contracts**
    This demo includes an additional layer by utilizing the Router contract along with Factory and Pair
    [View the demo-router task](https://github.com/NilFoundation/uniswap-v2-nil/blob/main/tasks/core/demo-router.ts)
+   ![alt text](/public/demo-router.png)
 
    **Important:**
    - The `UniswapV2Factory` is used for creating new pairs. `UniswapV2Router01` calls already deployed pair contracts.
