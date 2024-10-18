@@ -1,4 +1,4 @@
-import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
+import {shardNumber} from "@nilfoundation/hardhat-plugin/dist/utils/conversion";
 import {
   ExternalMessageEnvelope,
   bytesToHex,
@@ -6,20 +6,20 @@ import {
   toHex,
   waitTillCompleted,
 } from "@nilfoundation/niljs";
-import { encodeFunctionData } from "viem";
+import {encodeFunctionData} from "viem";
 
 /**
  * Function to mint and send currency from a contract.
  */
 export async function mintAndSendCurrency({
-  publicClient,
-  signer,
-  currencyContract,
-  contractAddress,
-  walletAddress,
-  mintAmount,
-  hre,
-}) {
+                                            publicClient,
+                                            signer,
+                                            currencyContract,
+                                            contractAddress,
+                                            walletAddress,
+                                            mintAmount,
+                                            hre,
+                                          }) {
   const artifact = await hre.artifacts.readArtifact("Currency");
   const chainId = await publicClient.chainId();
 
@@ -53,22 +53,77 @@ export async function mintAndSendCurrency({
   await sendAndAwait(publicClient, walletAddress, message);
 }
 
+export async function mintCurrency(
+  {
+    publicClient,
+    signer,
+    contractAddress,
+    walletAddress,
+    mintAmount,
+    hre,
+  }) {
+  const artifact = await hre.artifacts.readArtifact("Currency");
+  const chainId = await publicClient.chainId();
+
+  // Mint currency
+  let seqNo = await publicClient.getMessageCount(contractAddress, "latest");
+  let message = createExternalMessage({
+    contractAddress,
+    chainId,
+    seqNo,
+    functionName: "mintCurrency",
+    args: [mintAmount],
+    abi: artifact.abi,
+  });
+  message.authData = await message.sign(signer);
+  await sendAndAwait(publicClient, walletAddress, message);
+}
+
+export async function sendCurrency(
+  {
+    publicClient,
+    signer,
+    currencyContract,
+    contractAddress,
+    walletAddress,
+    amount,
+    hre,
+  }
+) {
+  const artifact = await hre.artifacts.readArtifact("Currency");
+  const chainId = await publicClient.chainId();
+  await sleep(3000);
+
+  // Send currency to wallet
+  const seqNo = await publicClient.getMessageCount(contractAddress, "latest");
+  const message = createExternalMessage({
+    contractAddress,
+    chainId,
+    seqNo,
+    functionName: "sendCurrency",
+    args: [walletAddress, await currencyContract.getCurrencyId(), amount],
+    abi: artifact.abi,
+  });
+  message.authData = await message.sign(signer);
+  await sendAndAwait(publicClient, walletAddress, message);
+}
+
 /**
  * Helper function to create an ExternalMessageEnvelope.
  */
 function createExternalMessage({
-  contractAddress,
-  chainId,
-  seqNo,
-  functionName,
-  args,
-  abi,
-}) {
+                                 contractAddress,
+                                 chainId,
+                                 seqNo,
+                                 functionName,
+                                 args,
+                                 abi,
+                               }) {
   return new ExternalMessageEnvelope({
     to: hexToBytes(contractAddress),
     chainId,
     seqno: seqNo,
-    data: hexToBytes(encodeFunctionData({ abi, functionName, args })),
+    data: hexToBytes(encodeFunctionData({abi, functionName, args})),
     authData: new Uint8Array(0),
     isDeploy: false,
   });

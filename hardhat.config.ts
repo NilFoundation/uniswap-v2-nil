@@ -23,6 +23,7 @@ import "./tasks/core/factory/create-pair";
 import "./tasks/core/demo";
 import "./tasks/core/demo-router";
 import "./tasks/core/demo-router-sync";
+import "./tasks/prepare/prepare-dex";
 
 dotenv.config();
 
