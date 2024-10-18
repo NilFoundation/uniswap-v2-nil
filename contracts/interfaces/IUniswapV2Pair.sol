@@ -1,5 +1,8 @@
 pragma solidity >=0.5.0;
 
+import {Currency} from "../Currency.sol";
+import "@nilfoundation/smart-contracts/contracts/Nil.sol";
+
 interface IUniswapV2Pair {
     event Mint(address indexed sender, uint amount0, uint amount1);
     event Burn(
@@ -21,8 +24,8 @@ interface IUniswapV2Pair {
     function factory() external view returns (address);
     function token0() external view returns (address);
     function token1() external view returns (address);
-    function token0Id() external view returns (uint256);
-    function token1Id() external view returns (uint256);
+    function token0Id() external view returns (CurrencyId);
+    function token1Id() external view returns (CurrencyId);
     function getReserves()
         external
         view
@@ -41,5 +44,5 @@ interface IUniswapV2Pair {
     ) external;
     function skim(address to) external;
     function sync() external;
-    function initialize(address, address, uint256, uint256) external;
+    function initialize(address, address, CurrencyId, CurrencyId) external;
 }

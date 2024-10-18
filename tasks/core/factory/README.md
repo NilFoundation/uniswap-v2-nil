@@ -16,7 +16,7 @@ A **Factory** is a contract that creates and manages pairs of currencies. The `U
 To deploy the factory contract, use the following command:
 
 ```bash
-npx hardhat ignition deploy ./ignition/modules/Factory.ts --network nil --parameters ./ignition/parameters.json
+npx hardhat ignition deploy ./ignition/modules/Factory.ts --parameters ./ignition/parameters.json
 ```
 
 ### 2. Deploy a Pair
@@ -24,7 +24,7 @@ npx hardhat ignition deploy ./ignition/modules/Factory.ts --network nil --parame
 To deploy a new pair, use the following command:
 
 ```bash
-npx hardhat create-pair --network nil --factory <Factory Address> --currency0 <Currency0 Address> --currency1 <Currency1 Address>
+npx hardhat create-pair --factory <Factory Address> --currency0 <Currency0 Address> --currency1 <Currency1 Address>
 ```
 
 Replace `<Factory Address>`, `<Currency0 Address>`, and `<Currency1 Address>` with the actual addresses.
@@ -34,7 +34,7 @@ Replace `<Factory Address>`, `<Currency0 Address>`, and `<Currency1 Address>` wi
 To fetch the pair address for two currencies, use the following command:
 
 ```bash
-npx hardhat get-pair --network nil --factory <Factory Address> --currency0 <Currency0 Address> --currency1 <Currency1 Address>
+npx hardhat get-pair --factory <Factory Address> --currency0 <Currency0 Address> --currency1 <Currency1 Address>
 ```
 
 Replace `<Factory Address>`, `<Currency0 Address>`, and `<Currency1 Address>` with the actual addresses.
