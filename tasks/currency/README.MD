@@ -32,7 +32,7 @@ Currency owners can add any additional functionality they want on top of the bui
 To deploy your own currency contract, use the following command:
 
 ```bash
-npx hardhat ignition deploy ./ignition/modules/Currency.ts --network nil --parameters ./ignition/parameters.json
+npx hardhat ignition deploy ./ignition/modules/Currency.ts --parameters ./ignition/parameters.json
 ```
 
 Make sure to set the `currencyName` and `public key` in your `./ignition/parameters.json` file before deploying. Once the deployment is complete, you will receive the contract address in the response.
@@ -42,7 +42,7 @@ Make sure to set the `currencyName` and `public key` in your `./ignition/paramet
 After deploying the currency contract, you can fetch the currency information (name, ID, Balance) by using the following command:
 
 ```bash
-npx hardhat currency_info --address <Currency Address> --network nil
+npx hardhat currency_info --address <Currency Address>
 ```
 
 Replace `<Currency Address>` with the actual deployed contract address
@@ -52,7 +52,7 @@ Replace `<Currency Address>` with the actual deployed contract address
 To mint currency from two contracts and send it to a specified wallet, use the mint-wallet task:
 
 ```bash
-npx hardhat mint-wallet --network nil --currency0 <Currency0 Address> --currency1 <Currency1 Address> --wallet <Wallet Address> --amount <Amount>
+npx hardhat mint-wallet --currency0 <Currency0 Address> --currency1 <Currency1 Address> --wallet <Wallet Address> --amount <Amount>
 ```
 
 This will mint the specified amount of both currencies and send it to the specified wallet

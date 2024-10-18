@@ -30,6 +30,7 @@ const config: NilHardhatUserConfig = {
   ignition: {
     requiredConfirmations: 1,
   },
+  defaultNetwork: "nil",
   solidity: {
     version: "0.8.24", // or your desired version
     settings: {

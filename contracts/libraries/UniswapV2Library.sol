@@ -8,15 +8,15 @@ library UniswapV2Library {
     using SafeMath for uint;
 
     // returns sorted token addresses, used to handle return values from pairs sorted in this order
-    function sortTokens(uint256 tokenAId, uint256 tokenBId) internal pure returns (uint256 token0, uint256 token1) {
+    function sortTokens(CurrencyId tokenAId, CurrencyId tokenBId) internal pure returns (CurrencyId token0, CurrencyId token1) {
         require(tokenAId != tokenBId, 'UniswapV2Library: IDENTICAL_ADDRESSES');
-        (token0, token1) = tokenAId < tokenBId ? (tokenAId, tokenBId) : (tokenBId, tokenAId);
-        require(token0 != uint256(0), 'UniswapV2Library: ZERO_ADDRESS');
+        (token0, token1) = CurrencyId.unwrap(tokenAId) < CurrencyId.unwrap(tokenBId) ? (tokenAId, tokenBId) : (tokenBId, tokenAId);
+        require(token0 != CurrencyId.wrap(address(0)), 'UniswapV2Library: ZERO_ADDRESS');
     }
 
     // fetches and sorts the reserves for a pair
-    function getReserves(address pair, uint256 tokenAId, uint256 tokenBId) internal view returns (uint reserveA, uint reserveB) {
-        (uint token0,) = sortTokens(tokenAId, tokenBId);
+    function getReserves(address pair, CurrencyId tokenAId, CurrencyId tokenBId) internal view returns (uint reserveA, uint reserveB) {
+        (CurrencyId token0,) = sortTokens(tokenAId, tokenBId);
         (uint reserve0, uint reserve1) = IUniswapV2Pair(pair).getReserves();
         (reserveA, reserveB) = tokenAId == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
     }
