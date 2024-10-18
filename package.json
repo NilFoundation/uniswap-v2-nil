@@ -18,7 +18,8 @@
     "@nilfoundation/hardhat-plugin": "^0.14.0",
     "@nilfoundation/niljs": "^0.14.0",
     "@nilfoundation/smart-contracts": "^0.1.2",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "viem": "^2.21.28"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.2",

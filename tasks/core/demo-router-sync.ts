@@ -2,19 +2,12 @@ import { shardNumber } from "@nilfoundation/hardhat-plugin/dist/utils/conversion
 import { waitTillCompleted } from "@nilfoundation/niljs";
 import { task } from "hardhat/config";
 import { encodeFunctionData } from "viem";
-import type {
-  Currency,
-  UniswapV2Factory,
-  UniswapV2Pair,
-} from "../../typechain-types";
 import { createClient } from "../util/client";
-import {
-  faucetWithdrawal,
-  mintAndSendCurrency,
-  sleep,
-} from "../util/currencyUtils";
-import { deployNilContract } from "../util/deploy";
+import { initCurrency } from "../util/currency-init";
+import { sleep } from "../util/currencyUtils";
+import { deployDex } from "../util/dex-deployment";
 import { calculateOutputAmount } from "../util/math";
+import { initPair } from "../util/pair-init";
 
 task(
   "demo-router-sync",
@@ -25,144 +18,48 @@ task(
     throw new Error("WALLET_ADDR is not set in environment variables");
   }
 
-  const faucetAddress = process.env.FAUCET_ADDR;
-
-  const shardId = 1;
   const mintAmount = 100000;
   const mintCurrency0Amount = 10000;
   const mintCurrency1Amount = 10000;
   const swapAmount = 1000;
 
-  const { wallet, publicClient, signer } = await createClient();
+  const { wallet, publicClient } = await createClient();
 
-  const { deployedContract: factoryContract, contractAddress: factoryAddress } =
-    await deployNilContract(hre, "UniswapV2Factory", [walletAddress]);
+  const { factory, routerAddress } = await deployDex(hre);
+  console.log("Dex deployed, router - " + routerAddress);
+
   const {
-    deployedContract: Currency0Contract,
-    contractAddress: currency0Address,
-  } = await deployNilContract(hre, "Currency", [
-    "currency0",
-    await signer.getPublicKey(),
-  ]);
+    address: token0Address,
+    currency: token0Contract,
+    id: token0Id,
+  } = await initCurrency("Token0", mintAmount, hre);
   const {
-    deployedContract: Currency1Contract,
-    contractAddress: currency1Address,
-  } = await deployNilContract(hre, "Currency", [
-    "currency1",
-    await signer.getPublicKey(),
-  ]);
+    address: token1Address,
+    currency: token1Contract,
+    id: token1Id,
+  } = await initCurrency("Token1", mintAmount, hre);
 
-  console.log("Factory deployed " + factoryAddress);
-  console.log("Currency0 deployed " + currency0Address);
-  console.log("Currency1 deployed " + currency1Address);
-
-  const { deployedContract: RouterContract, contractAddress: routerAddress } =
-    await deployNilContract(hre, "UniswapV2Router01");
-
-  console.log("Router deployed " + routerAddress);
-
-  const factory = factoryContract as UniswapV2Factory;
-
-  // 1. CREATE PAIR
-  await factory.createPair(
-    currency0Address.toLowerCase(),
-    currency1Address.toLowerCase(),
-    Math.floor(Math.random() * 10000000),
-    shardId,
-  );
-
-  const pairAddress = await factory.getTokenPair(
-    currency0Address.toLowerCase(),
-    currency1Address.toLowerCase(),
-  );
-
-  // Log the pair address
-  console.log(`Pair created successfully at address: ${pairAddress}`);
-
-  // Attach to the Currency contract for both currencies
-
-  const firstCurrency = Currency0Contract as Currency;
-  const firstCurrencyId = await firstCurrency.getCurrencyId();
-  console.log(`First currency ID: ${firstCurrencyId}`);
-
-  const secondCurrency = Currency1Contract as Currency;
-  const secondCurrencyId = await secondCurrency.getCurrencyId();
-  console.log(`Second currency ID: ${secondCurrencyId}`);
-
-  // Attach to the newly created Uniswap V2 Pair contract
-  const pairContract = await hre.ethers.getContractFactory("UniswapV2Pair");
-  const pair = pairContract.attach(pairAddress) as UniswapV2Pair;
-
-  // Initialize the pair with currency addresses and IDs
-  await pair.initialize(
-    currency0Address.toLowerCase(),
-    currency1Address.toLowerCase(),
-    firstCurrencyId,
-    secondCurrencyId,
-  );
-
-  console.log(`Pair initialized successfully at address: ${pairAddress}`);
-
-  // Prepare currencies
-  await faucetWithdrawal(
-    currency0Address.toLowerCase(),
-    100000000000n,
-    faucetAddress,
+  const { address: pairAddress, pair } = await initPair(
+    token0Address,
+    token1Address,
+    factory,
     hre,
-    publicClient,
   );
-
-  await sleep(2000);
-
-  await faucetWithdrawal(
-    currency1Address.toLowerCase(),
-    100000000000n,
-    faucetAddress,
-    hre,
-    publicClient,
-  );
-
-  await sleep(2000);
-
-  // 2. MINT CURRENCIES
-  console.log(`Minting ${mintAmount} Currency0 to wallet ${walletAddress}...`);
-  await mintAndSendCurrency({
-    publicClient,
-    signer,
-    currencyContract: firstCurrency,
-    contractAddress: currency0Address.toLowerCase(),
-    walletAddress,
-    mintAmount,
-    hre,
-  });
-
-  // Mint and send Currency1
-  console.log(`Minting ${mintAmount} Currency1 to wallet ${walletAddress}...`);
-  await mintAndSendCurrency({
-    publicClient,
-    signer,
-    currencyContract: secondCurrency,
-    contractAddress: currency1Address.toLowerCase(),
-    walletAddress,
-    mintAmount,
-    hre,
-  });
+  console.log("Pair deployed " + pairAddress);
 
   // Verify the balance of the recipient wallet for both currencies
   const recipientBalanceCurrency0 =
-    await firstCurrency.getCurrencyBalanceOf(walletAddress);
+    await token0Contract.getCurrencyBalanceOf(walletAddress);
   const recipientBalanceCurrency1 =
-    await secondCurrency.getCurrencyBalanceOf(walletAddress);
+    await token1Contract.getCurrencyBalanceOf(walletAddress);
 
   console.log(
     `Recipient balance after transfer - Currency0: ${recipientBalanceCurrency0}, Currency1: ${recipientBalanceCurrency1}`,
   );
 
-  // 3. ROUTER: ADD LIQUIDITY
-  const pairArtifact = await hre.artifacts.readArtifact("UniswapV2Pair");
-  const routerArtifact = await hre.artifacts.readArtifact("UniswapV2Router01");
+  const routerAbi = (await hre.artifacts.readArtifact("UniswapV2Router01")).abi;
 
-  // Mint liquidity
+  // ROUTER: ADD LIQUIDITY
   console.log("Adding liquidity...");
 
   const hash = await wallet.sendMessage({
@@ -171,7 +68,7 @@ task(
     value: BigInt(0),
     refundTo: wallet.address,
     data: encodeFunctionData({
-      abi: routerArtifact.abi,
+      abi: routerAbi,
       functionName: "addLiquiditySync",
       args: [
         pairAddress,
@@ -184,11 +81,11 @@ task(
     }),
     tokens: [
       {
-        id: await firstCurrency.getCurrencyId(),
+        id: token0Id,
         amount: BigInt(mintCurrency0Amount),
       },
       {
-        id: await secondCurrency.getCurrencyId(),
+        id: token1Id,
         amount: BigInt(mintCurrency1Amount),
       },
     ],
@@ -198,11 +95,11 @@ task(
 
   // Log balances in the pair contract
   const pairCurrency0Balance =
-    await firstCurrency.getCurrencyBalanceOf(pairAddress);
+    await token0Contract.getCurrencyBalanceOf(pairAddress);
   console.log("Pair Balance of Currency0:", pairCurrency0Balance.toString());
 
   const pairCurrency1Balance =
-    await secondCurrency.getCurrencyBalanceOf(pairAddress);
+    await token1Contract.getCurrencyBalanceOf(pairAddress);
   console.log("Pair Balance of Currency1:", pairCurrency1Balance.toString());
 
   console.log("Liquidity added...");
@@ -227,7 +124,7 @@ task(
     totalSupply.toString(),
   );
 
-  // 4. ROUTER: SWAP
+  // ROUTER: SWAP
   const expectedOutputAmount = calculateOutputAmount(
     BigInt(swapAmount),
     reserve0,
@@ -240,9 +137,9 @@ task(
 
   // Log balances before the swap
   const balanceCurrency0Before =
-    await firstCurrency.getCurrencyBalanceOf(walletAddress);
+    await token0Contract.getCurrencyBalanceOf(walletAddress);
   const balanceCurrency1Before =
-    await secondCurrency.getCurrencyBalanceOf(walletAddress);
+    await token1Contract.getCurrencyBalanceOf(walletAddress);
   console.log(
     "Balance of currency0 before swap:",
     balanceCurrency0Before.toString(),
@@ -255,20 +152,21 @@ task(
   // Execute the swap
   console.log("Executing swap...");
 
+  await sleep(2000);
   // Send currency0 to the pair contract
   const hash2 = await wallet.sendMessage({
     to: routerAddress,
     feeCredit: BigInt(10_000_000),
     value: BigInt(0),
     data: encodeFunctionData({
-      abi: routerArtifact.abi,
+      abi: routerAbi,
       functionName: "swapExactTokenForTokenSync",
-      args: [pairAddress, 1, walletAddress],
+      args: [pairAddress.toLowerCase(), 1, walletAddress],
     }),
     refundTo: wallet.address,
     tokens: [
       {
-        id: await firstCurrency.getCurrencyId(),
+        id: token0Id,
         amount: BigInt(swapAmount),
       },
     ],
@@ -277,16 +175,16 @@ task(
   await waitTillCompleted(publicClient, shardNumber(walletAddress), hash2);
 
   console.log(
-    `Sent ${swapAmount.toString()} of currency0 to the pair contract. Tx - ${hash2}`,
+    `Sent ${swapAmount.toString()} token0 to the pair contract. Tx - ${hash2}`,
   );
 
   console.log("Swap executed successfully.");
 
   // Log balances after the swap
   const balanceCurrency0After =
-    await firstCurrency.getCurrencyBalanceOf(walletAddress);
+    await token0Contract.getCurrencyBalanceOf(walletAddress);
   const balanceCurrency1After =
-    await secondCurrency.getCurrencyBalanceOf(walletAddress);
+    await token1Contract.getCurrencyBalanceOf(walletAddress);
   console.log(
     "SWAP RESULT: Balance of currency0 after swap:",
     balanceCurrency0After.toString(),
@@ -301,10 +199,10 @@ task(
   console.log("Total supply:", total.toString());
 
   // Fetch and log pair balances before burn
-  const pairBalanceToken0 = await firstCurrency.getCurrencyBalanceOf(
+  const pairBalanceToken0 = await token0Contract.getCurrencyBalanceOf(
     pairAddress.toLowerCase(),
   );
-  const pairBalanceToken1 = await secondCurrency.getCurrencyBalanceOf(
+  const pairBalanceToken1 = await token1Contract.getCurrencyBalanceOf(
     pairAddress.toLowerCase(),
   );
   console.log("Pair Balance token0 before burn:", pairBalanceToken0.toString());
@@ -312,9 +210,9 @@ task(
 
   // Fetch and log user balances before burn
   let userBalanceToken0 =
-    await firstCurrency.getCurrencyBalanceOf(walletAddress);
+    await token0Contract.getCurrencyBalanceOf(walletAddress);
   let userBalanceToken1 =
-    await secondCurrency.getCurrencyBalanceOf(walletAddress);
+    await token1Contract.getCurrencyBalanceOf(walletAddress);
   console.log("User Balance token0 before burn:", userBalanceToken0.toString());
   console.log("User Balance token1 before burn:", userBalanceToken1.toString());
 
@@ -330,9 +228,9 @@ task(
     feeCredit: BigInt(10_000_000),
     value: BigInt(0),
     data: encodeFunctionData({
-      abi: routerArtifact.abi,
+      abi: routerAbi,
       functionName: "removeLiquiditySync",
-      args: [pairAddress, walletAddress, 100, 100],
+      args: [pairAddress.toLowerCase(), walletAddress, 100, 100],
     }),
     refundTo: walletAddress,
     tokens: [
@@ -348,10 +246,10 @@ task(
   console.log("Burn executed.");
 
   // Log balances after burn
-  const balanceToken0 = await firstCurrency.getCurrencyBalanceOf(
+  const balanceToken0 = await token0Contract.getCurrencyBalanceOf(
     pairAddress.toLowerCase(),
   );
-  const balanceToken1 = await secondCurrency.getCurrencyBalanceOf(
+  const balanceToken1 = await token1Contract.getCurrencyBalanceOf(
     pairAddress.toLowerCase(),
   );
   console.log(
@@ -363,8 +261,8 @@ task(
     balanceToken1.toString(),
   );
 
-  userBalanceToken0 = await firstCurrency.getCurrencyBalanceOf(walletAddress);
-  userBalanceToken1 = await secondCurrency.getCurrencyBalanceOf(walletAddress);
+  userBalanceToken0 = await token0Contract.getCurrencyBalanceOf(walletAddress);
+  userBalanceToken1 = await token1Contract.getCurrencyBalanceOf(walletAddress);
   console.log(
     "REMOVELIQUIDITY RESULT: User Balance token0 after burn:",
     userBalanceToken0.toString(),

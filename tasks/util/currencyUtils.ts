@@ -53,6 +53,58 @@ export async function mintAndSendCurrency({
   await sendAndAwait(publicClient, walletAddress, message);
 }
 
+export async function mintCurrency({
+  publicClient,
+  signer,
+  contractAddress,
+  walletAddress,
+  mintAmount,
+  hre,
+}) {
+  const artifact = await hre.artifacts.readArtifact("Currency");
+  const chainId = await publicClient.chainId();
+
+  // Mint currency
+  const seqNo = await publicClient.getMessageCount(contractAddress, "latest");
+  const message = createExternalMessage({
+    contractAddress,
+    chainId,
+    seqNo,
+    functionName: "mintCurrency",
+    args: [mintAmount],
+    abi: artifact.abi,
+  });
+  message.authData = await message.sign(signer);
+  await sendAndAwait(publicClient, walletAddress, message);
+}
+
+export async function sendCurrency({
+  publicClient,
+  signer,
+  currencyContract,
+  contractAddress,
+  walletAddress,
+  amount,
+  hre,
+}) {
+  const artifact = await hre.artifacts.readArtifact("Currency");
+  const chainId = await publicClient.chainId();
+  await sleep(3000);
+
+  // Send currency to wallet
+  const seqNo = await publicClient.getMessageCount(contractAddress, "latest");
+  const message = createExternalMessage({
+    contractAddress,
+    chainId,
+    seqNo,
+    functionName: "sendCurrency",
+    args: [walletAddress, await currencyContract.getCurrencyId(), amount],
+    abi: artifact.abi,
+  });
+  message.authData = await message.sign(signer);
+  await sendAndAwait(publicClient, walletAddress, message);
+}
+
 /**
  * Helper function to create an ExternalMessageEnvelope.
  */
