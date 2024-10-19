@@ -12,7 +12,7 @@ import {
   faucetWithdrawal,
   mintAndSendCurrency,
   sleep,
-} from "../util/currencyUtils";
+} from "../util/currency-utils";
 import { deployNilContract } from "../util/deploy";
 import { calculateOutputAmount } from "../util/math";
 

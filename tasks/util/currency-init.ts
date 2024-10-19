@@ -1,7 +1,7 @@
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
 import type { Currency } from "../../typechain-types";
 import { createClient } from "./client";
-import { faucetWithdrawal, mintAndSendCurrency, sleep } from "./currencyUtils";
+import { faucetWithdrawal, mintAndSendCurrency, sleep } from "./currency-utils";
 import { deployNilContract } from "./deploy";
 
 export async function initCurrency(

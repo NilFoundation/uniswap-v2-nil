@@ -4,7 +4,7 @@ import { task } from "hardhat/config";
 import { encodeFunctionData } from "viem";
 import { createClient } from "../util/client";
 import { initCurrency } from "../util/currency-init";
-import { mintCurrency, sendCurrency } from "../util/currencyUtils";
+import { mintCurrency, sendCurrency } from "../util/currency-utils";
 import { deployDex } from "../util/dex-deployment";
 import { initPair } from "../util/pair-init";
 
@@ -78,19 +78,17 @@ task("prepare-dex", "Prepare DEX contract and set currency to wallets")
       await sendCurrency({
         publicClient,
         signer,
-        currencyContract: token0Contract,
         contractAddress: token0Address,
         walletAddress: receiver,
-        mintAmount: amount,
+        amount: amount,
         hre,
       });
       await sendCurrency({
         publicClient,
         signer,
-        currencyContract: token1Contract,
         contractAddress: token1Address,
         walletAddress: receiver,
-        mintAmount: amount,
+        amount: amount,
         hre,
       });
     }
@@ -114,11 +112,11 @@ task("prepare-dex", "Prepare DEX contract and set currency to wallets")
       }),
       tokens: [
         {
-          id: token0Id,
+          id: token0Address,
           amount: BigInt(mintCurrency0Amount),
         },
         {
-          id: token1Id,
+          id: token1Address,
           amount: BigInt(mintCurrency1Amount),
         },
       ],

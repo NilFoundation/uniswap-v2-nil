@@ -4,7 +4,7 @@ import { task } from "hardhat/config";
 import { encodeFunctionData } from "viem";
 import { createClient } from "../util/client";
 import { initCurrency } from "../util/currency-init";
-import { mintAndSendCurrency } from "../util/currencyUtils";
+import { mintAndSendCurrency } from "../util/currency-utils";
 import { deployDex } from "../util/dex-deployment";
 import { calculateOutputAmount } from "../util/math";
 import { initPair } from "../util/pair-init";
@@ -23,6 +23,7 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
 
     const { wallet, publicClient, signer } = await createClient();
 
+    console.log("Deploying...");
     const { factory, routerAddress } = await deployDex(hre);
     console.log("Dex deployed, router - " + routerAddress);
 
@@ -104,11 +105,11 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
       }),
       tokens: [
         {
-          id: token0Id,
+          id: token0Address,
           amount: BigInt(mintCurrency0Amount),
         },
         {
-          id: token1Id,
+          id: token1Address,
           amount: BigInt(mintCurrency1Amount),
         },
       ],
@@ -188,7 +189,7 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
       refundTo: wallet.address,
       tokens: [
         {
-          id: token0Id,
+          id: token0Address,
           amount: BigInt(swapAmount),
         },
       ],
@@ -269,7 +270,7 @@ task("demo-router", "Run demo with Uniswap Router").setAction(
       refundTo: walletAddress,
       tokens: [
         {
-          id: lpAddress,
+          id: pairAddress,
           amount: BigInt(userLpBalance),
         },
       ],

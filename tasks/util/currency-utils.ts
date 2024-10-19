@@ -46,7 +46,7 @@ export async function mintAndSendCurrency({
     chainId,
     seqNo,
     functionName: "sendCurrency",
-    args: [walletAddress, await currencyContract.getCurrencyId(), mintAmount],
+    args: [walletAddress, contractAddress, mintAmount],
     abi: artifact.abi,
   });
   message.authData = await message.sign(signer);
@@ -81,7 +81,6 @@ export async function mintCurrency({
 export async function sendCurrency({
   publicClient,
   signer,
-  currencyContract,
   contractAddress,
   walletAddress,
   amount,
@@ -98,7 +97,7 @@ export async function sendCurrency({
     chainId,
     seqNo,
     functionName: "sendCurrency",
-    args: [walletAddress, await currencyContract.getCurrencyId(), amount],
+    args: [walletAddress, contractAddress, amount],
     abi: artifact.abi,
   });
   message.authData = await message.sign(signer);

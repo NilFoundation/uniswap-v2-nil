@@ -12,6 +12,7 @@ export async function deployNilContract(
 
   const deployTx = await factory.getDeployTransaction(...args);
   const sentTx = await factory.runner.sendTransaction(deployTx);
+  console.log("deployTx:", sentTx.hash);
   const txReceipt = await sentTx.wait();
 
   if (!txReceipt || !txReceipt.contractAddress) {

@@ -4,7 +4,7 @@ import { task } from "hardhat/config";
 import { encodeFunctionData } from "viem";
 import { createClient } from "../util/client";
 import { initCurrency } from "../util/currency-init";
-import { sleep } from "../util/currencyUtils";
+import { sleep } from "../util/currency-utils";
 import { deployDex } from "../util/dex-deployment";
 import { calculateOutputAmount } from "../util/math";
 import { initPair } from "../util/pair-init";

@@ -5,7 +5,7 @@ import {
   faucetWithdrawal,
   mintAndSendCurrency,
   sleep,
-} from "../util/currencyUtils";
+} from "../util/currency-utils";
 
 task(
   "mint-wallet",
