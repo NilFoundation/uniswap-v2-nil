@@ -6,8 +6,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "compile": "npx hardhat compile",
-    "test": "npx hardhat test --network nil",
-    "deploy": "rm -rf ignition/deployments && npx hardhat ignition deploy ./ignition/modules/amm.ts --network nil",
+    "test": "npx hardhat test",
     "clean": "rm -rf iginition/deployments",
     "format": "biome format ./",
     "lint": "biome check ./",
@@ -15,9 +14,9 @@
     "fix:lint": "biome check --apply ./"
   },
   "dependencies": {
-    "@nilfoundation/hardhat-plugin": "^0.14.0",
-    "@nilfoundation/niljs": "^0.14.0",
-    "@nilfoundation/smart-contracts": "^0.1.2",
+    "@nilfoundation/hardhat-plugin": "^0.15.0",
+    "@nilfoundation/niljs": "^0.16.0",
+    "@nilfoundation/smart-contracts": "^0.1.4",
     "dotenv": "^16.4.5"
   },
   "devDependencies": {

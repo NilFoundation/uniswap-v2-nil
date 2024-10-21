@@ -16,7 +16,7 @@ A **Pair** is a contract that facilitates the swapping and liquidity management 
 To fetch the reserves of the pair, use the following command:
 
 ```bash
-npx hardhat get-reserves --network nil --pair <Pair Address>
+npx hardhat get-reserves --pair <Pair Address>
 ```
 
 Replace `<Pair Address>` with the actual pair address.
@@ -26,7 +26,7 @@ Replace `<Pair Address>` with the actual pair address.
 To mint liquidity and add it to the pair, use the following command:
 
 ```bash
-npx hardhat mint --network nil --pair <Pair Address> --wallet <User Wallet Address> --amount0 <Amount of Currency0> --amount1 <Amount of Currency1>
+npx hardhat mint --pair <Pair Address> --wallet <User Wallet Address> --amount0 <Amount of Currency0> --amount1 <Amount of Currency1>
 ```
 
 Replace `<Pair Address>`, `<User Wallet Address>`, `<Amount of Currency0>`, and `<Amount of Currency1>` with the actual values.
@@ -36,7 +36,7 @@ Replace `<Pair Address>`, `<User Wallet Address>`, `<Amount of Currency0>`, and 
 To swap currency0 for currency1, use the following command:
 
 ```bash
-npx hardhat swap --network nil --pair <Pair Address> --wallet <User Wallet Address> --amount <Amount of Currency0>
+npx hardhat swap --pair <Pair Address> --wallet <User Wallet Address> --amount <Amount of Currency0>
 ```
 
 Replace `<Pair Address>`, `<User Wallet Address>`, and `<Amount of Currency0>` with the actual values.
@@ -46,7 +46,7 @@ Replace `<Pair Address>`, `<User Wallet Address>`, and `<Amount of Currency0>` w
 To burn liquidity and withdraw your share of currencies from the pair, use the following command:
 
 ```bash
-npx hardhat burn --network nil --pair <Pair Address> --wallet <User Wallet Address>
+npx hardhat burn --pair <Pair Address> --wallet <User Wallet Address>
 ```
 
 Replace `<Pair Address>` and `<User Wallet Address>` with the actual values.

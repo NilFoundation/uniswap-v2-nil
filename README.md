@@ -81,15 +81,15 @@ as well as performing operations like minting, swapping, and burning
 2. **Run the Demo Tasks**:
    - For the core demo (Factory and Pair):
      ```bash
-     npx hardhat demo --network nil
+     npx hardhat demo 
      ```
    - For the demo with Router (Factory, Pair, and Router):
      ```bash
-     npx hardhat demo-router --network nil
+     npx hardhat demo-router
      ```
    - For the demo with Router (Sync calls):
      ```bash
-     npx hardhat demo-router-sync --network nil
+     npx hardhat demo-router-sync
      ```
 
 ### Manual Setup

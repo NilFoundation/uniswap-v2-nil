@@ -63,8 +63,8 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
 
     function _addLiquiditySync(
         address pair,
-        uint256 tokenA,
-        uint256 tokenB,
+        CurrencyId tokenA,
+        CurrencyId tokenB,
         uint amountADesired,
         uint amountBDesired,
         uint amountAMin,
@@ -134,9 +134,9 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
         if (tokens.length != 1) {
             revert("UniswapV2Router: should contains only pair token");
         }
-        uint256 token0Id = IUniswapV2Pair(pair).token0Id();
-        uint256 token1Id = IUniswapV2Pair(pair).token1Id();
-        uint256 tokenBId = tokens[0].id != token0Id ? token0Id : token1Id;
+        CurrencyId token0Id = IUniswapV2Pair(pair).token0Id();
+        CurrencyId token1Id = IUniswapV2Pair(pair).token1Id();
+        CurrencyId tokenBId = tokens[0].id != token0Id ? token0Id : token1Id;
         (uint reserveA, uint reserveB) = UniswapV2Library.getReserves(pair, tokens[0].id, tokenBId);
         amount = UniswapV2Library.getAmountOut(tokens[0].amount, reserveA, reserveB);
         require(amount >= amountOutMin, 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT');
@@ -168,7 +168,7 @@ contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
             (bool success, bytes memory result) = Nil.syncCall(dst, gasleft(), 0, tokens, callData);
             return (success, result);
         } else {
-            Nil.asyncCall(dst, address(0), address(0), 0, Nil.FORWARD_REMAINING, false, 0, tokens, callData);
+            Nil.asyncCallWithTokens(dst, address(0), address(0), 0, Nil.FORWARD_REMAINING, false, 0, tokens, callData);
             return (true, "");
         }
     }

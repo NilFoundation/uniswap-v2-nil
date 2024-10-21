@@ -7,6 +7,7 @@ import "./interfaces/IUniswapV2Factory.sol";
 import "@nilfoundation/smart-contracts/contracts/NilCurrencyBase.sol";
 import "./libraries/SafeMath.sol";
 import "@nilfoundation/smart-contracts/contracts/Nil.sol";
+import {Currency} from "./Currency.sol";
 
 contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     using SafeMath for uint;
@@ -17,8 +18,8 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     address public factory;
     address public token0;
     address public token1;
-    uint256 public tokenId0;
-    uint256 public tokenId1;
+    CurrencyId public tokenId0;
+    CurrencyId public tokenId1;
 
     uint256 private reserve0; // uses single storage slot, accessible via getReserves
     uint256 private reserve1; // uses single storage slot, accessible via getReserves
@@ -42,7 +43,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         _reserve1 = reserve1;
     }
 
-    function _safeTransfer(uint256 _tokenId, address _to, uint _value) private {
+    function _safeTransfer(CurrencyId _tokenId, address _to, uint _value) private {
         sendCurrencyInternal(_to, _tokenId, _value);
     }
 
@@ -51,7 +52,7 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
     }
 
     // called once by the factory at time of deployment
-    function initialize(address _token0, address _token1, uint256 _tokenId0, uint256 _tokenId1) public {
+    function initialize(address _token0, address _token1, CurrencyId _tokenId0, CurrencyId _tokenId1) public {
         token0 = _token0;
         token1 = _token1;
         tokenId0 = _tokenId0;
@@ -235,10 +236,10 @@ contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
         );
     }
 
-    function token0Id() external view returns (uint256) {
+    function token0Id() external view returns (CurrencyId) {
         return tokenId0;
     }
-    function token1Id() external view returns (uint256) {
+    function token1Id() external view returns (CurrencyId) {
         return tokenId1;
     }
 
