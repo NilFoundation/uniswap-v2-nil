@@ -7,7 +7,6 @@ import './libraries/UniswapV2Library.sol';
 import "@nilfoundation/smart-contracts/contracts/NilCurrencyBase.sol";
 import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 import "./interfaces/IUniswapV2Pair.sol";
-import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 
 contract UniswapV2Router01 is IUniswapV2Router01, NilCurrencyBase {
 

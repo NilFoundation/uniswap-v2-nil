@@ -7,8 +7,6 @@ import "./interfaces/IUniswapV2Factory.sol";
 import "@nilfoundation/smart-contracts/contracts/NilCurrencyBase.sol";
 import "./libraries/SafeMath.sol";
 import "@nilfoundation/smart-contracts/contracts/Nil.sol";
-import "@nilfoundation/smart-contracts/contracts/Nil.sol";
-import "@nilfoundation/smart-contracts/contracts/Nil.sol";
 import {Currency} from "./Currency.sol";
 
 contract UniswapV2Pair is NilCurrencyBase, IUniswapV2Pair {
