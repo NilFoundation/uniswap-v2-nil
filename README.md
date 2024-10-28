@@ -5,7 +5,7 @@
 
 ## 📋 Overview
 
-This repository showcases the migration of Uniswap V2 to the =nil; We have adapted Uniswap’s core contracts — Factory, Pair, and Router — to work seamlessly with the unique capabilities of =nil; 
+This repository showcases the migration of Uniswap V2 to the =nil; We have adapted Uniswap’s core contracts — Factory, Pair, and Router — to work seamlessly with the unique capabilities of =nil;
 By using this example, developers can learn how to migrate dApps from Ethereum compatible networks to the =nil; and take advantage of its features, such as:
 1. **Multi-Currency Support:** Learn how =nil; supports multiple currencies natively and how they replace the ERC20 standard
 2. **Async/Sync Calls:** Discover how to effectively utilize async and sync messaging between shards, making the protocol both scalable and performant
@@ -17,10 +17,10 @@ This repository also aims to spark discussion on the potential of running DeFi p
 
 Before working with this repository, ensure that you have properly set up your environment:
 
-1. **.env Configuration**:  
+1. **.env Configuration**:
    Make sure to create a `.env` file in the root directory. All required environment variables are listed in the `.env.example` file, which you can use as a reference. [Link to `.env.example`](./.env.example)
 
-2. **Getting an RPC Endpoint**:  
+2. **Getting an RPC Endpoint**:
    To request an RPC endpoint:
     - Join our Telegram chat: [https://t.me/nilfoundation](https://t.me/nilfoundation)
     - Request access, and our DevRel team will assist you.
@@ -34,22 +34,25 @@ Before working with this repository, ensure that you have properly set up your e
 
 ## 🎯 Usage
 
-To help you get started quickly, we provide two demo tasks that showcase the full lifecycle from deployment to execution. These tasks cover deploying and initializing all necessary contracts, 
+To help you get started quickly, we provide two demo tasks that showcase the full lifecycle from deployment to execution. These tasks cover deploying and initializing all necessary contracts,
 as well as performing operations like minting, swapping, and burning
 
 ### Demo Tasks
-1. **Using Factory and Pair Contracts Only**  
-   This demo handles deploying the Factory and Pair contracts and executing a complete flow of operations  
+1. **Using Factory and Pair Contracts Only**
+   This demo handles deploying the Factory and Pair contracts and executing a complete flow of operations
    [View the demo task](https://github.com/NilFoundation/uniswap-v2-nil/blob/main/tasks/core/demo.ts)
-   
+    ![alt text](/public/demo.png)
+
+
    **Important:**
    - Calculations are processed on the user's side.
    - Both the currency address and its ID are stored in the pair contract.
 
 
-2. **Using Factory, Pair, and Router Contracts**  
-   This demo includes an additional layer by utilizing the Router contract along with Factory and Pair 
+2. **Using Factory, Pair, and Router Contracts**
+   This demo includes an additional layer by utilizing the Router contract along with Factory and Pair
    [View the demo-router task](https://github.com/NilFoundation/uniswap-v2-nil/blob/main/tasks/core/demo-router.ts)
+   ![alt text](/public/demo-router.png)
 
    **Important:**
    - The `UniswapV2Factory` is used for creating new pairs. `UniswapV2Router01` calls already deployed pair contracts.
@@ -58,7 +61,7 @@ as well as performing operations like minting, swapping, and burning
      Rates and output amounts are entirely calculated on the user side.
 
 
-3. **Using Router with Sync Calls (1 shard)**  
+3. **Using Router with Sync Calls (1 shard)**
    This demo task shows how to deploy the `UniswapV2Router01` contract
    and use it as a proxy for adding/removing liquidity and swaps via sync calls.
    It allows checks on amounts before pair calls and maintains currency rates.
@@ -78,15 +81,15 @@ as well as performing operations like minting, swapping, and burning
 2. **Run the Demo Tasks**:
    - For the core demo (Factory and Pair):
      ```bash
-     npx hardhat demo --network nil
+     npx hardhat demo 
      ```
    - For the demo with Router (Factory, Pair, and Router):
      ```bash
-     npx hardhat demo-router --network nil
+     npx hardhat demo-router
      ```
    - For the demo with Router (Sync calls):
      ```bash
-     npx hardhat demo-router-sync --network nil
+     npx hardhat demo-router-sync
      ```
 
 ### Manual Setup
