@@ -91,6 +91,7 @@ task("prepare-dex", "Prepare DEX contract and set currency to wallets")
         amount: amount,
         hre,
       });
+      console.log(`Sent ${amount} tokens to ${receiver}`);
     }
 
     // 3. ROUTER: ADD LIQUIDITY
