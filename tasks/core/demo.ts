@@ -306,7 +306,7 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
       pairBalanceToken1.toString(),
     );
 
-    // Fetch and log user balances before burn
+    // Fetch and log user balances before burning
     let userBalanceToken0 =
       await firstCurrency.getCurrencyBalanceOf(walletAddress);
     let userBalanceToken1 =
@@ -325,7 +325,7 @@ task("demo", "Run demo for Uniswap Pairs and Factory").setAction(
     console.log("Total LP balance for user wallet:", userLpBalance.toString());
     // Execute burn
     console.log("Executing burn...");
-    // Send LP tokens to the user wallet
+    // Send LP tokens to the user's wallet
     const hash3 = await wallet.sendMessage({
       // @ts-ignore
       to: pairAddress,
